@@ -1,29 +1,562 @@
-<html>
-<title>Про гру Minecraft</title>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SimpleWorld — Minecraft Сервер</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --clr-bg-dark: #0e0e0e;
+    --clr-bg-light: #1a1a1a;
+    --clr-accent: #00ffcc;
+    --clr-accent-hover: #00bfa6;
+    --clr-text-main: #fff;
+    --clr-text-sub: #bbb;
+    --radius-lg: 15px;
+    --shadow-lg: 0 8px 25px rgba(0,255,204,0.25);
+  }
 
-<body style="background-color: red;">
-    <header style= "text-align: center; background-image: url('https://play-lh.googleusercontent.com/VSwHQjcAttxsLE47RuS4PqpC4LT7lCoSjE7Hx5AW_yCxtDvcnsHHvm5CTuL5BPN-uRTP')" >
-        <a href= "https://www.minecraft.net/en-us">Офіційний сайт Minecraft</a>
-        <h1 style= "text-align: center; color: white">Про гру Minecraft</h1>
-    </header>
-    <main style= "text-align: center">
-       <h2>Режими гри</h2>
-       <p><h3 style= "text-align: left">Творчість.</h3> Цей режим пропонує мінімум обмежень і передбачає безперешкодне створення будь-яких об'єктів. Гравці одразу ж отримують нескінченну кількість всіх видів блоків і спорядження. Усі блоки знищуються з одного удару, незалежно від знаряддя в руках. Завдяки цьому гравці можуть створювати як величезні тривимірні будівлі на кшталт замків, так і займатися піксель-артом — створенням двовимірних картинок з різнокольорових блоків. У творчому режимі також можна легко створювати автоматичні механізми з використанням особливого матеріалу — редстоуну, що передає сигнали. Персонаж у режимі «Творчості» не може померти, виняток — падіння в порожнечу, простір, який обмежує ігровий світ або за допомогою спеціальної команди /kill). З версії Minecraft beta 1.8 він може літати, якщо гравець двічі натисне клавішу стрибка (зазвичай Пробіл).<b> Монстри в цьому режимі не завдають ніякої шкоди та за замовчуванням взагалі не реагують на гравця.</b> Це єдиний доступний режим у класичних версіях Minecraft і основний для гри. Також він доступний у бета-версії після оновлення Adventure Update.</p>
-       <img src= "https://cdn.hobbyconsolas.com/sites/navi.axelspringer.es/public/media/image/2010/12/43887-minecraft-acerca-fase-beta.jpg?tf=3840x" widht= "250px" height= "250px">
-       <p><h3 style= "text-align: left">Виживання.</h3>Тут гравець повинен подорожувати і шукати потрібні блоки, боротися з мобами, вести господарство, виготовляти нові матеріали і майструвати інструменти. Тут персонаж має, крім інвентарю, шкали здоров'я, голоду і досвіду. Здоров'я представлене символами сердечок, які втрачаються, коли персонаж зазнає атаки, падає з великої висоти, потрапляє у лаву, зазнає інших ушкоджень. Поповнюється здоров'я споживанням їжі. Голод представлений символами курячих ніжок, які поступово автоматично споживаються. Коли їх не лишається, їжа перестає поповнювати запас здоров'я. Опинившись під водою, чоловічок може перебувати в ній, поки не вичерпає запас повітря (відображається у вигляді бульбашок). Зі знищенням ворогів (особисто, але не через дію оточення) з них випадають сфери досвіду, котрі слід піднімати, щоб заповнити шкалу досвіду. Пізніше він застосовується, щоб зачаровувати предмети, надаючи їм спеціальних властивостей, або ремонтувати їх.<b> В разі вичерпання здоров'я (смерті) гравцеві пропонується відродити персонажа на початковій точці спавну (появи), але тоді він втратить весь вміст інвентаря, також йому пропонують вийти в головне меню.</b></p>
-       <img src= "https://www.fayerwayer.com/resizer/wKcmjQTl1n9gK9qEMMRL7-I--ro=/1200x630/filters:format(jpg):quality(70)/cloudfront-us-east-1.images.arcpublishing.com/metroworldnews/MUGDS2SX4VGPTBXRIK5W7GY6QA.jpg" widht= "250px" height= "250px">
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
 
-       <p><h3 style= "text-align: left">Хардкор.</h3>Подібний на «Виживання» за винятком того, що діє найважча складність та відсутня можливість відродитися після вичерпання запасу здоров'я.<b> Після його загибелі гравцеві пропонується одразу видалити всю свою працю і почати заново, або оглянути перед цим світ.</b></p>
-       <img src= "https://www.minecraft.net/content/dam/minecraftnet/games/minecraft/screenshots/wim-combat.jpg" widht= "250px" height= "250px">
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(180deg, var(--clr-bg-dark), var(--clr-bg-light));
+    color: var(--clr-text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-       <p><h3 style= "text-align: left">Спостерігач.</h3><b>В цьому режимі гравці можуть літати як у «Творчості», але мають здатність пролітати крізь блоки і дивитись від особи будь-якого гравця або істоти.</b> Однак, гравці не можуть встановлювати й знищувати блоки. В цьому режимі, як і «Творчості», можна померти, лише залетівши за межі світу або набравши спеціальну команду /kill. Режим польоту неможливо вимкнути. При польоті крізь тверді блоки видно найближчі порожнини в товщі блоків.</p>
-       <img src= "https://cracked-games.org/wp-content/uploads/2016/05/MinecraftNew.jpg" widht= "250px" height= "250px">
+  header {
+    background: #111;
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    box-shadow: var(--shadow-lg);
+  }
+
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: var(--clr-accent);
+    cursor: default;
+  }
+
+  nav {
+    display: flex;
+    gap: 30px;
+  }
+
+  nav a {
+    color: var(--clr-text-main);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 10px 15px;
+    border-radius: var(--radius-lg);
+    transition: background-color 0.3s ease;
+  }
+
+  nav a:hover,
+  nav a.active {
+    background-color: var(--clr-accent);
+    color: #000;
+  }
+
+  main {
+    padding: 120px 20px 40px 20px;
+    max-width: 1100px;
+    margin: auto;
+  }
+
+  section {
+    margin-bottom: 80px;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.7s ease;
+  }
+
+  section.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 2.8rem;
+    color: var(--clr-accent);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  p, li {
+    font-size: 1.1rem;
+    color: var(--clr-text-sub);
+    line-height: 1.6;
+  }
+
+  ul {
+    list-style: none;
+    margin-top: 10px;
+    padding-left: 0;
+  }
+
+  ul li::before {
+    content: '➤';
+    color: var(--clr-accent);
+    margin-right: 10px;
+  }
+
+  /* Кнопка копіювати IP */
+  .copy-ip {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 50px 0;
+  }
+
+  .copy-ip input {
+    background: #222;
+    border: 2px solid var(--clr-accent);
+    border-radius: 25px 0 0 25px;
+    padding: 12px 20px;
+    width: 300px;
+    font-size: 1.2rem;
+    color: var(--clr-text-main);
+    outline: none;
+  }
+
+  .copy-ip button {
+    background-color: var(--clr-accent);
+    border: none;
+    border-radius: 0 25px 25px 0;
+    color: #000;
+    padding: 12px 25px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .copy-ip button:hover {
+    background-color: var(--clr-accent-hover);
+  }
+
+  /* Статус сервера */
+  .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+
+  .status-box {
+    background: #222;
+    border: 2px solid var(--clr-accent);
+    border-radius: var(--radius-lg);
+    padding: 30px 20px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+  }
+
+  .status-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px var(--clr-accent);
+  }
+
+  .status-box h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--clr-accent);
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+  }
+
+  .status-box p {
+    font-size: 1.3rem;
+    color: var(--clr-text-main);
+  }
+
+  /* Донати */
+  .donate-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+  }
+
+  .donate-card {
+    background: #222;
+    border-radius: var(--radius-lg);
+    padding: 30px 25px;
+    border: 2px solid var(--clr-accent);
+    width: 260px;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .donate-card:hover {
+    transform: scale(1.07);
+    box-shadow: 0 14px 50px var(--clr-accent);
+  }
+
+  .donate-card h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    color: var(--clr-accent);
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+  }
+
+  .donate-card p {
+    font-size: 1.2rem;
+    color: var(--clr-text-sub);
+  }
+
+  /* FAQ */
+  .faq-item {
+    background: #222;
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--clr-accent);
+    margin-bottom: 15px;
+    padding: 20px 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .faq-item:hover {
+    background-color: var(--clr-accent-hover);
+    color: #000;
+  }
+
+  .faq-question {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+
+  .faq-answer {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: var(--clr-text-sub);
+    display: none;
+  }
+
+  .faq-item.active .faq-answer {
+    display: block;
+  }
+
+  /* Контакти */
+  form {
+    max-width: 400px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  form input, form textarea {
+    background: #222;
+    border: 2px solid var(--clr-accent);
+    border-radius: var(--radius-lg);
+    padding: 12px 15px;
+    font-size: 1rem;
+    color: var(--clr-text-main);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+
+  form input:focus, form textarea:focus {
+    border-color: var(--clr-accent-hover);
+  }
+
+  form button {
+    background: var(--clr-accent);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: #000;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  form button:hover {
+    background: var(--clr-accent-hover);
+  }
+
+  /* Анімації появи */
+  .fade-in {
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Плавний скролл */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Медіа для мобільних */
+  @media(max-width: 600px) {
+    nav {
+      gap: 15px;
+    }
+
+    header {
+      padding: 15px 20px;
+    }
+
+    .copy-ip input {
+      width: 180px;
+    }
+
+    .donate-card {
+      width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SimpleWorld</h1>
+  <nav>
+    <a href="#home" class="nav-link active">Головна</a>
+    <a href="#about" class="nav-link">Про сервер</a>
+    <a href="#donate" class="nav-link">Донати</a>
+    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="#contact" class="nav-link">Контакти</a>
+  </nav>
+</header>
+
+<main>
+
+  <section id="home" class="active fade-in">
+    <h2>Вітаємо на SimpleWorld!</h2>
+    <p style="text-align:center; max-width:600px; margin: auto;">
+      Офіційний Minecraft сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.
+    </p>
+
+    <div class="copy-ip">
+      <input type="text" value="simpleworldl.aternos.me" id="ipInput" readonly />
+      <button onclick="copyIP()">Копіювати IP</button>
+    </div>
+
+    <div class="status-grid">
+      <div class="status-box">
+        <h3>IP Адреса</h3>
+        <p id="ip-address">simpleworldl.aternos.me</p>
+      </div>
+      <div class="status-box">
+        <h3>Статус</h3>
+        <p id="server-status">Завантаження...</p>
+      </div>
+      <div class="status-box">
+        <h3>Гравців Онлайн</h3>
+        <p id="players-count">Оновлення...</p>
+      </div>
+      <div class="status-box">
+        <h3>Версія</h3>
+        <p>1.16 - 1.20+</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2>Про сервер</h2>
+    <p>
+      SimpleWorld — це Minecraft сервер, який пропонує класичний геймплей із сучасними можливостями:
+    </p>
+    <ul>
+      <li>Стабільна робота 24/7</li>
+      <li>Регулярні оновлення івентів</li>
+      <li>Велика спільнота гравців</li>
+      <li>Дружня адміністрація</li>
+    </ul>
+    <p>
+      Ми прагнемо зробити ваш ігровий досвід максимально приємним та захопливим.
+    </p>
+  </section>
+
+  <section id="donate">
+  <h2>Донати на сервері</h2>
+  <div class="donate-grid">
+    <div class="donate-card">
+      <h4>Player</h4>
+      <p>Безкоштовно</p>
+    </div>
+    <div class="donate-card">
+      <h4>Premium</h4>
+      <p>29 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Elite</h4>
+      <p>49 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Deluxe</h4>
+      <p>69 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Ultra</h4>
+      <p>99 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Immortal</h4>
+      <p>119 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Supreme</h4>
+      <p>149 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Legend</h4>
+      <p>199 UAH</p>
+    </div>
+    <div class="donate-card">
+      <h4>Infinity</h4>
+      <p>249 UAH</p>
+    </div>
+  </div>
+</section>
 
 
-    </main>
-    <footer>
-        <p>Сайт створив Остап</p>
-      </footer>
+  <section id="faq">
+    <h2>Часті питання</h2>
+    <div class="faq-item">
+      <div class="faq-question">Як підключитись до сервера?</div>
+      <div class="faq-answer">Використайте IP адрес: simpleworldl.aternos.me у вашому Minecraft.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Які версії підтримуються?</div>
+      <div class="faq-answer">Підтримуються версії 1.16 - 1.20+</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Чи є донати безпечними?</div>
+      <div class="faq-answer">Так, всі платежі проходять через безпечні системи.</div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Контакти</h2>
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Ваше ім'я" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <textarea id="message" placeholder="Ваше повідомлення" rows="5" required></textarea>
+      <button type="submit">Відправити</button>
+    </form>
+  </section>
+
+</main>
+
+<script>
+  // Плавна навігація і активний пункт меню
+  const navLinks = document.querySelectorAll('nav a');
+  const sections = document.querySelectorAll('main section');
+
+  function activateSection(id) {
+    sections.forEach(sec => {
+      if (sec.id === id) {
+        sec.classList.add('active', 'fade-in');
+      } else {
+        sec.classList.remove('active', 'fade-in');
+      }
+    });
+    navLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+    });
+  }
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      activateSection(targetId);
+      history.pushState(null, '', '#' + targetId);
+    });
+  });
+
+  // При завантаженні сторінки активуємо секцію по хешу в URL (якщо є)
+  window.addEventListener('load', () => {
+    let hash = location.hash.substring(1);
+    if (hash && document.getElementById(hash)) {
+      activateSection(hash);
+    } else {
+      activateSection('home');
+    }
+  });
+
+  // Копіювати IP
+  function copyIP() {
+    const ipInput = document.getElementById('ipInput');
+    ipInput.select();
+    ipInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(ipInput.value).then(() => {
+      alert('IP адреса скопійована!');
+    });
+  }
+
+  // FAQ розгортання
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('active');
+    });
+  });
+
+  // Імітація статусу сервера (постав замість fetch API)
+  function updateServerStatus() {
+    // Тут можна підключити справжнє API для статусу сервера
+    const statusEl = document.getElementById('server-status');
+    const playersEl = document.getElementById('players-count');
+
+    // Імітація статусу
+    const online = Math.random() > 0.3;
+    if (online) {
+      statusEl.textContent = 'Сервер Онлайн';
+      playersEl.textContent = Math.floor(Math.random() * 100) + ' гравців';
+      statusEl.style.color = 'var(--clr-accent)';
+    } else {
+      statusEl.textContent = 'Сервер Офлайн';
+      playersEl.textContent = '0 гравців';
+      statusEl.style.color = '#ff4444';
+    }
+  }
+
+  updateServerStatus();
+  setInterval(updateServerStatus, 15000);
+
+  // Контактна форма (для прикладу просто показує alert)
+  document.getElementById('contactForm').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('Дякуємо за повідомлення! Ми зв’яжемося з вами найближчим часом.');
+    e.target.reset();
+  });
+</script>
+
 </body>
-
 </html>
