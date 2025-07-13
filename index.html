@@ -13,30 +13,30 @@
     --clr-text-main:#fff; --clr-text-sub:#bbb;
     --radius-lg:15px; --shadow-lg:0 8px 25px rgba(0,255,204,.25);
   }
-  ,::before,::after{margin:0;padding:0;box-sizing:border-box}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
     font-family:'Montserrat',sans-serif;
     background:linear-gradient(180deg,var(--clr-bg-dark),var(--clr-bg-light));
     color:var(--clr-text-main);min-height:100vh;overflow-x:hidden
   }
-  / ── Хедер ───────────────────────────────── /
+  /* ── Хедер ───────────────────────────────── */
   header{
     background:#111;padding:20px 40px;display:flex;align-items:center;justify-content:space-between;
     position:fixed;inset:0 0 auto;z-index:1000;box-shadow:var(--shadow-lg)
   }
   header h1{font-family:'Orbitron',sans-serif;font-size:2.5rem;color:var(--clr-accent)}
-  / ── Навігація ──────────────────────────── /
+  /* ── Навігація ──────────────────────────── */
   nav{display:flex;gap:30px}
   nav a{
     color:var(--clr-text-main);font-weight:600;font-size:1.1rem;text-decoration:none;
     padding:10px 15px;border-radius:var(--radius-lg);transition:.3s
   }
   nav a:hover,nav a.active{background:var(--clr-accent);color:#000}
-  / ── Бургер ─────────────────────────────── /
+  /* ── Бургер ─────────────────────────────── */
   #burger{display:none;flex-direction:column;gap:5px;padding:10px;background:transparent;border:none;cursor:pointer}
   #burger span{width:28px;height:3px;background:var(--clr-text-main);transition:.3s}
-  / ── Контент ────────────────────────────── /
+  /* ── Контент ────────────────────────────── */
   main{max-width:1100px;margin:auto;padding:120px 20px 40px}
   section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
   section.active{opacity:1;transform:none}
@@ -44,7 +44,7 @@
   p,li{font-size:1.1rem;color:var(--clr-text-sub);line-height:1.6}
   ul{list-style:none;margin-top:10px}
   ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
-  / ── Копіювання IP ──────────────────────── /
+  /* ── Копіювання IP ──────────────────────── */
   .copy-ip{display:flex;justify-content:center;margin:30px 0 50px}
   .copy-ip input{
     width:300px;padding:12px 20px;border:2px solid var(--clr-accent);border-radius:25px 0 0 25px;
@@ -55,7 +55,7 @@
     color:#000;font-weight:700;cursor:pointer;transition:.3s
   }
   .copy-ip button:hover{background:var(--clr-accent-hover)}
-  / ── Сітки ──────────────────────────────── /
+  /* ── Сітки ──────────────────────────────── */
   .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:30px;margin-top:40px}
   .status-box{
     background:#222;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);
@@ -84,7 +84,7 @@
     padding:14px;font-weight:700;font-size:1.1rem;cursor:pointer;transition:.3s
   }
   form button:hover{background:var(--clr-accent-hover)}
-  / ── Мобільний режим ───────────────────── */
+  /* ── Мобільний режим ───────────────────── */
   @media(max-width:768px){
     nav{
       position:fixed;top:70px;right:-100%;height:calc(100% - 70px);width:220px;
@@ -123,24 +123,24 @@
     </p>
     <div class="copy-ip">
       <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
-      <button onclick="copyIP()">Копіювати IP</button>
+      <button onclick="copyIP()">Копіювати IP</button>
     </div>
     <div class="status-grid">
       <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
       <div class="status-box"><h3>Статус</h3><p id="server-status">Завантаження...</p></div>
       <div class="status-box"><h3>Гравців онлайн</h3><p id="players-count">Оновлення...</p></div>
-      <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
+      <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
     </div>
   </section>
 
   <!-- ABOUT -->
   <section id="about">
     <h2>Про сервер</h2>
-    <p>SimpleWorld — це Minecraft‑сервер, який пропонує класичний геймплей із сучасними можливостями:</p>
+    <p>SimpleWorld — це Minecraft‑сервер, який пропонує класичний геймплей із сучасними можливостями:</p>
     <ul>
-      <li>Стабільна робота 24/7</li>
+      <li>Стабільна робота 24/7</li>
       <li>Регулярні івенти та оновлення</li>
-      <li>Велика спільнота гравців</li>
+      <li>Велика спільнота гравців</li>
       <li>Дружня адміністрація</li>
     </ul>
     <p>Ми прагнемо зробити ваш ігровий досвід максимально приємним та захопливим.</p>
@@ -150,17 +150,15 @@
   <section id="donate">
     <h2>Донати на сервері</h2>
     <div class="donate-grid">
-      <div class="donate-card"><h4>Player</h4><p>Безкоштовно</p><
-
-      /div>
-      <div class="donate-card"><h4>Premium</h4><p>29 UAH</p></div>
-      <div class="donate-card"><h4>Elite</h4><p>49 UAH</p></div>
-      <div class="donate-card"><h4>Deluxe</h4><p>69 UAH</p></div>
-      <div class="donate-card"><h4>Ultra</h4><p>99 UAH</p></div>
-      <div class="donate-card"><h4>Immortal</h4><p>119 UAH</p></div>
-      <div class="donate-card"><h4>Supreme</h4><p>149 UAH</p></div>
-      <div class="donate-card"><h4>Legend</h4><p>199 UAH</p></div>
-      <div class="donate-card"><h4>Infinity</h4><p>249 UAH</p></div>
+      <div class="donate-card"><h4>Player</h4><p>Безкоштовно</p></div>
+      <div class="donate-card"><h4>Premium</h4><p>29 UAH</p></div>
+      <div class="donate-card"><h4>Elite</h4><p>49 UAH</p></div>
+      <div class="donate-card"><h4>Deluxe</h4><p>69 UAH</p></div>
+      <div class="donate-card"><h4>Ultra</h4><p>99 UAH</p></div>
+      <div class="donate-card"><h4>Immortal</h4><p>119 UAH</p></div>
+      <div class="donate-card"><h4>Supreme</h4><p>149 UAH</p></div>
+      <div class="donate-card"><h4>Legend</h4><p>199 UAH</p></div>
+      <div class="donate-card"><h4>Infinity</h4><p>249 UAH</p></div>
     </div>
   </section>
 
@@ -169,13 +167,13 @@
     <h2>📘 Правила сервера</h2>
     <h3 style="color:var(--clr-accent);margin-top:30px">🔹 1. ЧАТ</h3>
     <ul>
-      <li><b>1.1</b> Образа гравців — <i>мут 1 год</i></li>
-      <li><b>1.2</b> Образа адміністрації — <i>мут 2 год / бан 1 день</i></li>
+      <li><b>1.1</b> Образа гравців — <i>мут 1 год</i></li>
+      <li><b>1.2</b> Образа адміністрації — <i>мут 2 год / бан 1 день</i></li>
       <li><b>…</b> (скорочено для прикладу, залиш решту правил без змін)</li>
     </ul>
     <h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
     <ul>
-      <li><b>2.1</b> Чити / взломки — <i>бан 30‑50 днів</i></li>
+      <li><b>2.1</b> Чити / взломки — <i>бан 30‑50 днів</i></li>
       <li><b>…</b> (інші пункти)</li>
     </ul>
     <p style="margin-top:15px">Порушення правил тягне за собою попередження, мут або бан. Дотримуйтесь регламенту та отримуйте задоволення від гри!</p>
@@ -184,8 +182,8 @@
   <!-- FAQ -->
   <section id="faq">
     <h2>Часті питання</h2>
-    <div class="faq-item"><div class="faq-question">Як підключитись до сервера?</div><div class="faq-answer">Додайте IP <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
-    <div class="faq-item"><div class="faq-question">Які версії підтримуються?</div><div class="faq-answer">Підтримуються версії 1.16 – 1.20+.</div></div>
+    <div class="faq-item"><div class="faq-question">Як підключитись до сервера?</div><div class="faq-answer">Додайте IP <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
+    <div class="faq-item"><div class="faq-question">Які версії підтримуються?</div><div class="faq-answer">Підтримуються версії 1.16 – 1.20+.</div></div>
     <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі платежі проходять через захищені системи.</div></div>
   </section>
 
