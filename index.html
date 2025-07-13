@@ -6,19 +6,17 @@
 <title>SimpleWorld — Minecraft Сервер</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Orbitron:wght@700&display=swap" rel="stylesheet" />
 <style>
-  /* ─── Змінні ───────────────────────── */
   :root{
     --bg-dark:#0e0e0e;--bg-light:#1a1a1a;
     --accent:#00ffcc; --accent-hover:#00bfa6;
     --text:#fff;      --text-sub:#bbb;
     --radius:15px;    --shadow:0 8px 25px rgba(0,255,204,.25);
   }
-  /* ─── База ─────────────────────────── */
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:'Montserrat',sans-serif;background:linear-gradient(180deg,var(--bg-dark),var(--bg-light));color:var(--text);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
   a{text-decoration:none}
-  /* ─── Хедер + меню ─────────────────── */
+  /* header */
   header{background:#111;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;position:fixed;inset:0 0 auto;z-index:1000;box-shadow:var(--shadow)}
   h1{font-family:'Orbitron',sans-serif;font-size:2.4rem;color:var(--accent)}
   nav{display:flex;gap:25px}
@@ -26,7 +24,7 @@
   nav a:hover,nav a.active{background:var(--accent);color:#000}
   #burger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer}
   #burger span{width:26px;height:3px;background:#fff}
-  /* ─── Контент ──────────────────────── */
+  /* main */
   main{flex:1;max-width:900px;margin:auto;padding:110px 20px 40px}
   section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.6s}
   section.active{opacity:1;transform:none}
@@ -34,29 +32,27 @@
   p,li{font-size:1.05rem;color:var(--text-sub);line-height:1.6}
   ul{list-style:none;margin-top:8px}
   ul li::before{content:'➤';color:var(--accent);margin-right:8px}
-  /* ─── Сітки ────────────────────────── */
+  /* grids */
   .status-grid,.donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;margin-top:30px}
-  .box{background:#222;border:2px solid var(--accent);border-radius:var(--radius);padding:26px 22px;text-align:center;min-width:230px;box-shadow:var(--shadow);transition:.3s}
-  .box:hover{transform:translateY(-6px);box-shadow:0 12px 40px var(--accent)}
-  .box h3{color:var(--accent);margin-bottom:10px;font-size:1.4rem}
-  .donate-card{background:#222;border:2px solid var(--accent);border-radius:var(--radius);padding:26px 22px;width:240px;text-align:center;box-shadow:var(--shadow);transition:.3s}
-  .donate-card:hover{transform:scale(1.07);box-shadow:0 14px 50px var(--accent)}
-  .donate-card h4{color:var(--accent);margin-bottom:8px;font-size:1.3rem}
-  /* ─── Контактна форма ──────────────── */
+  .box,.donate-card{background:#222;border:2px solid var(--accent);border-radius:var(--radius);padding:26px 22px;text-align:center;box-shadow:var(--shadow);transition:.3s}
+  .box{min-width:230px}.box:hover,.donate-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px var(--accent)}
+  .box h3,.donate-card h4{color:var(--accent);margin-bottom:10px;font-size:1.4rem}
+  .donate-card{width:240px;transform:scale(1);transition:.3s}
+  .donate-card:hover{transform:scale(1.07)}
+  /* form */
   form{max-width:480px;margin:auto;display:flex;flex-direction:column;gap:14px}
   input,textarea{background:#222;border:2px solid var(--accent);border-radius:var(--radius);padding:12px 16px;font:inherit;color:var(--text);resize:vertical}
   button.send{background:var(--accent);color:#000;border:none;border-radius:var(--radius);padding:12px;font-weight:700;cursor:pointer;transition:.3s}
   button.send:hover{background:var(--accent-hover)}
-  /* ─── FAQ акордеон ─────────────────── */
+  /* faq */
   .faq-item{background:#222;border:2px solid var(--accent);border-radius:var(--radius);padding:18px 20px;margin-bottom:15px;cursor:pointer}
   .faq-item:hover{background:var(--accent-hover);color:#000}
   .faq-answer{display:none;margin-top:8px}
   .faq-item.active .faq-answer{display:block}
-  /* ─── Media ────────────────────────── */
+  /* media */
   @media(max-width:768px){
-    nav{position:fixed;top:68px;right:-100%;width:230px;height:calc(100%-68px);flex-direction:column;gap:18px;padding:24px;background:#111;transition:.4s}
-    nav.open{right:0}
-    #burger{display:flex}
+    nav{position:fixed;top:68px;right:-100%;width:230px;height:calc(100% - 68px);flex-direction:column;gap:18px;padding:24px;background:#111;transition:.4s}
+    nav.open{right:0} #burger{display:flex}
   }
 </style>
 </head>
@@ -64,34 +60,29 @@
 
 <header>
   <h1>SimpleWorld</h1>
-
-  <!-- Навігація -->
   <nav>
     <a href="#home"   class="link active">Головна</a>
     <a href="#donate" class="link">Донати</a>
     <a href="#rules"  class="link">Правила</a>
     <a href="#faq"    class="link">FAQ</a>
-    <a href="#contact"class="link">Контакти</a>
+    <a href="#support"class="link">Тех. підтримка</a>
   </nav>
-
-  <!-- Бургер -->
   <button id="burger"><span></span><span></span><span></span></button>
 </header>
 
 <main>
-  <!-- Головна -->
+  <!-- головна -->
   <section id="home" class="active">
     <h2>Ласкаво просимо!</h2>
-    <p style="text-align:center">SimpleWorld — український Minecraft‑сервер із дружньою спільнотою.</p>
-
+    <p style="text-align:center">SimpleWorld — український Minecraft‑сервер із дружньою спільнотою.</p>
     <div class="status-grid">
-      <div class="box"><h3>Версії</h3><p>1.16 – 1.20+</p></div>
+      <div class="box"><h3>Версії</h3><p>1.16 – 1.20+</p></div>
       <div class="box"><h3>IP</h3><p>simpleworldl.aternos.me</p></div>
       <div class="box"><h3>Час роботи</h3><p>24/7</p></div>
     </div>
   </section>
 
-  <!-- Донати -->
+  <!-- донати -->
   <section id="donate">
     <h2>Донати на сервері</h2>
     <div class="donate-grid">
@@ -104,7 +95,7 @@
     </div>
   </section>
 
-  <!-- Правила -->
+  <!-- правила -->
   <section id="rules">
     <h2>Правила сервера</h2>
     <ul>
@@ -115,31 +106,28 @@
     </ul>
   </section>
 
-  <!-- FAQ -->
+  <!-- faq -->
   <section id="faq">
     <h2>Часті питання</h2>
-    <div class="faq-item"><div class="faq-question">Як зайти?</div><div class="faq-answer">Додайте IP simpleworldl.aternos.me у лаунчер.</div></div>
-    <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">1.16 – 1.20+</div></div>
+    <div class="faq-item"><div class="faq-question">Як зайти?</div><div class="faq-answer">Додайте IP simpleworldl.aternos.me у лаунcher.</div></div>
+    <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16 – 1.20+</div></div>
   </section>
 
-  <!-- Контакти -->
-  <section id="contact">
-    <h2>Зв’язатися з нами</h2>
-    <p style="text-align:center">Надішліть пропозицію чи запитання — ми відповімо на вказану адресу.</p>
+  <!-- технічна підтримка -->
+  <section id="support">
+    <h2>Тех. підтримка</h2>
+    <p style="text-align:center">Надішліть запит або повідомлення — ми відповімо на вашу пошту.</p>
 
-    <!-- FormSubmit перенаправить дані на e‑mail -->
-    <form action="https://formsubmit.co/ostapklymko14@gmail.com" method="POST">
-      <!-- Приховані опції -->
+    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+      <!-- опції -->
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_subject" value="Нове повідомлення з SimpleWorld!">
       <input type="hidden" name="_template" value="box">
 
-      <!-- Поля -->
       <input name="name"  type="text"  placeholder="Ваше ім'я" required>
       <input name="email" type="email" placeholder="Email для відповіді" required>
-      <textarea name="message" rows="5" placeholder="Ваше повідомлення" required></textarea>
+      <textarea name="message" rows="5" placeholder="Опишіть питання або проблему" required></textarea>
 
-      <!-- Кнопка -->
       <button type="submit" class="send">Надіслати ✉️</button>
     </form>
   </section>
@@ -148,11 +136,11 @@
 <footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
 <script>
-/* Бургер */
+/* бургер */
 const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
 burger.onclick=()=>nav.classList.toggle('open');
 
-/* Навігація SPA */
+/* навігація SPA */
 const links=document.querySelectorAll('.link'), sections=document.querySelectorAll('main section');
 function show(id){sections.forEach(s=>s.classList.toggle('active',s.id===id));links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));nav.classList.remove('open');}
 links.forEach(l=>l.onclick=e=>{e.preventDefault();show(l.hash.slice(1));history.pushState(null,'',l.hash);});
