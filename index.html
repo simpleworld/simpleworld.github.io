@@ -216,6 +216,53 @@ function copyIP(){
   i.select();i.setSelectionRange(0,99999);
   navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
 }
-</script>
+  <!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Адмін-панель</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #111;
+      color: #fff;
+      padding: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 90vh;
+      border: none;
+    }
+    #login {
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔒 Вхід у адмін-панель</h1>
+  <div id="login">
+    <input type="password" id="pass" placeholder="Введіть пароль" />
+    <button onclick="check()">Увійти</button>
+  </div>
+
+  <div id="panel" style="display: none;">
+    <h2>📊 Статистика сайту</h2>
+    <iframe src="https://plausible.io/share/ВАШ_ДОМЕН?auth=публічний_ключ_якщо_є" allow="clipboard-write"></iframe>
+  </div>
+
+  <script>
+    const adminPassword = "brauni123"; // заміни на свій
+
+    function check() {
+      const input = document.getElementById("pass").value;
+      if (input === adminPassword) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+      } else {
+        alert("Невірний пароль");
+      }
+    }
+  </script>
 </body>
 </html>
