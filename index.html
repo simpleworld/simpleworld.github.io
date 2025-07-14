@@ -184,6 +184,104 @@
     </div>
   </section>
 </main>
+  <!-- ========== ADMIN LOGIN & PANEL (додати ПІСЛЯ </main>, ПЕРЕД <footer>) ========== -->
+
+<!-- 🔐 Форма входу -->
+<section id="admin-login" style="display:none;max-width:360px;margin:40px auto;padding:25px;background:#222;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);font-family:'Montserrat',sans-serif;">
+  <h3 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:15px;">Вхід у адмін‑панель</h3>
+  <input id="admin-pass" type="password" placeholder="Пароль" required
+         style="width:100%;padding:12px;border-radius:var(--radius-lg);border:2px solid var(--clr-accent);background:#111;color:#fff;font-size:1rem;">
+  <button id="admin-login-btn"
+          style="margin-top:15px;width:100%;padding:12px;background:var(--clr-accent);color:#000;font-weight:700;border:none;border-radius:var(--radius-lg);cursor:pointer;">
+          Увійти
+  </button>
+  <p id="admin-login-err" style="display:none;color:#ff4444;text-align:center;margin-top:10px">Невірний пароль</p>
+</section>
+
+<!-- 🛠 Адмін‑панель -->
+<section id="admin-panel" style="display:none;margin:40px auto;max-width:800px;padding:30px;background:#111;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);font-family:'Montserrat',sans-serif;">
+  <h2 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:25px">Адмін‑панель SimpleWorld</h2>
+
+  <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-bottom:25px">
+    <div style="flex:1 1 220px;background:#222;padding:15px;border-radius:var(--radius-lg);text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:8px">IP сервера</h4>
+      <p id="admin-ip" style="font-size:1.2rem">—</p>
+    </div>
+    <div style="flex:1 1 220px;background:#222;padding:15px;border-radius:var(--radius-lg);text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:8px">Гравців онлайн</h4>
+      <p id="admin-players" style="font-size:1.2rem">—</p>
+    </div>
+  </div>
+
+  <!-- приклад додаткового блоку -->
+  <div style="background:#222;padding:15px;border-radius:var(--radius-lg);margin-bottom:25px">
+    <h4 style="color:var(--clr-accent);margin-bottom:10px">Швидкі дії</h4>
+    <button onclick="alert('Рестарт сервера (демо)')" style="padding:10px 20px;background:#ff4444;border:none;border-radius:var(--radius-lg);color:#fff;font-weight:700;cursor:pointer;">Рестарт сервера</button>
+  </div>
+
+  <button id="admin-logout"
+          style="display:block;margin:0 auto;padding:12px 30px;background:#ff4444;border:none;border-radius:var(--radius-lg);color:#fff;font-weight:700;cursor:pointer;">
+          Вийти
+  </button>
+</section>
+
+<!-- JS‑логіка адмінки -->
+<script>
+/* ---------- Константи ---------- */
+const ADMIN_PASS = '1235467TTT';
+
+/* ---------- Елементи ---------- */
+const loginBox   = document.getElementById('admin-login');
+const passInput  = document.getElementById('admin-pass');
+const loginBtn   = document.getElementById('admin-login-btn');
+const loginErr   = document.getElementById('admin-login-err');
+
+const panelBox   = document.getElementById('admin-panel');
+const ipField    = document.getElementById('admin-ip');
+const playersFld = document.getElementById('admin-players');
+const logoutBtn  = document.getElementById('admin-logout');
+
+/* ---------- Перемикання режимів ---------- */
+function updateAdminView() {
+  const logged = sessionStorage.getItem('sw_admin') === 'true';
+  loginBox.style.display  = logged ? 'none' : 'block';
+  panelBox.style.display  = logged ? 'block' : 'none';
+  if (logged) refreshAdminStats();
+}
+
+/* ---------- Логін ---------- */
+loginBtn.onclick = () => {
+  if (passInput.value === ADMIN_PASS) {
+    sessionStorage.setItem('sw_admin', 'true');
+    passInput.value = '';
+    loginErr.style.display = 'none';
+    updateAdminView();
+  } else {
+    loginErr.style.display = 'block';
+  }
+};
+
+/* ---------- Логаут ---------- */
+logoutBtn.onclick = () => {
+  sessionStorage.removeItem('sw_admin');
+  updateAdminView();
+};
+
+/* ---------- Оновлення статистики (демо) ---------- */
+function refreshAdminStats() {
+  const online = Math.random() > 0.3;
+  ipField.textContent      = online ? 'simpleworldl.aternos.me' : '—';
+  playersFld.textContent   = online ? (Math.floor(Math.random() * 100) + ' гравців') : '0';
+}
+setInterval(() => {
+  if (panelBox.style.display === 'block') refreshAdminStats();
+}, 15000);
+
+/* ---------- Ініціалізація ---------- */
+document.addEventListener('DOMContentLoaded', updateAdminView);
+</script>
+<!-- ========== КІНЕЦЬ ВСТАВКИ ========== -->
+
 
 <footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
