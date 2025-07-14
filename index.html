@@ -184,6 +184,52 @@
     </div>
   </section>
 </main>
+  <!-- ==== SIMPLE ADMIN PANEL ==== -->
+<section id="admin-panel"
+         style="display:none;margin:40px auto;max-width:800px;padding:30px;background:#111;
+                border:2px solid var(--clr-accent);border-radius:12px;box-shadow:0 0 20px #000;
+                font-family:'Montserrat',sans-serif;">
+  <h2 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:25px">
+    Адмін‑панель SimpleWorld
+  </h2>
+
+  <div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;margin-bottom:25px">
+    <div style="flex:1 1 220px;background:#222;padding:15px;border-radius:12px;text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:8px">IP сервера</h4>
+      <p id="admin-ip" style="font-size:1.2rem">simpleworldl.aternos.me</p>
+    </div>
+    <div style="flex:1 1 220px;background:#222;padding:15px;border-radius:12px;text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:8px">Гравців онлайн</h4>
+      <p id="admin-players" style="font-size:1.2rem">0</p>
+    </div>
+  </div>
+
+  <button onclick="alert('🔁 Рестарт сервера (поки демо)')"
+          style="display:block;margin:0 auto 20px;padding:12px 30px;background:#ff4444;border:none;
+                 border-radius:12px;color:#fff;font-weight:700;cursor:pointer;">
+    🔁 Рестарт сервера
+  </button>
+</section>
+
+<script>
+(function(){
+  window.addEventListener('load', () => {
+    const pass = prompt("🔐 Введіть пароль для входу в адмін‑панель:");
+    if (pass === "1235467TTT") {
+      const panel = document.getElementById("admin-panel");
+      if (panel) panel.style.display = "block";
+      refreshAdminStats();
+    }
+  });
+
+  function refreshAdminStats(){
+    const online = Math.random() > 0.3;
+    document.getElementById('admin-ip').textContent = online ? 'simpleworldl.aternos.me' : '—';
+    document.getElementById('admin-players').textContent = online ? (Math.floor(Math.random()*50 + 1) + ' гравців') : '0';
+  }
+})();
+</script>
+
 
 <footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
