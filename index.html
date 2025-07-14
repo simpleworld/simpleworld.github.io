@@ -184,35 +184,57 @@
     </div>
   </section>
 </main>
- <!-- 🔐 Форма входу -->
-<section id="admin-login" style="max-width:360px;margin:30px auto;">
-  <h3 style="text-align:center;color:#333;font-family:sans-serif;">Введіть пароль адміністратора</h3>
-  <input id="admin-pass" type="password" placeholder="Пароль"
-         style="width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #ccc;" required>
-  <button id="admin-login-btn"
-          style="margin-top:15px;width:100%;padding:12px;background:#333;color:#fff;border:none;border-radius:8px;">
-    Увійти
-  </button>
-</section>
-
-<!-- 👨‍💼 Панель адміністратора -->
-<section id="admin-panel" style="display:none;padding:20px;margin:30px auto;max-width:600px;background:#f3f3f3;border-radius:12px;">
-  <h2>👨‍💼 Адмін панель</h2>
-  <p>Вітаємо, адміністраторе! Тут ти можеш додавати новини, керувати сайтом і т.д.</p>
+ <!-- Адмін-панель починається тут -->
+<section id="admin-panel" style="padding:20px; border:1px solid #ccc; margin-top:20px;">
+  <h2>Адмін Панель</h2>
+  <div id="admin-status"></div>
+  <ul id="admin-userList" style="list-style:none; padding:0;"></ul>
 </section>
 
 <script>
-  document.getElementById("admin-login-btn").addEventListener("click", function () {
-    const pass = document.getElementById("admin-pass").value;
-    const correctPass = "1235467TTT";
-    if (pass === correctPass) {
-      document.getElementById("admin-panel").style.display = "block";
-      document.getElementById("admin-login").style.display = "none";
-    } else {
-      alert("Неправильний пароль!");
+  (function(){
+    const password = '1324567TTT';
+    const entered = prompt('Введіть пароль для входу в адмін-панель:');
+    if (entered !== password) {
+      document.getElementById('admin-panel').innerHTML = '<h3 style="color:red;">Невірний пароль. Доступ заборонено.</h3>';
+      return;
     }
-  });
+
+    // Приклад користувачів онлайн (тут заміниш на реальних)
+    let usersOnline = ['Ivan', 'Olena', 'Petro', 'Svitlana', 'Dmytro'];
+
+    const userListElem = document.getElementById('admin-userList');
+    const statusElem = document.getElementById('admin-status');
+
+    function renderUsers() {
+      userListElem.innerHTML = '';
+      if (usersOnline.length === 0) {
+        statusElem.textContent = 'Наразі користувачів онлайн немає.';
+        return;
+      }
+      statusElem.textContent = `Користувачів онлайн: ${usersOnline.length}`;
+      usersOnline.forEach((user, index) => {
+        const li = document.createElement('li');
+        li.style.marginBottom = '8px';
+        li.textContent = user;
+        const kickBtn = document.createElement('button');
+        kickBtn.textContent = 'Вигнати';
+        kickBtn.style.marginLeft = '15px';
+        kickBtn.onclick = () => {
+          if (confirm(`Ви впевнені, що хочете вигнати користувача "${user}"?`)) {
+            usersOnline.splice(index, 1);
+            renderUsers();
+          }
+        };
+        li.appendChild(kickBtn);
+        userListElem.appendChild(li);
+      });
+    }
+
+    renderUsers();
+  })();
 </script>
+<!-- Адмін-панель закінчується тут -->
 
 <footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
