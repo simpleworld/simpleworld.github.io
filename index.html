@@ -69,56 +69,6 @@
     nav.open{right:0}
     #burger{display:flex}
   }
-
-  /* --- Admin Panel styles --- */
-  #admin-panel {
-    position: fixed;
-    top: 70px; right: 10px; bottom: 10px;
-    width: 320px;
-    background: #111;
-    border: 2px solid var(--clr-accent);
-    border-radius: var(--radius-lg);
-    padding: 15px;
-    color: var(--clr-text-main);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.9rem;
-    box-shadow: var(--shadow-lg);
-    overflow-y: auto;
-    z-index: 1100;
-    display: none;
-  }
-  #admin-panel h3 {
-    font-family: 'Orbitron', sans-serif;
-    color: var(--clr-accent);
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  #admin-panel ul {
-    list-style: none;
-    padding: 0;
-  }
-  #admin-panel li {
-    background: #222;
-    margin-bottom: 8px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  #admin-panel button.kick-btn {
-    background: #ff4444;
-    border: none;
-    border-radius: 8px;
-    color: #fff;
-    padding: 4px 10px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background 0.3s;
-  }
-  #admin-panel button.kick-btn:hover {
-    background: #cc0000;
-  }
 </style>
 </head>
 <body>
@@ -173,151 +123,99 @@
     <div class="donate-grid">
       <div class="donate-card"><h4>Player</h4>   <p>Безкоштовно</p></div>
       <div class="donate-card"><h4>Premium</h4>  <p>29 UAH</p></div>
-      <div class="donate-card"><h4>VIP</h4>      <p>59 UAH</p></div>
-      <div class="donate-card"><h4>Premium+</h4> <p>119 UAH</p></div>
+      <div class="donate-card"><h4>Elite</h4>    <p>49 UAH</p></div>
+      <div class="donate-card"><h4>Deluxe</h4>   <p>69 UAH</p></div>
+      <div class="donate-card"><h4>Ultra</h4>    <p>99 UAH</p></div>
+      <div class="donate-card"><h4>Immortal</h4> <p>119 UAH</p></div>
+      <div class="donate-card"><h4>Supreme</h4>  <p>149 UAH</p></div>
+      <div class="donate-card"><h4>Legend</h4>   <p>199 UAH</p></div>
+      <div class="donate-card"><h4>Infinity</h4> <p>249 UAH</p></div>
     </div>
   </section>
 
   <!-- RULES -->
   <section id="rules">
-    <h2>Правила сервера</h2>
+    <h2>📘 Правила сервера</h2>
+    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 1. ЧАТ</h3>
     <ul>
-      <li>Заборонено використання чітів і багів.</li>
-      <li>Поважайте інших гравців.</li>
-      <li>Заборонено образи та тролінг.</li>
-      <li>Дотримуйтесь інструкцій адміністраторів.</li>
+      <li><b>1.1</b> Образа гравців — <i>мут 1 год</i></li>
+      <li><b>1.2</b> Образа адміністрації — <i>мут 2 год / бан 1 день</i></li>
+      <li><b>1.3</b> Токсична поведінка — <i>мут 1 год</i></li>
+      <!-- … додай інші підпункти -->
     </ul>
+    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
+    <ul>
+      <li><b>2.1</b> Чити / взломки — <i>бан 30‑50 днів</i></li>
+      <!-- … -->
+    </ul>
+    <p style="margin-top:15px">Порушення правил тягне за собою попередження, мут або бан.</p>
   </section>
 
   <!-- FAQ -->
   <section id="faq">
-    <h2>FAQ</h2>
-    <div class="faq-item">
-      <p class="faq-question">Як підключитися до сервера?</p>
-      <div class="faq-answer"><p>Використайте IP simpleworldl.aternos.me у вашому Minecraft клієнті.</p></div>
-    </div>
-    <div class="faq-item">
-      <p class="faq-question">Які версії підтримуються?</p>
-      <div class="faq-answer"><p>Підтримуються версії 1.16 – 1.20+</p></div>
-    </div>
+    <h2>Часті питання</h2>
+    <div class="faq-item"><div class="faq-question">Як підключитись?</div><div class="faq-answer">Додайте <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
+    <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16 – 1.20+.</div></div>
+    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі платежі проходять через захищені системи.</div></div>
   </section>
 
   <!-- SUPPORT -->
   <section id="support">
-    <h2>Технічна підтримка</h2>
-    <form id="supportForm">
-      <input type="text" name="username" placeholder="Ваш нік" required />
-      <textarea name="message" rows="4" placeholder="Ваше питання або повідомлення" required></textarea>
-      <button type="submit" class="send">Відправити</button>
+    <h2>Тех. підтримка</h2>
+    <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
+
+    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+      <input type="hidden" name="_captcha"  value="false">
+      <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
+      <input type="hidden" name="_template" value="box">
+
+      <input   name="name"    type="text"  placeholder="Ваше ім'я" required>
+      <input   name="email"   type="email" placeholder="Email для відповіді" required>
+      <textarea name="message" rows="5"    placeholder="Опишіть питання чи проблему" required></textarea>
+
+      <button type="submit" class="send">Надіслати ✉️</button>
     </form>
+
+    <div style="text-align:center;margin-top:25px">
+      <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"
+         style="display:inline-block;padding:10px 26px;background:var(--clr-accent);color:#000;font-weight:600;border-radius:28px;transition:.3s">
+         Відкрити Gmail →
+      </a>
+    </div>
   </section>
 </main>
 
-<!-- Admin Panel -->
-<div id="admin-panel">
-  <h3>Адмін-панель</h3>
-  <p><strong>Користувачі онлайн:</strong></p>
-  <ul id="user-list">
-    <!-- Користувачі динамічно -->
-  </ul>
-</div>
+<footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
 <script>
-  // Копіювання IP
-  function copyIP() {
-    const ipInput = document.getElementById('ipInput');
-    ipInput.select();
-    ipInput.setSelectionRange(0, 99999);
-    navigator.clipboard.writeText(ipInput.value).then(() => {
-      alert('IP адреса скопійована!');
-    });
-  }
+/* Бургер */
+const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
+burger.onclick=()=>nav.classList.toggle('open');
 
-  // Бургер меню для мобільних
-  const burger = document.getElementById('burger');
-  const nav = document.querySelector('nav');
-  burger.addEventListener('click', () => {
-    nav.classList.toggle('open');
-  });
+/* SPA навігація */
+const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
+function show(id){sections.forEach(s=>s.classList.toggle('active',s.id===id));links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));nav.classList.remove('open');}
+links.forEach(l=>l.onclick=e=>{e.preventDefault();show(l.hash.slice(1));history.replaceState(null,'',l.hash);});
+window.addEventListener('load',()=>show(location.hash.slice(1)||'home'));
 
-  // Логіка FAQ (відкриття відповідей)
-  document.querySelectorAll('.faq-item').forEach(item => {
-    item.addEventListener('click', () => {
-      item.classList.toggle('active');
-    });
-  });
+/* FAQ акордеон */
+document.querySelectorAll('.faq-item').forEach(i=>i.onclick=()=>i.classList.toggle('active'));
 
-  // Плавний скролл і підсвітка меню
-  const sections = document.querySelectorAll('section');
-  const navLinks = document.querySelectorAll('nav a');
+/* Статус (імітація) */
+function updateStatus(){
+  const online=Math.random()>0.3;
+  document.getElementById('server-status').textContent=online?'Сервер онлайн':'Сервер офлайн';
+  document.getElementById('server-status').style.color=online?'var(--clr-accent)':'#ff4444';
+  document.getElementById('players-count').textContent=online?Math.floor(Math.random()*100)+' гравців':'0 гравців';
+}
+updateStatus(); setInterval(updateStatus,15000);
 
-  window.addEventListener('scroll', () => {
-    let scrollY = window.pageYOffset;
-    sections.forEach(section => {
-      const sectionHeight = section.offsetHeight;
-      const sectionTop = section.offsetTop - 70;
-      const id = section.getAttribute('id');
-      if(scrollY > sectionTop && scrollY <= sectionTop + sectionHeight){
-        navLinks.forEach(link => link.classList.remove('active'));
-        document.querySelector(`nav a[href="#${id}"]`).classList.add('active');
-      }
-    });
-  });
-
-  // === Адмін-панель ===
-  const adminPanel = document.getElementById('admin-panel');
-  const userList = document.getElementById('user-list');
-
-  // Пароль для адміна
-  const adminPassword = '1235467TTT';
-
-  // Фейкові користувачі (приклад)
-  let usersOnline = ['PlayerOne', 'DiamondMine', 'CreeperKing', 'Steve', 'Alex'];
-
-  // Запит пароля для доступу до панелі
-  function askAdminPassword() {
-    let pass = prompt('Введіть пароль адміністратора:');
-    if (pass === adminPassword) {
-      adminPanel.style.display = 'block';
-      refreshUserList();
-    } else {
-      alert('Невірний пароль!');
-    }
-  }
-
-  // Оновлення списку користувачів
-  function refreshUserList() {
-    userList.innerHTML = '';
-    usersOnline.forEach((user, index) => {
-      const li = document.createElement('li');
-      li.textContent = user;
-      const kickBtn = document.createElement('button');
-      kickBtn.textContent = 'Викинути';
-      kickBtn.className = 'kick-btn';
-      kickBtn.onclick = () => {
-        kickUser(index);
-      };
-      li.appendChild(kickBtn);
-      userList.appendChild(li);
-    });
-  }
-
-  // Викинути користувача (видалити зі списку)
-  function kickUser(index) {
-    if (confirm(`Ви дійсно хочете викинути користувача ${usersOnline[index]}?`)) {
-      usersOnline.splice(index, 1);
-      refreshUserList();
-      alert('Користувач викинутий');
-    }
-  }
-
-  // Запускаємо запит пароля після завантаження сторінки
-  window.onload = () => {
-    askAdminPassword();
-  };
-
-</script>
-
+/* Копіювання IP */
+function copyIP(){
+  const i=document.getElementById('ipInput');
+  i.select();i.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
+}
+  </script>
 </body>
 </html>
-
