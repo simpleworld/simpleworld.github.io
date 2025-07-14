@@ -184,50 +184,6 @@
     </div>
   </section>
 </main>
-  <section id="admin-panel" style="margin-top: 30px; padding: 20px; background: #222; color: #eee; border-radius: 10px; font-family: 'Orbitron', sans-serif;">
-  <h2 style="color: #ffdd00;">Адмін-панель: Користувачі онлайн</h2>
-  <ul id="users-online-list" style="list-style:none; padding-left: 0; border: 1px solid #ffdd00; border-radius: 8px; min-height: 80px;">
-    <li>Завантаження...</li>
-  </ul>
-</section>
-
-<script>
-  // Функція для отримання користувачів онлайн з API сервера
-  async function fetchOnlineUsers() {
-    try {
-      // Заміни URL на свій API, який повертає масив користувачів онлайн, наприклад:
-      // ["Мілки", "Ігор", "Олена"]
-      const response = await fetch('/api/online-users'); // Твоє API на сервері
-      if (!response.ok) throw new Error('Помилка мережі');
-
-      const users = await response.json();
-
-      const usersList = document.getElementById('users-online-list');
-      usersList.innerHTML = '';
-
-      if (users.length === 0) {
-        usersList.innerHTML = '<li>Користувачів немає</li>';
-      } else {
-        users.forEach(user => {
-          const li = document.createElement('li');
-          li.textContent = user;
-          usersList.appendChild(li);
-        });
-      }
-    } catch (error) {
-      document.getElementById('users-online-list').innerHTML = '<li>Не вдалося завантажити користувачів</li>';
-      console.error(error);
-    }
-  }
-
-  // Завантажити користувачів онлайн при завантаженні сторінки
-  fetchOnlineUsers();
-
-  // Оновлювати список кожні 15 секунд (щоб була актуальна інформація)
-  setInterval(fetchOnlineUsers, 15000);
-</script>
-
-  
 
 <footer>&copy; 2025 SimpleWorld Minecraft</footer>
 
