@@ -82,6 +82,48 @@
     <a href="#rules"  class="nav-link">Правила</a>
     <a href="#faq"    class="nav-link">FAQ</a>
     <a href="#support" class="nav-link">Тех. підтримка</a>
+    <script>
+const ADMIN_PASS = '1235467TTT';
+const loginBox   = document.getElementById('admin-login');
+const passInput  = document.getElementById('admin-pass');
+const loginBtn   = document.getElementById('admin-login-btn');
+const loginErr   = document.getElementById('admin-login-err');
+const panelBox   = document.getElementById('admin-panel');
+const ipField    = document.getElementById('admin-ip');
+const playersFld = document.getElementById('admin-players');
+const logoutBtn  = document.getElementById('admin-logout');
+
+function updateAdminView() {
+  const logged = sessionStorage.getItem('sw_admin') === 'true';
+  loginBox.style.display  = logged ? 'none' : 'block';
+  panelBox.style.display  = logged ? 'block' : 'none';
+  if (logged) refreshAdminStats();
+}
+loginBtn.onclick = () => {
+  if (passInput.value === ADMIN_PASS) {
+    sessionStorage.setItem('sw_admin', 'true');
+    passInput.value = '';
+    loginErr.style.display = 'none';
+    updateAdminView();
+  } else {
+    loginErr.style.display = 'block';
+  }
+};
+logoutBtn.onclick = () => {
+  sessionStorage.removeItem('sw_admin');
+  updateAdminView();
+};
+function refreshAdminStats() {
+  const online = Math.random() > 0.3;
+  ipField.textContent      = online ? 'simpleworldl.aternos.me' : '—';
+  playersFld.textContent   = online ? (Math.floor(Math.random() * 100) + ' гравців') : '0';
+}
+setInterval(() => {
+  if (panelBox.style.display === 'block') refreshAdminStats();
+}, 15000);
+document.addEventListener('DOMContentLoaded', updateAdminView);
+</script>
+
   </nav>
   <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
 </header>
