@@ -184,23 +184,31 @@
     </div>
   </section>
 </main>
- <!-- Адмін-панель починається тут -->
-<section id="admin-panel" style="padding:20px; border:1px solid #ccc; margin-top:20px;">
+<!-- Адмін-панель починається тут -->
+<section id="admin-panel" style="padding:20px; border:1px solid #ccc; margin-top:20px; display:none;">
   <h2>Адмін Панель</h2>
   <div id="admin-status"></div>
   <ul id="admin-userList" style="list-style:none; padding:0;"></ul>
 </section>
 
+<div id="admin-error" style="color:red; font-weight:bold; margin-top:20px;"></div>
+
 <script>
   (function(){
     const password = '1324567TTT';
     const entered = prompt('Введіть пароль для входу в адмін-панель:');
+    const panel = document.getElementById('admin-panel');
+    const errorDiv = document.getElementById('admin-error');
+
     if (entered !== password) {
-      document.getElementById('admin-panel').innerHTML = '<h3 style="color:red;">Невірний пароль. Доступ заборонено.</h3>';
+      errorDiv.textContent = 'Невірний пароль. Доступ заборонено.';
       return;
     }
 
-    // Приклад користувачів онлайн (тут заміниш на реальних)
+    // Якщо пароль правильний — показуємо панель
+    panel.style.display = 'block';
+
+    // Приклад користувачів онлайн
     let usersOnline = ['Ivan', 'Olena', 'Petro', 'Svitlana', 'Dmytro'];
 
     const userListElem = document.getElementById('admin-userList');
