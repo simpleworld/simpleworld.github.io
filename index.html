@@ -224,8 +224,6 @@ button.send:hover{background:var(--clr-accent-hover)}
     </div>
     <div class="status-grid">
       <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
-      <div class="status-box"><h3>Статус</h3><p id="server-status">Онлайн</p></div>
-      <div class="status-box"><h3>Гравців онлайн</h3><p id="players-count">12</p></div>
       <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
     </div>
   </section>
@@ -259,6 +257,7 @@ button.send:hover{background:var(--clr-accent-hover)}
 
   <section id="support">
     <h2>Тех. підтримка</h2>
+    <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
     <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
       <input type="hidden" name="_captcha" value="false">
       <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
@@ -284,13 +283,13 @@ button.send:hover{background:var(--clr-accent-hover)}
       <input type="hidden" name="_subject" value="Нове замовлення з SimpleWorld">
       <input type="hidden" name="_template" value="box">
       <input id="order-package" name="package" readonly>
-      <input id="order-nick" name="nick" placeholder="Ваш нік у грі" required>
-      <input id="order-name" name="name" placeholder="Ім'я" required>
-      <input id="order-contact" name="contact" placeholder="Email або Telegram" required>
+      <input name="nick" placeholder="Ваш нік у грі" required>
+      <input name="name" placeholder="Ім’я" required>
+      <input name="contact" placeholder="Email або Telegram" required>
       <select name="payment" required>
-        <option value="Вручну">Вручну (домовитись)</option>
-        <option value="PayPal">PayPal</option>
-        <option value="LiqPay">LiqPay</option>
+        <option>Вручну (домовитись)</option>
+        <option>PayPal</option>
+        <option>LiqPay</option>
       </select>
       <button type="submit" class="send">Надіслати замовлення</button>
       <button type="button" id="modal-close" style="margin-top:10px;padding:8px 12px;background:#ccc;border:none;border-radius:8px;cursor:pointer;">Скасувати</button>
@@ -334,6 +333,11 @@ function openModal(name,price){
 document.getElementById('modal-close').onclick=()=>modal.style.display='none';
 window.onclick=e=>{if(e.target===modal)modal.style.display='none';};
 
+/* Повідомлення після покупки */
+document.getElementById('order-form').addEventListener('submit',function(){
+  alert('✅ Дякуємо за покупку! Ми скоро зв’яжемось із вами.');
+});
+
 /* Вкладки */
 document.querySelectorAll('.nav-link').forEach(link=>{
   link.addEventListener('click',e=>{
@@ -354,11 +358,6 @@ document.querySelectorAll('.faq-item').forEach(f=>{
 
 /* Burger */
 document.getElementById('burger').onclick=()=>document.querySelector('nav').classList.toggle('open');
-
-/* Повідомлення після відправки */
-document.getElementById('order-form').addEventListener('submit',()=>{
-  setTimeout(()=>alert('✅ Дякуємо за покупку! Ми зв’яжемось із вами найближчим часом.'),1000);
-});
 </script>
 </body>
 </html>
