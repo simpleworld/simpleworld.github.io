@@ -1,267 +1,50 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SimpleWorld — Minecraft Сервер</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
-
-<style>
-:root{
-  --clr-bg:#ffffff;
-  --clr-accent:#ff8c00;
-  --clr-accent-hover:#e67800;
-  --clr-text-main:#222;
-  --clr-text-sub:#555;
-  --shadow-lg:0 8px 25px rgba(255,140,0,.25);
-  --radius-lg:15px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:'Montserrat',sans-serif;
-  background:var(--clr-bg);
-  color:var(--clr-text-main);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow-x:hidden;
-}
-
-/* Header */
-header{
-  background:#fff;
-  padding:20px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:fixed;
-  inset:0 0 auto;
-  z-index:1000;
-  box-shadow:var(--shadow-lg);
-}
-header h1{
-  font-family:'Orbitron',sans-serif;
-  font-size:2.3rem;
-  color:var(--clr-accent);
-}
-nav{display:flex;gap:30px}
-nav a{
-  color:var(--clr-text-main);
-  font-weight:600;
-  font-size:1.1rem;
-  padding:10px 15px;
-  border-radius:var(--radius-lg);
-  transition:.3s;
-  text-decoration:none;
-}
-nav a:hover,nav a.active{background:var(--clr-accent);color:#fff}
-#burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer}
-#burger span{width:28px;height:3px;background:var(--clr-text-main)}
-
-/* Main / sections */
-main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px}
-section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
-section.active{opacity:1;transform:none}
-h2{
-  font-family:'Orbitron',sans-serif;
-  font-size:2.6rem;
-  color:var(--clr-accent);
-  text-align:center;
-  margin-bottom:20px;
-}
-p,li{font-size:1.1rem;color:var(--clr-text-sub);line-height:1.6}
-ul{list-style:none;margin-top:10px}
-ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
-
-/* IP copy */
-.copy-ip{display:flex;justify-content:center;margin:30px 0 50px}
-.copy-ip input{
-  width:300px;
-  padding:12px 20px;
-  border:2px solid var(--clr-accent);
-  border-radius:25px 0 0 25px;
-  background:#fff;
-  font-size:1.2rem;
-  color:var(--clr-text-main);
-}
-.copy-ip button{
-  padding:12px 25px;
-  border:none;
-  border-radius:0 25px 25px 0;
-  background:var(--clr-accent);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-  transition:.3s;
-}
-.copy-ip button:hover{background:var(--clr-accent-hover)}
-
-/* Grids */
-.donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;width:100%}
-.donate-card{
-  width:260px;
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:30px 25px;
-  text-align:center;
-  box-shadow:var(--shadow-lg);
-  transition:.3s;
-}
-.donate-card:hover{
-  transform:scale(1.06);
-  box-shadow:0 12px 35px rgba(255,140,0,.3);
-}
-.buy-btn{
-  display:inline-block;
-  margin-top:12px;
-  padding:10px 16px;
-  border-radius:12px;
-  background:var(--clr-accent);
-  color:#fff;
-  font-weight:700;
-  border:none;
-  cursor:pointer;
-  transition:.3s;
-}
-.buy-btn:hover{background:var(--clr-accent-hover)}
-
-/* FAQ */
-.faq-item{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:20px 25px;
-  margin-bottom:15px;
-  cursor:pointer;
-  transition:.3s;
-}
-.faq-item:hover{background:var(--clr-accent);color:#fff}
-.faq-answer{display:none;margin-top:10px}
-.faq-item.active .faq-answer{display:block}
-
-/* Form */
-form{max-width:480px;margin:auto;display:flex;flex-direction:column;gap:15px}
-input,textarea,select{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:12px 15px;
-  color:var(--clr-text-main);
-  font-size:1rem;
-}
-button.send{
-  background:var(--clr-accent);
-  color:#fff;
-  border:none;
-  border-radius:var(--radius-lg);
-  padding:14px;
-  font-weight:700;
-  font-size:1.1rem;
-  cursor:pointer;
-  transition:.3s;
-}
-button.send:hover{background:var(--clr-accent-hover)}
-
-/* Modal */
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:2000}
-.modal{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  padding:20px;
-  border-radius:12px;
-  width:92%;
-  max-width:520px;
-  box-shadow:var(--shadow-lg);
-}
-.modal h3{color:var(--clr-accent);margin-bottom:12px;font-family:'Orbitron',sans-serif}
-
-/* Mobile */
-@media(max-width:768px){
-  nav{position:fixed;top:70px;right:-100%;width:220px;height:calc(100% - 70px);flex-direction:column;gap:20px;padding:30px;background:#fff;transition:right .4s;box-shadow:var(--shadow-lg)}
-  nav.open{right:0}
-  #burger{display:flex}
-}
-</style>
-</head>
-<body>
-
-<header>
-  <h1>SimpleWorld</h1>
-  <nav>
-    <a href="#home" class="nav-link active">Головна</a>
-    <a href="#about" class="nav-link">Про сервер</a>
-    <a href="#donate" class="nav-link">Донати</a>
-    <a href="#rules" class="nav-link">Правила</a>
-    <a href="#faq" class="nav-link">FAQ</a>
-    <a href="#support" class="nav-link">Тех. підтримка</a>
-  </nav>
-  <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
-</header>
-
-<main>
-  <section id="home" class="active">
-    <h2>Вітаємо на SimpleWorld!</h2>
-    <p style="text-align:center;max-width:600px;margin:auto">Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.</p>
-    <div class="copy-ip">
-      <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
-      <button onclick="copyIP()">Копіювати IP</button>
-    </div>
-  </section>
-
-  <section id="about">
-    <h2>Про сервер</h2>
-    <ul>
-      <li>Стабільна робота 24/7</li>
-      <li>Регулярні івенти та оновлення</li>
-      <li>Велика спільнота гравців</li>
-      <li>Дружня адміністрація</li>
-    </ul>
-  </section>
-
-  <section id="donate">
-    <h2>Донати</h2>
-    <div class="donate-grid" id="donate-grid"></div>
-  </section>
-
-  <section id="rules">
-    <h2>Правила сервера</h2>
-    <ul><li>Будь ввічливим і грай чесно!</li></ul>
-  </section>
-
-  <section id="faq">
-    <h2>Часті питання</h2>
-    <div class="faq-item"><div class="faq-question">Як підключитись?</div><div class="faq-answer">Додайте <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
-    <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16–1.20+.</div></div>
-    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі заявки безпечні.</div></div>
-  </section>
-
-  <section id="support">
-    <h2>Тех. підтримка</h2>
-    <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
-    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
-      <input type="hidden" name="_template" value="box">
-      <input name="name" type="text" placeholder="Ваше ім'я" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <textarea name="message" rows="5" placeholder="Ваше повідомлення" required></textarea>
-      <button type="submit" class="send">Надіслати</button>
-    </form>
-  </section>
-</main>
-
-<footer style="text-align:center;padding:20px;background:#fff;border-top:2px solid var(--clr-accent);color:var(--clr-text-sub)">
-  © 2025 SimpleWorld Minecraft
-</footer>
-
-<!-- Modal -->
+<!-- Modal залишаємо той самий -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <h3>Оформлення покупки</h3>
     <form id="order-form">
       <input id="order-package" name="Пакет" readonly>
       <input name="Нік у грі" placeholder="Ваш нік у грі" required>
-      <inpu
+      <input name="Ім'я" placeholder="Ваше ім'я" required>
+      <input name="Контакт" placeholder="Email або Telegram" required>
+      <select name="Спосіб оплати" required>
+        <option value="Домовитись">Домовитись</option>
+        <option value="Monobank">Monobank</option>
+        <option value="PrivatBank">PrivatBank</option>
+      </select>
+      <button type="submit" class="send">Надіслати замовлення</button>
+      <button type="button" id="modal-close" style="margin-top:10px;padding:8px 12px;background:#ccc;border:none;border-radius:8px;cursor:pointer;">Скасувати</button>
+    </form>
+    <div id="thank-you" style="display:none;text-align:center;color:green;font-weight:700;margin-top:15px;">
+      ✅ Дякуємо за покупку!
+    </div>
+  </div>
+</div>
+
+<script>
+// Відкриття модалки
+const modal = document.getElementById('modal-backdrop');
+const pkgInput = document.getElementById('order-package');
+function openModal(name, price){
+  pkgInput.value = `${name} — ${price}`;
+  modal.style.display = 'flex';
+  document.getElementById('order-form').style.display = 'flex';
+  document.getElementById('thank-you').style.display = 'none';
+}
+document.getElementById('modal-close').onclick = () => modal.style.display = 'none';
+window.onclick = e => { if(e.target === modal) modal.style.display = 'none'; };
+
+// Відправка форми з показом “Дякуємо”
+document.getElementById('order-form').addEventListener('submit', function(e){
+  e.preventDefault();
+  const form = e.target;
+  const data = new FormData(form);
+  fetch('https://formsubmit.co/simpleworld237@gmail.com', {
+    method: 'POST',
+    body: data,
+  }).then(() => {
+    form.style.display = 'none';
+    document.getElementById('thank-you').style.display = 'block';
+  }).catch(err => alert('Помилка при відправленні!'));
+});
+</script>
