@@ -10,16 +10,16 @@
 <style>
   :root{
     --clr-bg-dark:#f5f5f5; --clr-bg-light:#ffffff;
-    --clr-accent:#ff9500;  --clr-accent-hover:#e68a00;
+    --clr-accent:#ff8c00;  --clr-accent-hover:#ff7600;
     --clr-text-main:#333;  --clr-text-sub:#666;
-    --radius-lg:15px;      --shadow-lg:0 8px 25px rgba(255,149,0,.15);
+    --radius-lg:15px;      --shadow-lg:0 8px 25px rgba(255,140,0,.15);
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{font-family:'Montserrat',sans-serif;background:linear-gradient(180deg,var(--clr-bg-dark),var(--clr-bg-light));color:var(--clr-text-main);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
 
   /* Header */
-  header{background:#ffffff;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;position:fixed;inset:0 0 auto;z-index:1000;box-shadow:var(--shadow-lg);border-bottom:3px solid var(--clr-accent)}
+  header{background:#fff;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;position:fixed;inset:0 0 auto;z-index:1000;box-shadow:var(--shadow-lg)}
   header h1{font-family:'Orbitron',sans-serif;font-size:2.5rem;color:var(--clr-accent)}
   nav{display:flex;gap:30px}
   nav a{color:var(--clr-text-main);font-weight:600;font-size:1.1rem;padding:10px 15px;border-radius:var(--radius-lg);transition:.3s;text-decoration:none}
@@ -28,9 +28,9 @@
   #burger span{width:28px;height:3px;background:var(--clr-text-main)}
 
   /* Main / sections */
-  main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px}
-  section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
-  section.active{opacity:1;transform:none}
+  main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px;width:100%}
+  section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s;display:none}
+  section.active{opacity:1;transform:none;display:block}
   h2{font-family:'Orbitron',sans-serif;font-size:2.8rem;color:var(--clr-accent);text-align:center;margin-bottom:20px}
   p,li{font-size:1.1rem;color:var(--clr-text-sub);line-height:1.6}
   ul{list-style:none;margin-top:10px}
@@ -45,7 +45,7 @@
   /* Grids */
   .status-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:30px;margin-top:40px}
   .status-box,.donate-card{background:#fff;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);padding:30px 25px;text-align:center;box-shadow:var(--shadow-lg);transition:.3s}
-  .status-box:hover,.donate-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(255,149,0,.25)}
+  .status-box:hover,.donate-card:hover{transform:translateY(-6px);box-shadow:0 12px 40px rgba(255,140,0,.25)}
   .status-box h3,.donate-card h4{font-family:'Orbitron',sans-serif;color:var(--clr-accent);margin-bottom:10px}
   .donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;width:100%}
   .donate-card{width:260px}
@@ -58,7 +58,7 @@
 
   /* FAQ */
   .faq-item{background:#fff;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);padding:20px 25px;margin-bottom:15px;cursor:pointer}
-  .faq-item:hover{background:var(--clr-accent);color:#fff}
+  .faq-item:hover{background:var(--clr-accent-hover);color:#fff}
   .faq-answer{display:none;margin-top:10px}
   .faq-item.active .faq-answer{display:block}
 
@@ -69,7 +69,7 @@
   button.send:hover{background:var(--clr-accent-hover)}
 
   /* Modal */
-  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;z-index:2000}
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:2000}
   .modal{background:#fff;border:2px solid var(--clr-accent);padding:20px;border-radius:12px;width:92%;max-width:520px;box-shadow:var(--shadow-lg)}
   .modal h3{color:var(--clr-accent);margin-bottom:12px;font-family:'Orbitron',sans-serif}
   .modal .row{display:flex;gap:10px}
@@ -77,9 +77,9 @@
 
   /* Admin login/panel */
   #admin-login{display:none;max-width:360px;margin:20px auto;padding:20px;background:#fff;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
-  #admin-panel{display:none;margin:20px auto;max-width:900px;padding:20px;background:#ffffff;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
+  #admin-panel{display:none;margin:20px auto;max-width:900px;padding:20px;background:#f9f9f9;border:2px solid var(--clr-accent);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg)}
   .orders-list{max-height:300px;overflow:auto;margin-top:12px}
-  .order-item{background:#f9f9f9;border:1px solid rgba(255,149,0,.15);padding:10px;border-radius:8px;margin-bottom:8px}
+  .order-item{background:#fff;border:1px solid rgba(255,140,0,0.2);padding:10px;border-radius:8px;margin-bottom:8px}
 
   /* Mobile */
   @media(max-width:768px){
@@ -139,7 +139,7 @@
   <section id="donate">
     <h2>Донати на сервері</h2>
     <div class="donate-grid" id="donate-grid">
-      <!-- cards populated by JS (see bottom) -->
+      <!-- cards populated by JS -->
     </div>
   </section>
 
@@ -213,14 +213,14 @@
 
     <div style="text-align:center;margin-top:25px">
       <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"
-         style="display:inline-block;padding:10px 26px;background:var(--clr-accent);color:#fff;font-weight:600;border-radius:28px;transition:.3s">
+         style="display:inline-block;padding:10px 26px;background:var(--clr-accent);color:#fff;font-weight:600;border-radius:28px;transition:.3s;text-decoration:none">
          Відкрити Gmail →
       </a>
     </div>
   </section>
 </main>
 
-<!-- ========== ADMIN LOGIN & PANEL ========== -->
+<!-- Admin Login & Panel -->
 <section id="admin-login">
   <h3 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:10px;">Вхід у адмін-панель</h3>
   <input id="admin-pass" type="password" placeholder="Пароль" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--clr-accent);background:#fff;color:#333;">
@@ -232,21 +232,21 @@
   <h2 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:15px">Адмін-панель SimpleWorld</h2>
 
   <div style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-bottom:20px">
-    <div style="flex:1 1 220px;background:#f9f9f9;padding:12px;border-radius:8px;text-align:center;">
+    <div style="flex:1 1 220px;background:#fff;padding:12px;border-radius:8px;text-align:center;">
       <h4 style="color:var(--clr-accent);margin-bottom:6px">IP сервера</h4>
       <p id="admin-ip">—</p>
     </div>
-    <div style="flex:1 1 220px;background:#f9f9f9;padding:12px;border-radius:8px;text-align:center;">
+    <div style="flex:1 1 220px;background:#fff;padding:12px;border-radius:8px;text-align:center;">
       <h4 style="color:var(--clr-accent);margin-bottom:6px">Гравців онлайн</h4>
       <p id="admin-players">—</p>
     </div>
-    <div style="flex:1 1 220px;background:#f9f9f9;padding:12px;border-radius:8px;text-align:center;">
+    <div style="flex:1 1 220px;background:#fff;padding:12px;border-radius:8px;text-align:center;">
       <h4 style="color:var(--clr-accent);margin-bottom:6px">Нещодавні замовлення</h4>
       <p id="admin-orders-count">0</p>
     </div>
   </div>
 
-  <div style="background:#f9f9f9;padding:12px;border-radius:8px;">
+  <div style="background:#fff;padding:12px;border-radius:8px;">
     <h4 style="color:var(--clr-accent);margin-bottom:8px">Швидкі дії</h4>
     <button onclick="alert('Рестарт сервера (демо)')" style="padding:8px 14px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer">Рестарт (демо)</button>
   </div>
@@ -259,9 +259,7 @@
   <button id="admin-logout" style="margin-top:15px;padding:10px 16px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer;">Вийти</button>
 </section>
 
-<footer style="margin-top:30px;text-align:center">&copy; 2025 SimpleWorld Minecraft</footer>
-
-<!-- Modal для покупки -->
+<!-- Modal -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h3 id="modal-title">Оформлення покупки</h3>
@@ -284,7 +282,7 @@
       </select>
 
       <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
-        <button type="button" id="modal-close" style="padding:8px 12px;border-radius:8px;background:#ddd;border:1px solid #999;color:#333;cursor:pointer">Скасувати</button>
+        <button type="button" id="modal-close" style="padding:8px 12px;border-radius:8px;background:#ddd;border:1px solid #ccc;color:#333;cursor:pointer">Скасувати</button>
         <button type="submit" class="send" style="padding:8px 12px;border-radius:8px;">Відправити замовлення</button>
       </div>
     </form>
@@ -305,7 +303,7 @@ const DONATES = [
   { id: 'infinity', name: 'Infinity', price: '249 UAH',      desc: 'Найвищий рівень' },
 ];
 
-/* ---------- Допоміжне: рендер донатів ---------- */
+/* ---------- Рендер донатів ---------- */
 const donateGrid = document.getElementById('donate-grid');
 DONATES.forEach(d => {
   const card = document.createElement('div');
@@ -344,7 +342,6 @@ document.getElementById('modal-close').addEventListener('click', () => {
 /* ---------- Надсилання замовлення ---------- */
 orderForm.addEventListener('submit', function(e){
   e.preventDefault();
-
   const data = new FormData(orderForm);
   data.append('_subject', `Новий донат: ${data.get('package')} (ID ${data.get('_form_id')})`);
   data.append('_template', 'box');
@@ -374,21 +371,20 @@ orderForm.addEventListener('submit', function(e){
   })
   .catch(err => {
     console.error(err);
-    alert('Помилка надсилання. Спробуй ще раз або напиши на пошту.');
+    alert('Помилка надсилання. Спробуй ще раз.');
     modalBackdrop.style.display = 'none';
     orderForm.reset();
-    updateOrdersView();
   });
 });
 
-/* ---------- LocalStorage: зберігання замовлень ---------- */
+/* ---------- Зберігання замовлень (sessionStorage) ---------- */
 function saveOrderLocal(order){
   const list = JSON.parse(sessionStorage.getItem('sw_orders') || '[]');
   list.unshift(order);
   sessionStorage.setItem('sw_orders', JSON.stringify(list.slice(0,200)));
 }
 
-/* ---------- Адмінка: логін + показ замовлень ---------- */
+/* ---------- Адмін-панель ---------- */
 const ADMIN_PASS = '1235467TTT';
 const loginBox   = document.getElementById('admin-login');
 const loginBtn   = document.getElementById('admin-login-btn');
@@ -409,114 +405,4 @@ function updateOrdersView(){
   ordersList.innerHTML = '';
   ordersCount.textContent = arr.length;
   if (arr.length === 0){
-    ordersList.innerHTML = '<p style="color:var(--clr-text-sub)">Замовлень немає</p>';
-    return;
-  }
-  arr.forEach(o=>{
-    const div = document.createElement('div');
-    div.className = 'order-item';
-    div.innerHTML = `
-      <strong>${o.package}</strong> — <span style="color:var(--clr-text-sub)">${o.created}</span>
-      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick || '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
-      <div style="margin-top:6px">Оплата: ${escapeHtml(o.payment)}</div>
-      <div style="margin-top:8px"><button data-id="${o.id}" style="padding:6px 8px;border-radius:6px;background:#ff9500;border:none;cursor:pointer;color:#fff;font-weight:700">Позначити як виконане</button></div>
-    `;
-    div.querySelector('button').addEventListener('click', (e)=>{
-      markOrderDone(o.id);
-    });
-    ordersList.appendChild(div);
-  });
-}
-
-function markOrderDone(id){
-  let arr = JSON.parse(sessionStorage.getItem('sw_orders') || '[]');
-  arr = arr.filter(o=>o.id !== id);
-  sessionStorage.setItem('sw_orders', JSON.stringify(arr));
-  updateOrdersView();
-}
-
-function escapeHtml(text){
-  return String(text).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
-}
-
-loginBtn.addEventListener('click', ()=>{
-  const v = passInput.value;
-  if (v === ADMIN_PASS){
-    sessionStorage.setItem('sw_admin','true');
-    passInput.value = '';
-    loginErr.style.display = 'none';
-    showAdmin(true);
-    updateOrdersView();
-  } else {
-    loginErr.style.display = 'block';
-  }
-});
-
-logoutBtn.addEventListener('click', ()=>{
-  sessionStorage.removeItem('sw_admin');
-  showAdmin(false);
-});
-
-const ipField = document.getElementById('admin-ip');
-const playersField = document.getElementById('admin-players');
-function refreshAdminStats(){
-  const online = Math.random() > 0.3;
-  ipField.textContent = online ? 'simpleworldl.aternos.me' : '—';
-  playersField.textContent = online ? (Math.floor(Math.random()*100) + ' гравців') : '0';
-}
-
-document.addEventListener('DOMContentLoaded', ()=>{
-  const logged = sessionStorage.getItem('sw_admin') === 'true';
-  showAdmin(logged);
-  if (logged) {
-    updateOrdersView();
-    refreshAdminStats();
-  }
-});
-
-/* ---------- Кнопка в шапці: burger ---------- */
-const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
-if (burger) burger.onclick=()=>nav.classList.toggle('open');
-
-/* ---------- SPA навігація ---------- */
-const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
-function show(id){
-  sections.forEach(s=>s.classList.toggle('active',s.id===id));
-  links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));
-  nav.classList.remove('open');
-}
-links.forEach(l=>l.addEventListener('click', e=>{
-  e.preventDefault();
-  show(l.getAttribute('href').slice(1));
-  history.replaceState(null,'',l.hash);
-}));
-window.addEventListener('load', ()=> show(location.hash.slice(1)||'home'));
-
-/* ---------- FAQ акордеон ---------- */
-document.querySelectorAll('.faq-item').forEach(i=>i.addEventListener('click', ()=> i.classList.toggle('active')));
-
-/* ---------- Статус (імітація) ---------- */
-function updateStatus(){
-  const online = Math.random()>0.3;
-  document.getElementById('server-status').textContent = online?'Сервер онлайн':'Сервер офлайн';
-  document.getElementById('server-status').style.color = online?'var(--clr-accent)':'#ff4444';
-  document.getElementById('players-count').textContent = online?Math.floor(Math.random()*100)+' гравців':'0';
-}
-updateStatus();
-setInterval(updateStatus,15000);
-
-/* ---------- Копіювання IP ---------- */
-function copyIP(){
-  const i=document.getElementById('ipInput');
-  i.select();
-  i.setSelectionRange(0,99999);
-  navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
-}
-
-/* ---------- Закриття модалу ---------- */
-modalBackdrop.addEventListener('click', (e)=>{
-  if (e.target === modalBackdrop) modalBackdrop.style.display = 'none';
-});
-document.addEventListener('keydown', (e)=>{
-  if (e.key === 'Escape') modalBackdrop.style.display = 'none';
-});
+    ordersList.innerHTML = '<p style="color:var(--clr-text-sub
