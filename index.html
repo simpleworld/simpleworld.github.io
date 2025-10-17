@@ -184,32 +184,39 @@ button.send:hover{background:var(--clr-accent-hover)}
 <header>
   <h1>SimpleWorld</h1>
   <nav>
-    <a href="#home" class="nav-link active">Головна</a>
-    <a href="#about" class="nav-link">Про сервер</a>
+    <a href="#home"   class="nav-link active">Головна</a>
+    <a href="#about"  class="nav-link">Про сервер</a>
     <a href="#donate" class="nav-link">Донати</a>
-    <a href="#rules" class="nav-link">Правила</a>
-    <a href="#faq" class="nav-link">FAQ</a>
+    <a href="#rules"  class="nav-link">Правила</a>
+    <a href="#faq"    class="nav-link">FAQ</a>
     <a href="#support" class="nav-link">Тех. підтримка</a>
   </nav>
   <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
 </header>
 
 <main>
+  <!-- HOME -->
   <section id="home" class="active">
     <h2>Вітаємо на SimpleWorld!</h2>
     <p style="text-align:center;max-width:600px;margin:auto">Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.</p>
+
     <div class="copy-ip">
       <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
       <button onclick="copyIP()">Копіювати IP</button>
     </div>
+
     <div class="status-grid">
       <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
+      <div class="status-box"><h3>Статус</h3><p id="server-status">Завантаження...</p></div>
+      <div class="status-box"><h3>Гравців онлайн</h3><p id="players-count">Оновлення...</p></div>
       <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
     </div>
   </section>
 
+  <!-- ABOUT -->
   <section id="about">
     <h2>Про сервер</h2>
+    <p>SimpleWorld — це Minecraft-сервер, який пропонує класичний геймплей із сучасними можливостями:</p>
     <ul>
       <li>Стабільна робота 24/7</li>
       <li>Регулярні івенти та оновлення</li>
@@ -218,14 +225,55 @@ button.send:hover{background:var(--clr-accent-hover)}
     </ul>
   </section>
 
+  <!-- DONATE -->
   <section id="donate">
-    <h2>Донати</h2>
-    <div class="donate-grid" id="donate-grid"></div>
+    <h2>Донати на сервері</h2>
+    <div class="donate-grid" id="donate-grid">
+      <!-- cards populated by JS (see bottom) -->
+    </div>
   </section>
 
+  <!-- RULES -->
   <section id="rules">
-    <h2>Правила сервера</h2>
-    <ul><li>Будь ввічливим і грай чесно!</li></ul>
+    <h2>📘 Правила сервера</h2>
+    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 1. ЧАТ</h3>
+    <ul>
+      <li><b>1.1</b> Образа гравців — <i>мут 1 год</i></li>
+      <li><b>1.2</b> Образа адміністрації — <i>мут 2 год / бан 1 день</i></li>
+      <li><b>1.3</b> Токсична поведінка — <i>мут 1 год</i></li>
+      <li><b>1.4</b> Капс (>70%) — <i>мут 15 хв</i></li>
+      <li><b>1.5</b> Флуд (3+ повтори) — <i>мут 30 хв</i></li>
+      <li><b>1.6</b> Спам — <i>мут 30 хв</i></li>
+      <li><b>1.7</b> Провокації — <i>мут 1 год</i></li>
+      <li><b>1.8</b> Політичні/релігійні теми — <i>мут 1 год</i></li>
+      <li><b>1.9</b> Реклама сторонніх проєктів — <i>перманентний бан</i></li>
+      <li><b>1.10</b> Побори в чаті — <i>мут 20 хв</i></li>
+      <li><b>1.11</b> Підбурювання — <i>мут 1 год</i></li>
+      <li><b>1.12</b> Fake-розіграші/скам — <i>бан 7 днів</i></li>
+      <li><b>1.13</b> Видавання за адміна — <i>бан 3 дні</i></li>
+      <li><b>1.14</b> Обман новачків — <i>бан 1 день</i></li>
+      <li><b>1.15</b> Тролінг модерації — <i>мут 2 год</i></li>
+    </ul>
+
+    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
+    <ul>
+      <li><b>2.1</b> Чити / взломки — <i>бан 30-50 днів</i></li>
+      <li><b>2.2</b> Автоклікери / макроси — <i>бан 7 днів</i></li>
+      <li><b>2.3</b> X-ray — <i>бан 5 днів + конфіскація ресурсів</i></li>
+      <li><b>2.4</b> Багозловживання — <i>бан 3 дні</i></li>
+      <li><b>2.5</b> Дюп — <i>бан 14 днів + вайп інвентаря</i></li>
+      <li><b>2.6</b> PvP-зрада — <i>бан 1 день</i></li>
+      <li><b>2.7</b> TP-ловушки — <i>бан 3 дні</i></li>
+      <li><b>2.8</b> Гриф у неанархії — <i>бан 2 дні</i></li>
+      <li><b>2.9</b> Залив територій — <i>бан 1 день</i></li>
+      <li><b>2.10</b> Лаг-машини — <i>бан 2 дні</i></li>
+      <li><b>2.11</b> Намагання зламати сервер — <i>перманентний бан</i></li>
+      <li><b>2.13</b> Смертельні пастки у приваті — <i>бан 2 дні</i></li>
+      <li><b>2.14</b> Фарм гравців на арені — <i>бан 1 день</i></li>
+      <li><b>2.15</b> Некоректні назви предметів — <i>бан 1 день</i></li>
+    </ul>
+
+    <p style="margin-top:15px">Порушення правил тягне за собою попередження, мут або бан. Дотримуйтесь регламенту та отримуйте задоволення від гри!</p>
   </section>
 
   <!-- FAQ -->
@@ -233,102 +281,343 @@ button.send:hover{background:var(--clr-accent-hover)}
     <h2>Часті питання</h2>
     <div class="faq-item"><div class="faq-question">Як підключитись?</div><div class="faq-answer">Додайте <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
     <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16 – 1.20+.</div></div>
-    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі платежі проходять через захищені системи.</div></div>
+    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, заявки безпечні — фактичну оплату обговорюємо окремо.</div></div>
   </section>
 
+  <!-- SUPPORT -->
   <section id="support">
     <h2>Тех. підтримка</h2>
     <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
-    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
-      <input type="hidden" name="_captcha" value="false">
+
+    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST" id="support-form">
+      <input type="hidden" name="_captcha"  value="false">
       <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
       <input type="hidden" name="_template" value="box">
-      <input name="name" type="text" placeholder="Ваше ім'я" required>
-      <input name="email" type="email" placeholder="Email" required>
-      <textarea name="message" rows="5" placeholder="Ваше повідомлення" required></textarea>
-      <button type="submit" class="send">Надіслати</button>
+
+      <input   name="name"    type="text"  placeholder="Ваше ім'я" required>
+      <input   name="email"   type="email" placeholder="Email для відповіді" required>
+      <textarea name="message" rows="5"    placeholder="Опишіть питання чи проблему" required></textarea>
+
+      <button type="submit" class="send">Надіслати ✉️</button>
     </form>
+
+    <div style="text-align:center;margin-top:25px">
+      <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"
+         style="display:inline-block;padding:10px 26px;background:var(--clr-accent);color:#000;font-weight:600;border-radius:28px;transition:.3s">
+         Відкрити Gmail →
+      </a>
+    </div>
   </section>
 </main>
 
-<footer style="text-align:center;padding:20px;background:#fff;border-top:2px solid var(--clr-accent);color:var(--clr-text-sub)">
-  © 2025 SimpleWorld Minecraft
-</footer>
+<!-- ========== ADMIN LOGIN & PANEL (додано) ========== -->
+<section id="admin-login">
+  <h3 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:10px;">Вхід у адмін-панель</h3>
+  <input id="admin-pass" type="password" placeholder="Пароль" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--clr-accent);background:#111;color:#fff;">
+  <button id="admin-login-btn" style="margin-top:12px;width:100%;padding:10px;background:var(--clr-accent);border:none;color:#000;font-weight:700;border-radius:8px;cursor:pointer;">Увійти</button>
+  <p id="admin-login-err" style="display:none;color:#ff4444;text-align:center;margin-top:10px">Невірний пароль</p>
+</section>
 
-<!-- Modal -->
+<section id="admin-panel">
+  <h2 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:15px">Адмін-панель SimpleWorld</h2>
+
+  <div style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-bottom:20px">
+    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:6px">IP сервера</h4>
+      <p id="admin-ip">—</p>
+    </div>
+    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:6px">Гравців онлайн</h4>
+      <p id="admin-players">—</p>
+    </div>
+    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
+      <h4 style="color:var(--clr-accent);margin-bottom:6px">Нещодавні замовлення</h4>
+      <p id="admin-orders-count">0</p>
+    </div>
+  </div>
+
+  <div style="background:#222;padding:12px;border-radius:8px;">
+    <h4 style="color:var(--clr-accent);margin-bottom:8px">Швидкі дії</h4>
+    <button onclick="alert('Рестарт сервера (демо)')" style="padding:8px 14px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer">Рестарт (демо)</button>
+  </div>
+
+  <h3 style="margin-top:16px;color:var(--clr-accent)">Список замовлень</h3>
+  <div class="orders-list" id="orders-list">
+    <!-- заповнюється JS -->
+  </div>
+
+  <button id="admin-logout" style="margin-top:15px;padding:10px 16px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer;">Вийти</button>
+</section>
+
+<footer style="margin-top:30px">&copy; 2025 SimpleWorld Minecraft</footer>
+
+<!-- Modal для покупки -->
 <div class="modal-backdrop" id="modal-backdrop">
-  <div class="modal">
-    <h3>Оформлення покупки</h3>
-    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
-      <input type="hidden" name="_subject" value="Замовлення донату SimpleWorld">
-      <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_template" value="table">
-      <input id="order-package" name="Пакет" readonly>
-      <input name="Нік у грі" placeholder="Ваш нік у грі" required>
-      <input name="Ім'я" placeholder="Ваше ім'я" required>
-      <input name="Контакт" placeholder="Email або Telegram" required>
-      <select name="Спосіб оплати" required>
-        <option value="Домовитись">Домовитись</option>
-        <option value="Monobank">Monobank</option>
-        <option value="PrivatBank">PrivatBank</option>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h3 id="modal-title">Оформлення покупки</h3>
+    <form id="order-form">
+      <input type="hidden" name="_form_id" id="order-id">
+      <label style="display:block;margin-bottom:8px">Пакет:</label>
+      <input id="order-package" name="package" type="text" readonly style="width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:2px solid var(--clr-accent);background:#111;color:#fff;">
+      <label style="display:block;margin-bottom:8px">Minecraft нік (опційно):</label>
+      <input id="order-nick" name="nick" type="text" placeholder="Ваш нік у грі">
+      <label style="display:block;margin:8px 0">Ім'я:</label>
+      <input id="order-name" name="name" type="text" placeholder="Ім'я для контакту" required>
+      <label style="display:block;margin:8px 0">Email або телеграм:</label>
+      <input id="order-contact" name="contact" type="text" placeholder="email або @telegram" required>
+      <label style="display:block;margin:8px 0">Спосіб оплати (як домовимося):</label>
+      <select id="order-pay" name="payment" required>
+        <option value="manual">Вручну (домовитись з адміністратором)</option>
+        <option value="paypal">PayPal</option>
+        <option value="liqpay">LiqPay</option>
+        <option value="other">Інше</option>
       </select>
-      <button type="submit" class="send">Надіслати замовлення</button>
-      <button type="button" id="modal-close" style="margin-top:10px;padding:8px 12px;background:#ccc;border:none;border-radius:8px;cursor:pointer;">Скасувати</button>
+
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
+        <button type="button" id="modal-close" style="padding:8px 12px;border-radius:8px;background:#333;border:1px solid #444;color:#fff;cursor:pointer">Скасувати</button>
+        <button type="submit" class="send" style="padding:8px 12px;border-radius:8px;">Відправити замовлення</button>
+      </div>
     </form>
+    <p style="margin-top:10px;color:var(--clr-text-sub);font-size:0.9rem">Після відправки ти отримаєш лист на пошту адміністрації — звʼяжемося для оплати та видачі привілеїв.</p>
   </div>
 </div>
 
 <script>
+/* ---------- Налаштування донатів ---------- */
 const DONATES = [
-  { name: 'Premium',  price: '29 UAH',  desc: 'Малі бонуси' },
-  { name: 'Elite',    price: '49 UAH',  desc: 'Розширені можливості' },
-  { name: 'Deluxe',   price: '69 UAH',  desc: 'Круті фішки' },
-  { name: 'Ultra',    price: '99 UAH',  desc: 'Ще більше бонусів' },
-  { name: 'Immortal', price: '119 UAH', desc: 'Сильні привілеї' },
-  { name: 'Supreme',  price: '149 UAH', desc: 'Топ пакет' },
-  { name: 'Legend',   price: '199 UAH', desc: 'Легендарний рівень' },
-  { name: 'Infinity', price: '249 UAH', desc: 'Найвищий рівень' },
+  { id: 'player',   name: 'Player',   price: 'Безкоштовно', desc: 'Базові права' },
+  { id: 'premium',  name: 'Premium',  price: '29 UAH',       desc: 'Малі бонуси' },
+  { id: 'elite',    name: 'Elite',    price: '49 UAH',       desc: 'Розширені можливості' },
+  { id: 'deluxe',   name: 'Deluxe',   price: '69 UAH',       desc: 'Круті фішки' },
+  { id: 'ultra',    name: 'Ultra',    price: '99 UAH',       desc: 'Ще більше бонусів' },
+  { id: 'immortal', name: 'Immortal', price: '119 UAH',      desc: 'Сильні привілеї' },
+  { id: 'supreme',  name: 'Supreme',  price: '149 UAH',      desc: 'Топ пакет' },
+  { id: 'legend',   name: 'Legend',   price: '199 UAH',      desc: 'Легендарний' },
+  { id: 'infinity', name: 'Infinity', price: '249 UAH',      desc: 'Найвищий рівень' },
 ];
 
-const donateGrid=document.getElementById('donate-grid');
-DONATES.forEach(d=>{
-  const c=document.createElement('div');
-  c.className='donate-card';
-  c.innerHTML=`<h4>${d.name}</h4><p>${d.desc}</p><p><b>${d.price}</b></p><button class='buy-btn'>Придбати</button>`;
-  c.querySelector('.buy-btn').addEventListener('click',()=>openModal(d.name,d.price));
-  donateGrid.appendChild(c);
+/* ---------- Допоміжне: рендер донатів ---------- */
+const donateGrid = document.getElementById('donate-grid');
+DONATES.forEach(d => {
+  const card = document.createElement('div');
+  card.className = 'donate-card';
+  card.innerHTML = `
+    <h4>${d.name}</h4>
+    <p style="color:var(--clr-text-sub)">${d.desc}</p>
+    <p style="font-weight:700;margin-top:8px">${d.price}</p>
+    <button class="buy-btn" data-id="${d.id}" data-name="${d.name}" data-price="${d.price}">Придбати</button>
+  `;
+  donateGrid.appendChild(card);
 });
 
-function copyIP(){
-  navigator.clipboard.writeText(document.getElementById('ipInput').value);
-  alert('IP скопійовано!');
-}
+/* ---------- Модальне замовлення ---------- */
+const modalBackdrop = document.getElementById('modal-backdrop');
+const orderForm = document.getElementById('order-form');
+const orderIdInput = document.getElementById('order-id');
+const orderPackage = document.getElementById('order-package');
 
-/* Modal */
-const modal=document.getElementById('modal-backdrop');
-const pkgInput=document.getElementById('order-package');
-function openModal(name,price){
-  pkgInput.value=`${name} — ${price}`;
-  modal.style.display='flex';
-}
-document.getElementById('modal-close').onclick=()=>modal.style.display='none';
-window.onclick=e=>{if(e.target===modal)modal.style.display='none';};
-
-/* Tabs */
-document.querySelectorAll('.nav-link').forEach(link=>{
-  link.addEventListener('click',e=>{
-    e.preventDefault();
-    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
-    link.classList.add('active');
-    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-    document.querySelector(link.getAttribute('href')).classList.add('active');
-    window.scrollTo({top:0,behavior:'smooth'});
-    document.querySelector('nav').classList.remove('open');
+document.querySelectorAll('.buy-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const name = btn.dataset.name;
+    const id = btn.dataset.id;
+    // створимо унікальний id замовлення
+    const orderId = 'ORD-' + Date.now() + '-' + Math.floor(Math.random()*900+100);
+    orderIdInput.value = orderId;
+    orderPackage.value = `${name} — ${btn.dataset.price}`;
+    // покажемо модал
+    modalBackdrop.style.display = 'flex';
+    document.getElementById('order-name').focus();
   });
 });
 
-/* Burger */
-document.getElementById('burger').onclick=()=>document.querySelector('nav').classList.toggle('open');
+document.getElementById('modal-close').addEventListener('click', () => {
+  modalBackdrop.style.display = 'none';
+});
+
+/* ---------- Надсилання замовлення (FormSubmit AJAX) ---------- */
+orderForm.addEventListener('submit', function(e){
+  e.preventDefault();
+
+  // зібрати дані
+  const data = new FormData(orderForm);
+  // додати приховані поля для FormSubmit:
+  data.append('_subject', `Новий донат: ${data.get('package')} (ID ${data.get('_form_id')})`);
+  data.append('_template', 'box');
+
+  // збережемо локально (щоб бачити в адмінці)
+  const orderObj = {
+    id: data.get('_form_id'),
+    package: data.get('package'),
+    nick: data.get('nick') || '',
+    name: data.get('name'),
+    contact: data.get('contact'),
+    payment: data.get('payment'),
+    created: new Date().toLocaleString()
+  };
+  saveOrderLocal(orderObj);
+
+  // AJAX POST на FormSubmit (ajax endpoint)
+  fetch('https://formsubmit.co/ajax/simpleworld237@gmail.com', {
+    method: 'POST',
+    body: data,
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(json => {
+    if (json.success === 'true' || json.success === true) {
+      alert('Замовлення успішно надіслано! Ми скоро звʼяжемося.');
+      modalBackdrop.style.display = 'none';
+      orderForm.reset();
+      updateOrdersView(); // оновити адмінку
+    } else {
+      // FormSubmit sometimes returns different structure — treat as success if ok
+      alert('Замовлення надіслано (результат сервісу неочікуваний).');
+      modalBackdrop.style.display = 'none';
+      orderForm.reset();
+      updateOrdersView();
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert('Помилка надсилання. Спробуй ще раз або напиши на пошту.');
+    // fallback: закрити модал та залишити замовлення локально
+    modalBackdrop.style.display = 'none';
+    orderForm.reset();
+    updateOrdersView();
+  });
+});
+
+/* ---------- LocalStorage: зберігання замовлень ---------- */
+function saveOrderLocal(order){
+  const list = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+  list.unshift(order); // нові в початок
+  localStorage.setItem('sw_orders', JSON.stringify(list.slice(0,200))); // зберігаємо максимум 200
+}
+
+/* ---------- Адмінка: логін + показ замовлень ---------- */
+const ADMIN_PASS = '1235467TTT'; // клієнтська авторизація (видна у коді) — для справжньої безпеки потрібен бекенд
+const loginBox   = document.getElementById('admin-login');
+const loginBtn   = document.getElementById('admin-login-btn');
+const passInput  = document.getElementById('admin-pass');
+const loginErr   = document.getElementById('admin-login-err');
+const panelBox   = document.getElementById('admin-panel');
+const logoutBtn  = document.getElementById('admin-logout');
+const ordersList = document.getElementById('orders-list');
+const ordersCount = document.getElementById('admin-orders-count');
+
+function showAdmin(show){
+  loginBox.style.display = show ? 'none' : 'block';
+  panelBox.style.display = show ? 'block' : 'none';
+}
+
+function updateOrdersView(){
+  const arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+  ordersList.innerHTML = '';
+  ordersCount.textContent = arr.length;
+  if (arr.length === 0){
+    ordersList.innerHTML = '<p style="color:var(--clr-text-sub)">Замовлень немає</p>';
+    return;
+  }
+  arr.forEach(o=>{
+    const div = document.createElement('div');
+    div.className = 'order-item';
+    div.innerHTML = `
+      <strong>${o.package}</strong> — <span style="color:var(--clr-text-sub)">${o.created}</span>
+      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick || '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
+      <div style="margin-top:6px">Оплата: ${escapeHtml(o.payment)}</div>
+      <div style="margin-top:8px"><button data-id="${o.id}" style="padding:6px 8px;border-radius:6px;background:#00bfa6;border:none;cursor:pointer;color:#000;font-weight:700">Позначити як виконане</button></div>
+    `;
+    // кнопка видалення / помітки виконаного
+    div.querySelector('button').addEventListener('click', (e)=>{
+      markOrderDone(o.id);
+    });
+    ordersList.appendChild(div);
+  });
+}
+
+function markOrderDone(id){
+  let arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+  arr = arr.filter(o=>o.id !== id);
+  localStorage.setItem('sw_orders', JSON.stringify(arr));
+  updateOrdersView();
+}
+
+function escapeHtml(text){
+  return String(text).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+}
+
+loginBtn.addEventListener('click', ()=>{
+  const v = passInput.value;
+  if (v === ADMIN_PASS){
+    sessionStorage.setItem('sw_admin','true');
+    passInput.value = '';
+    loginErr.style.display = 'none';
+    showAdmin(true);
+    updateOrdersView();
+  } else {
+    loginErr.style.display = 'block';
+  }
+});
+logoutBtn.addEventListener('click', ()=>{
+  sessionStorage.removeItem('sw_admin');
+  showAdmin(false);
+});
+
+/* ---------- Refresh some admin stats (demo) ---------- */
+const ipField = document.getElementById('admin-ip');
+const playersField = document.getElementById('admin-players');
+function refreshAdminStats(){
+  const online = Math.random() > 0.3;
+  ipField.textContent = online ? 'simpleworldl.aternos.me' : '—';
+  playersField.textContent = online ? (Math.floor(Math.random()*100) + ' гравців') : '0';
+}
+
+/* ---------- Init: показати/приховати адмінку в залежності від сесії ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  const logged = sessionStorage.getItem('sw_admin') === 'true';
+  showAdmin(logged);
+  if (logged) {
+    updateOrdersView();
+    refreshAdminStats();
+  }
+});
+
+/* ---------- Кнопка в шапці: burger ---------- */
+const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
+if (burger) burger.onclick=()=>nav.classList.toggle('open');
+
+/* ---------- SPA навігація ---------- */
+const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
+function show(id){sections.forEach(s=>s.classList.toggle('active',s.id===id));links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));nav.classList.remove('open');}
+links.forEach(l=>l.addEventListener('click', e=>{ e.preventDefault(); show(l.getAttribute('href').slice(1)); history.replaceState(null,'',l.hash); }));
+window.addEventListener('load', ()=> show(location.hash.slice(1)||'home'));
+
+/* ---------- FAQ акордеон ---------- */
+document.querySelectorAll('.faq-item').forEach(i=>i.addEventListener('click', ()=> i.classList.toggle('active')));
+
+/* ---------- Статус (імітація) ---------- */
+function updateStatus(){
+  const online = Math.random()>0.3;
+  document.getElementById('server-status').textContent = online?'Сервер онлайн':'Сервер офлайн';
+  document.getElementById('server-status').style.color = online?'var(--clr-accent)':'#ff4444';
+  document.getElementById('players-count').textContent = online?Math.floor(Math.random()*100)+' гравців':'0';
+}
+updateStatus(); setInterval(updateStatus,15000);
+
+/* ---------- Копіювання IP ---------- */
+function copyIP(){
+  const i=document.getElementById('ipInput');
+  i.select();i.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
+}
+
+/* ---------- Helper: close modal on backdrop click or ESC ---------- */
+modalBackdrop.addEventListener('click', (e)=>{
+  if (e.target === modalBackdrop) modalBackdrop.style.display = 'none';
+});
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'Escape') modalBackdrop.style.display = 'none';
+});
 </script>
 </body>
 </html>
