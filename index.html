@@ -8,240 +8,194 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
 
 <style>
-:root {
-  --clr-bg: #ffffff;
-  --clr-bg-alt: #f7f7f7;
-  --clr-accent: #ff7b00;
-  --clr-accent-hover: #e06900;
-  --clr-text: #222;
-  --clr-text-sub: #555;
-  --radius-lg: 15px;
-  --shadow-lg: 0 6px 25px rgba(255, 123, 0, 0.25);
+:root{
+  --clr-bg:#ffffff;
+  --clr-accent:#ff8c00;
+  --clr-accent-hover:#e67800;
+  --clr-text-main:#222;
+  --clr-text-sub:#555;
+  --shadow-lg:0 8px 25px rgba(255,140,0,.25);
+  --radius-lg:15px;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body {
-  font-family: 'Montserrat', sans-serif;
-  background: var(--clr-bg);
-  color: var(--clr-text);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-}
-
-/* HEADER */
-header {
-  background: var(--clr-bg);
-  border-bottom: 2px solid var(--clr-accent);
-  padding: 18px 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: fixed;
-  inset: 0 0 auto;
-  z-index: 1000;
-  box-shadow: var(--shadow-lg);
-}
-header h1 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.3rem;
-  color: var(--clr-accent);
-}
-nav {
-  display: flex;
-  gap: 25px;
-}
-nav a {
-  text-decoration: none;
-  font-weight: 600;
-  color: var(--clr-text);
-  padding: 10px 15px;
-  border-radius: var(--radius-lg);
-  transition: 0.3s;
-}
-nav a:hover,
-nav a.active {
-  background: var(--clr-accent);
-  color: #fff;
-}
-#burger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-#burger span {
-  width: 28px;
-  height: 3px;
-  background: var(--clr-text);
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Montserrat',sans-serif;
+  background:var(--clr-bg);
+  color:var(--clr-text-main);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
 }
 
-/* MAIN */
-main {
-  flex: 1;
-  max-width: 1100px;
-  margin: auto;
-  padding: 120px 20px 40px;
+/* Header */
+header{
+  background:#fff;
+  padding:20px 40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:fixed;
+  inset:0 0 auto;
+  z-index:1000;
+  box-shadow:var(--shadow-lg);
 }
-section {
-  margin-bottom: 70px;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: 0.6s;
+header h1{
+  font-family:'Orbitron',sans-serif;
+  font-size:2.3rem;
+  color:var(--clr-accent);
 }
-section.active {
-  opacity: 1;
-  transform: none;
+nav{display:flex;gap:30px}
+nav a{
+  color:var(--clr-text-main);
+  font-weight:600;
+  font-size:1.1rem;
+  padding:10px 15px;
+  border-radius:var(--radius-lg);
+  transition:.3s;
+  text-decoration:none;
 }
-h2 {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 2.5rem;
-  color: var(--clr-accent);
-  text-align: center;
-  margin-bottom: 20px;
+nav a:hover,nav a.active{background:var(--clr-accent);color:#fff}
+#burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer}
+#burger span{width:28px;height:3px;background:var(--clr-text-main)}
+
+/* Main / sections */
+main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px}
+section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
+section.active{opacity:1;transform:none}
+h2{
+  font-family:'Orbitron',sans-serif;
+  font-size:2.6rem;
+  color:var(--clr-accent);
+  text-align:center;
+  margin-bottom:20px;
 }
-p, li {
-  font-size: 1.1rem;
-  color: var(--clr-text-sub);
-  line-height: 1.6;
-}
-ul {
-  list-style: none;
-  margin-top: 10px;
-}
-ul li::before {
-  content: '➤';
-  color: var(--clr-accent);
-  margin-right: 10px;
-}
+p,li{font-size:1.1rem;color:var(--clr-text-sub);line-height:1.6}
+ul{list-style:none;margin-top:10px}
+ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
 
 /* IP copy */
-.copy-ip {
-  display: flex;
-  justify-content: center;
-  margin: 30px 0 50px;
+.copy-ip{display:flex;justify-content:center;margin:30px 0 50px}
+.copy-ip input{
+  width:300px;
+  padding:12px 20px;
+  border:2px solid var(--clr-accent);
+  border-radius:25px 0 0 25px;
+  background:#fff;
+  font-size:1.2rem;
+  color:var(--clr-text-main);
 }
-.copy-ip input {
-  width: 300px;
-  padding: 12px 20px;
-  border: 2px solid var(--clr-accent);
-  border-radius: 25px 0 0 25px;
-  background: var(--clr-bg-alt);
-  font-size: 1.2rem;
-  color: var(--clr-text);
+.copy-ip button{
+  padding:12px 25px;
+  border:none;
+  border-radius:0 25px 25px 0;
+  background:var(--clr-accent);
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+  transition:.3s;
 }
-.copy-ip button {
-  padding: 12px 25px;
-  border: none;
-  border-radius: 0 25px 25px 0;
-  background: var(--clr-accent);
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.copy-ip button:hover {
-  background: var(--clr-accent-hover);
-}
+.copy-ip button:hover{background:var(--clr-accent-hover)}
 
-/* STATUS GRID */
-.status-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 25px;
-  margin-top: 40px;
+/* Grids */
+.status-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:30px;
+  margin-top:40px;
 }
-.status-box {
-  background: var(--clr-bg-alt);
-  border: 2px solid var(--clr-accent);
-  border-radius: var(--radius-lg);
-  padding: 25px 20px;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  transition: 0.3s;
+.status-box,.donate-card{
+  background:#fff;
+  border:2px solid var(--clr-accent);
+  border-radius:var(--radius-lg);
+  padding:30px 25px;
+  text-align:center;
+  box-shadow:var(--shadow-lg);
+  transition:.3s;
 }
-.status-box:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 30px rgba(255, 123, 0, 0.4);
+.status-box:hover,.donate-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 35px rgba(255,140,0,.3);
 }
-.status-box h3 {
-  font-family: 'Orbitron', sans-serif;
-  color: var(--clr-accent);
-  margin-bottom: 10px;
+.status-box h3,.donate-card h4{
+  font-family:'Orbitron',sans-serif;
+  color:var(--clr-accent);
+  margin-bottom:10px;
 }
+.donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;width:100%}
+.donate-card{width:260px}
+.donate-card:hover{transform:scale(1.06)}
+
+.buy-btn{
+  display:inline-block;
+  margin-top:12px;
+  padding:10px 16px;
+  border-radius:12px;
+  background:var(--clr-accent);
+  color:#fff;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  transition:.3s;
+}
+.buy-btn:hover{background:var(--clr-accent-hover)}
 
 /* FAQ */
-.faq-item {
-  background: var(--clr-bg-alt);
-  border: 2px solid var(--clr-accent);
-  border-radius: var(--radius-lg);
-  padding: 20px 25px;
-  margin-bottom: 15px;
-  cursor: pointer;
-  transition: 0.3s;
+.faq-item{
+  background:#fff;
+  border:2px solid var(--clr-accent);
+  border-radius:var(--radius-lg);
+  padding:20px 25px;
+  margin-bottom:15px;
+  cursor:pointer;
+  transition:.3s;
 }
-.faq-item:hover {
-  background: var(--clr-accent);
-  color: #fff;
-}
-.faq-answer {
-  display: none;
-  margin-top: 10px;
-}
-.faq-item.active .faq-answer {
-  display: block;
-}
+.faq-item:hover{background:var(--clr-accent);color:#fff}
+.faq-answer{display:none;margin-top:10px}
+.faq-item.active .faq-answer{display:block}
 
-/* FORM */
-form {
-  max-width: 480px;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+/* Form */
+form{max-width:480px;margin:auto;display:flex;flex-direction:column;gap:15px}
+input,textarea,select{
+  background:#fff;
+  border:2px solid var(--clr-accent);
+  border-radius:var(--radius-lg);
+  padding:12px 15px;
+  color:var(--clr-text-main);
+  font-size:1rem;
 }
-input, textarea {
-  background: var(--clr-bg-alt);
-  border: 2px solid var(--clr-accent);
-  border-radius: var(--radius-lg);
-  padding: 12px 15px;
-  color: var(--clr-text);
-  font-size: 1rem;
+button.send{
+  background:var(--clr-accent);
+  color:#fff;
+  border:none;
+  border-radius:var(--radius-lg);
+  padding:14px;
+  font-weight:700;
+  font-size:1.1rem;
+  cursor:pointer;
+  transition:.3s;
 }
-button.send {
-  background: var(--clr-accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  font-weight: 700;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: 0.3s;
-}
-button.send:hover {
-  background: var(--clr-accent-hover);
-}
+button.send:hover{background:var(--clr-accent-hover)}
 
-/* MOBILE */
-@media(max-width:768px) {
-  nav {
-    position: fixed;
-    top: 70px;
-    right: -100%;
-    width: 220px;
-    height: calc(100% - 70px);
-    flex-direction: column;
-    gap: 20px;
-    padding: 30px;
-    background: var(--clr-bg);
-    transition: right 0.4s;
-    box-shadow: var(--shadow-lg);
-  }
-  nav.open { right: 0; }
-  #burger { display: flex; }
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:2000}
+.modal{
+  background:#fff;
+  border:2px solid var(--clr-accent);
+  padding:20px;
+  border-radius:12px;
+  width:92%;
+  max-width:520px;
+  box-shadow:var(--shadow-lg);
+}
+.modal h3{color:var(--clr-accent);margin-bottom:12px;font-family:'Orbitron',sans-serif}
+
+/* Mobile */
+@media(max-width:768px){
+  nav{position:fixed;top:70px;right:-100%;width:220px;height:calc(100% - 70px);flex-direction:column;gap:20px;padding:30px;background:#fff;transition:right .4s;box-shadow:var(--shadow-lg)}
+  nav.open{right:0}
+  #burger{display:flex}
 }
 </style>
 </head>
@@ -252,126 +206,152 @@ button.send:hover {
   <nav>
     <a href="#home" class="nav-link active">Головна</a>
     <a href="#about" class="nav-link">Про сервер</a>
+    <a href="#donate" class="nav-link">Донати</a>
     <a href="#rules" class="nav-link">Правила</a>
     <a href="#faq" class="nav-link">FAQ</a>
-    <a href="#support" class="nav-link">Підтримка</a>
+    <a href="#support" class="nav-link">Тех. підтримка</a>
   </nav>
-  <button id="burger"><span></span><span></span><span></span></button>
+  <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
 </header>
 
 <main>
-  <!-- HOME -->
   <section id="home" class="active">
     <h2>Вітаємо на SimpleWorld!</h2>
-    <p style="text-align:center;max-width:600px;margin:auto">
-      Офіційний Minecraft-сервер з дружньою спільнотою та стабільною роботою.
-    </p>
+    <p style="text-align:center;max-width:600px;margin:auto">Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.</p>
     <div class="copy-ip">
       <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
       <button onclick="copyIP()">Копіювати IP</button>
     </div>
     <div class="status-grid">
       <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
-      <div class="status-box"><h3>Статус</h3><p id="server-status">Онлайн</p></div>
-      <div class="status-box"><h3>Гравців онлайн</h3><p id="players-count">5 / 20</p></div>
+      <div class="status-box"><h3>Статус</h3><p id="server-status">Завантаження...</p></div>
+      <div class="status-box"><h3>Гравців онлайн</h3><p id="players-count">Оновлення...</p></div>
       <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
     </div>
   </section>
 
-  <!-- ABOUT -->
   <section id="about">
     <h2>Про сервер</h2>
-    <p>SimpleWorld — це Minecraft-сервер, який пропонує класичний геймплей із сучасними фішками:</p>
     <ul>
       <li>Стабільна робота 24/7</li>
-      <li>Регулярні івенти</li>
+      <li>Регулярні івенти та оновлення</li>
+      <li>Велика спільнота гравців</li>
       <li>Дружня адміністрація</li>
-      <li>Без лагів і вайпів</li>
     </ul>
   </section>
 
-  <!-- RULES -->
+  <section id="donate">
+    <h2>Донати</h2>
+    <div class="donate-grid" id="donate-grid"></div>
+  </section>
+
   <section id="rules">
-    <h2>📘 Правила сервера</h2>
-    <ul>
-      <li>1. Без образ у чаті</li>
-      <li>2. Без читів та дюпів</li>
-      <li>3. Не спамити</li>
-      <li>4. Поважай інших гравців</li>
-      <li>5. Не зловживати багами</li>
-    </ul>
+    <h2>Правила сервера</h2>
+    <ul><li>Будь ввічливим і грай чесно!</li></ul>
   </section>
 
-  <!-- FAQ -->
   <section id="faq">
     <h2>Часті питання</h2>
-    <div class="faq-item">
-      <div class="faq-question">Як підключитись?</div>
-      <div class="faq-answer">Додайте <b>simpleworldl.aternos.me</b> у лаунчері.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question">Які версії?</div>
-      <div class="faq-answer">Підтримуються версії 1.16–1.20+</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question">Чи потрібні моди?</div>
-      <div class="faq-answer">Ні, достатньо чистого клієнта Minecraft.</div>
-    </div>
+    <div class="faq-item"><div class="faq-question">Як підключитись?</div><div class="faq-answer">Додайте <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
+    <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16–1.20+.</div></div>
+    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі заявки безпечні.</div></div>
   </section>
 
-  <!-- SUPPORT -->
   <section id="support">
-    <h2>Підтримка</h2>
-    <p style="text-align:center">Заповніть форму, і ми відповімо на вашу пошту:</p>
+    <h2>Тех. підтримка</h2>
+    <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
     <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
       <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
+      <input type="hidden" name="_template" value="box">
       <input name="name" type="text" placeholder="Ваше ім'я" required>
-      <input name="email" type="email" placeholder="Email для відповіді" required>
-      <textarea name="message" rows="5" placeholder="Опишіть питання" required></textarea>
-      <button type="submit" class="send">Надіслати ✉️</button>
+      <input name="email" type="email" placeholder="Email" required>
+      <textarea name="message" rows="5" placeholder="Ваше повідомлення" required></textarea>
+      <button type="submit" class="send">Надіслати</button>
     </form>
   </section>
 </main>
 
-<footer style="text-align:center;margin-bottom:30px;color:var(--clr-text-sub);">
-  © 2025 SimpleWorld Minecraft Server
+<footer style="text-align:center;padding:20px;background:#fff;border-top:2px solid var(--clr-accent);color:var(--clr-text-sub)">
+  © 2025 SimpleWorld Minecraft
 </footer>
 
+<!-- Modal -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <h3>Оформлення покупки</h3>
+    <form id="order-form">
+      <input id="order-package" readonly>
+      <input id="order-nick" placeholder="Ваш нік у грі">
+      <input id="order-name" placeholder="Ім'я" required>
+      <input id="order-contact" placeholder="Email або Telegram" required>
+      <select required>
+        <option>Вручну (домовитись)</option>
+        <option>PayPal</option>
+        <option>LiqPay</option>
+      </select>
+      <button type="submit" class="send">Надіслати замовлення</button>
+      <button type="button" id="modal-close" style="margin-top:10px;padding:8px 12px;background:#ccc;border:none;border-radius:8px;cursor:pointer;">Скасувати</button>
+    </form>
+  </div>
+</div>
+
 <script>
-/* Перемикання секцій */
-const links = document.querySelectorAll('.nav-link');
-const sections = document.querySelectorAll('main section');
-links.forEach(link => {
-  link.addEventListener('click', e => {
+const DONATES = [
+  { name: 'Premium',  price: '29 UAH',  desc: 'Малі бонуси' },
+  { name: 'Elite',    price: '49 UAH',  desc: 'Розширені можливості' },
+  { name: 'Deluxe',   price: '69 UAH',  desc: 'Круті фішки' },
+  { name: 'Ultra',    price: '99 UAH',  desc: 'Ще більше бонусів' },
+  { name: 'Immortal', price: '119 UAH', desc: 'Сильні привілеї' },
+  { name: 'Supreme',  price: '149 UAH', desc: 'Топ пакет' },
+  { name: 'Legend',   price: '199 UAH', desc: 'Легендарний рівень' },
+  { name: 'Infinity', price: '249 UAH', desc: 'Найвищий рівень' },
+];
+
+const donateGrid=document.getElementById('donate-grid');
+DONATES.forEach(d=>{
+  const c=document.createElement('div');
+  c.className='donate-card';
+  c.innerHTML=`<h4>${d.name}</h4><p>${d.desc}</p><p><b>${d.price}</b></p><button class='buy-btn'>Придбати</button>`;
+  c.querySelector('.buy-btn').addEventListener('click',()=>openModal(d.name,d.price));
+  donateGrid.appendChild(c);
+});
+
+function copyIP(){
+  navigator.clipboard.writeText(document.getElementById('ipInput').value);
+  alert('IP скопійовано!');
+}
+
+/* Модальне */
+const modal=document.getElementById('modal-backdrop');
+const pkgInput=document.getElementById('order-package');
+function openModal(name,price){
+  pkgInput.value=`${name} — ${price}`;
+  modal.style.display='flex';
+}
+document.getElementById('modal-close').onclick=()=>modal.style.display='none';
+window.onclick=e=>{if(e.target===modal)modal.style.display='none';};
+
+/* Вкладки */
+document.querySelectorAll('.nav-link').forEach(link=>{
+  link.addEventListener('click',e=>{
     e.preventDefault();
-    const target = link.getAttribute('href').substring(1);
-    links.forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
     link.classList.add('active');
-    sections.forEach(sec => sec.classList.remove('active'));
-    document.getElementById(target).classList.add('active');
+    document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+    document.querySelector(link.getAttribute('href')).classList.add('active');
     window.scrollTo({top:0,behavior:'smooth'});
     document.querySelector('nav').classList.remove('open');
   });
 });
 
-/* FAQ відкривання */
-document.querySelectorAll('.faq-item').forEach(item => {
-  item.addEventListener('click', () => item.classList.toggle('active'));
+/* FAQ */
+document.querySelectorAll('.faq-item').forEach(f=>{
+  f.addEventListener('click',()=>f.classList.toggle('active'));
 });
 
-/* Копіювання IP */
-function copyIP() {
-  const ipInput = document.getElementById('ipInput');
-  ipInput.select();
-  document.execCommand('copy');
-  alert('IP скопійовано: ' + ipInput.value);
-}
-
-/* Меню для телефону */
-document.getElementById('burger').onclick = () => {
-  document.querySelector('nav').classList.toggle('open');
-};
+/* Burger */
+document.getElementById('burger').onclick=()=>document.querySelector('nav').classList.toggle('open');
 </script>
-
 </body>
 </html>
