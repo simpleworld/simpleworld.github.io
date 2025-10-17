@@ -401,4 +401,122 @@ const ordersCount = document.getElementById('admin-orders-count');
 
 function showAdmin(show){
   loginBox.style.display = show ? 'none' : 'block';
-  panelBox.style.display = show ?
+  panelBox.style.display = show ? 'block' : 'none';
+}
+
+function updateOrdersView(){
+  const arr = JSON.parse(sessionStorage.getItem('sw_orders') || '[]');
+  ordersList.innerHTML = '';
+  ordersCount.textContent = arr.length;
+  if (arr.length === 0){
+    ordersList.innerHTML = '<p style="color:var(--clr-text-sub)">Замовлень немає</p>';
+    return;
+  }
+  arr.forEach(o=>{
+    const div = document.createElement('div');
+    div.className = 'order-item';
+    div.innerHTML = `
+      <strong>${o.package}</strong> — <span style="color:var(--clr-text-sub)">${o.created}</span>
+      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick || '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
+      <div style="margin-top:6px">Оплата: ${escapeHtml(o.payment)}</div>
+      <div style="margin-top:8px"><button data-id="${o.id}" style="padding:6px 8px;border-radius:6px;background:#ff9500;border:none;cursor:pointer;color:#fff;font-weight:700">Позначити як виконане</button></div>
+    `;
+    div.querySelector('button').addEventListener('click', (e)=>{
+      markOrderDone(o.id);
+    });
+    ordersList.appendChild(div);
+  });
+}
+
+function markOrderDone(id){
+  let arr = JSON.parse(sessionStorage.getItem('sw_orders') || '[]');
+  arr = arr.filter(o=>o.id !== id);
+  sessionStorage.setItem('sw_orders', JSON.stringify(arr));
+  updateOrdersView();
+}
+
+function escapeHtml(text){
+  return String(text).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+}
+
+loginBtn.addEventListener('click', ()=>{
+  const v = passInput.value;
+  if (v === ADMIN_PASS){
+    sessionStorage.setItem('sw_admin','true');
+    passInput.value = '';
+    loginErr.style.display = 'none';
+    showAdmin(true);
+    updateOrdersView();
+  } else {
+    loginErr.style.display = 'block';
+  }
+});
+
+logoutBtn.addEventListener('click', ()=>{
+  sessionStorage.removeItem('sw_admin');
+  showAdmin(false);
+});
+
+const ipField = document.getElementById('admin-ip');
+const playersField = document.getElementById('admin-players');
+function refreshAdminStats(){
+  const online = Math.random() > 0.3;
+  ipField.textContent = online ? 'simpleworldl.aternos.me' : '—';
+  playersField.textContent = online ? (Math.floor(Math.random()*100) + ' гравців') : '0';
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  const logged = sessionStorage.getItem('sw_admin') === 'true';
+  showAdmin(logged);
+  if (logged) {
+    updateOrdersView();
+    refreshAdminStats();
+  }
+});
+
+/* ---------- Кнопка в шапці: burger ---------- */
+const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
+if (burger) burger.onclick=()=>nav.classList.toggle('open');
+
+/* ---------- SPA навігація ---------- */
+const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
+function show(id){
+  sections.forEach(s=>s.classList.toggle('active',s.id===id));
+  links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));
+  nav.classList.remove('open');
+}
+links.forEach(l=>l.addEventListener('click', e=>{
+  e.preventDefault();
+  show(l.getAttribute('href').slice(1));
+  history.replaceState(null,'',l.hash);
+}));
+window.addEventListener('load', ()=> show(location.hash.slice(1)||'home'));
+
+/* ---------- FAQ акордеон ---------- */
+document.querySelectorAll('.faq-item').forEach(i=>i.addEventListener('click', ()=> i.classList.toggle('active')));
+
+/* ---------- Статус (імітація) ---------- */
+function updateStatus(){
+  const online = Math.random()>0.3;
+  document.getElementById('server-status').textContent = online?'Сервер онлайн':'Сервер офлайн';
+  document.getElementById('server-status').style.color = online?'var(--clr-accent)':'#ff4444';
+  document.getElementById('players-count').textContent = online?Math.floor(Math.random()*100)+' гравців':'0';
+}
+updateStatus();
+setInterval(updateStatus,15000);
+
+/* ---------- Копіювання IP ---------- */
+function copyIP(){
+  const i=document.getElementById('ipInput');
+  i.select();
+  i.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
+}
+
+/* ---------- Закриття модалу ---------- */
+modalBackdrop.addEventListener('click', (e)=>{
+  if (e.target === modalBackdrop) modalBackdrop.style.display = 'none';
+});
+document.addEventListener('keydown', (e)=>{
+  if (e.key === 'Escape') modalBackdrop.style.display = 'none';
+});
