@@ -60,7 +60,7 @@ nav a:hover,nav a.active{background:var(--clr-accent);color:#fff}
 #burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer}
 #burger span{width:28px;height:3px;background:var(--clr-text-main)}
 
-/* Main / sections */
+/* Main */
 main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px}
 section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
 section.active{opacity:1;transform:none}
@@ -98,7 +98,7 @@ ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
 }
 .copy-ip button:hover{background:var(--clr-accent-hover)}
 
-/* Grids */
+/* Cards */
 .status-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
@@ -118,15 +118,9 @@ ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
   transform:translateY(-6px);
   box-shadow:0 12px 35px rgba(255,140,0,.3);
 }
-.status-box h3,.donate-card h4{
-  font-family:'Orbitron',sans-serif;
-  color:var(--clr-accent);
-  margin-bottom:10px;
-}
 .donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;width:100%}
 .donate-card{width:260px}
 .donate-card:hover{transform:scale(1.06)}
-
 .buy-btn{
   display:inline-block;
   margin-top:12px;
@@ -140,20 +134,6 @@ ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
   transition:.3s;
 }
 .buy-btn:hover{background:var(--clr-accent-hover)}
-
-/* FAQ */
-.faq-item{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:20px 25px;
-  margin-bottom:15px;
-  cursor:pointer;
-  transition:.3s;
-}
-.faq-item:hover{background:var(--clr-accent);color:#fff}
-.faq-answer{display:none;margin-top:10px}
-.faq-item.active .faq-answer{display:block}
 
 /* Form */
 form{max-width:480px;margin:auto;display:flex;flex-direction:column;gap:15px}
@@ -217,14 +197,12 @@ button.send:hover{background:var(--clr-accent-hover)}
 <main>
   <section id="home" class="active">
     <h2>Вітаємо на SimpleWorld!</h2>
-    <p style="text-align:center;max-width:600px;margin:auto">Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.</p>
+    <p style="text-align:center;max-width:600px;margin:auto">
+      Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.
+    </p>
     <div class="copy-ip">
       <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
       <button onclick="copyIP()">Копіювати IP</button>
-    </div>
-    <div class="status-grid">
-      <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
-      <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
     </div>
   </section>
 
@@ -252,7 +230,6 @@ button.send:hover{background:var(--clr-accent-hover)}
     <h2>Часті питання</h2>
     <div class="faq-item"><div class="faq-question">Як підключитись?</div><div class="faq-answer">Додайте <strong>simpleworldl.aternos.me</strong> у лаунчері.</div></div>
     <div class="faq-item"><div class="faq-question">Які версії?</div><div class="faq-answer">Підтримуються 1.16–1.20+.</div></div>
-    <div class="faq-item"><div class="faq-question">Чи безпечні донати?</div><div class="faq-answer">Так, усі заявки безпечні.</div></div>
   </section>
 
   <section id="support">
@@ -278,18 +255,18 @@ button.send:hover{background:var(--clr-accent-hover)}
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <h3>Оформлення покупки</h3>
-    <form id="order-form" action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="Замовлення донату SimpleWorld">
       <input type="hidden" name="_captcha" value="false">
-      <input type="hidden" name="_subject" value="Нове замовлення з SimpleWorld">
-      <input type="hidden" name="_template" value="box">
-      <input id="order-package" name="package" readonly>
-      <input name="nick" placeholder="Ваш нік у грі" required>
-      <input name="name" placeholder="Ім’я" required>
-      <input name="contact" placeholder="Email або Telegram" required>
-      <select name="payment" required>
-        <option>Вручну (домовитись)</option>
-        <option>PayPal</option>
-        <option>LiqPay</option>
+      <input type="hidden" name="_template" value="table">
+      <input id="order-package" name="Пакет" readonly>
+      <input name="Нік у грі" placeholder="Ваш нік у грі" required>
+      <input name="Ім'я" placeholder="Ваше ім'я" required>
+      <input name="Контакт" placeholder="Email або Telegram" required>
+      <select name="Спосіб оплати" required>
+        <option value="Домовитись">Домовитись</option>
+        <option value="Monobank">Monobank</option>
+        <option value="PrivatBank">PrivatBank</option>
       </select>
       <button type="submit" class="send">Надіслати замовлення</button>
       <button type="button" id="modal-close" style="margin-top:10px;padding:8px 12px;background:#ccc;border:none;border-radius:8px;cursor:pointer;">Скасувати</button>
@@ -323,7 +300,7 @@ function copyIP(){
   alert('IP скопійовано!');
 }
 
-/* Модальне */
+/* Modal */
 const modal=document.getElementById('modal-backdrop');
 const pkgInput=document.getElementById('order-package');
 function openModal(name,price){
@@ -333,12 +310,7 @@ function openModal(name,price){
 document.getElementById('modal-close').onclick=()=>modal.style.display='none';
 window.onclick=e=>{if(e.target===modal)modal.style.display='none';};
 
-/* Повідомлення після покупки */
-document.getElementById('order-form').addEventListener('submit',function(){
-  alert('✅ Дякуємо за покупку! Ми скоро зв’яжемось із вами.');
-});
-
-/* Вкладки */
+/* Tabs */
 document.querySelectorAll('.nav-link').forEach(link=>{
   link.addEventListener('click',e=>{
     e.preventDefault();
@@ -349,11 +321,6 @@ document.querySelectorAll('.nav-link').forEach(link=>{
     window.scrollTo({top:0,behavior:'smooth'});
     document.querySelector('nav').classList.remove('open');
   });
-});
-
-/* FAQ */
-document.querySelectorAll('.faq-item').forEach(f=>{
-  f.addEventListener('click',()=>f.classList.toggle('active'));
 });
 
 /* Burger */
