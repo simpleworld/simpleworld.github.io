@@ -3,54 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FoxDrop - Відкриття кейсів CS2</title>
+<title>🦊 FoxDrop 2.0 | Відкриття кейсів CS2</title>
 <style>
 body {
   margin: 0;
   font-family: 'Poppins', sans-serif;
-  background: #0e0e10;
-  color: white;
+  background: #0d0e11;
+  color: #fff;
+  overflow-x: hidden;
 }
 header {
-  background: #141416;
+  background: #16181d;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 40px;
-  border-bottom: 2px solid #ff7b00;
+  border-bottom: 2px solid #ff8800;
 }
 header h1 {
-  color: #ff7b00;
-  font-size: 28px;
-  letter-spacing: 1px;
+  color: #ff8800;
+  font-size: 30px;
+  font-weight: 700;
 }
 .balance {
-  background: #1f1f22;
+  background: #1f2126;
   padding: 10px 20px;
   border-radius: 12px;
-  border: 1px solid #ff7b00;
+  border: 1px solid #ff8800;
 }
 .balance span {
-  color: #ffb84a;
+  color: #ffcc66;
   font-weight: bold;
 }
 nav {
-  background: #1a1a1d;
+  background: #1a1c22;
   display: flex;
   justify-content: center;
   padding: 15px;
-  gap: 20px;
-  border-bottom: 2px solid #ff7b00;
+  gap: 25px;
+  border-bottom: 2px solid #ff8800;
 }
 nav a {
   color: white;
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border-radius: 8px;
   transition: 0.3s;
 }
 nav a:hover {
-  background: #ff7b00;
+  background: #ff8800;
   color: black;
 }
 .container {
@@ -61,7 +62,7 @@ nav a:hover {
   justify-content: center;
 }
 .case {
-  background: #1c1c1f;
+  background: #1c1e25;
   border-radius: 16px;
   width: 250px;
   padding: 20px;
@@ -71,17 +72,19 @@ nav a:hover {
 }
 .case:hover {
   transform: scale(1.05);
-  border-color: #ff7b00;
+  border-color: #ff8800;
 }
 .case img {
   width: 200px;
+  height: 200px;
+  object-fit: contain;
   border-radius: 10px;
 }
 .case h2 {
   margin: 10px 0;
 }
 .case button {
-  background: #ff7b00;
+  background: #ff8800;
   color: black;
   border: none;
   border-radius: 8px;
@@ -91,7 +94,7 @@ nav a:hover {
   transition: 0.3s;
 }
 .case button:hover {
-  background: #ffa733;
+  background: #ffaa33;
 }
 #openAnimation {
   display: none;
@@ -101,14 +104,20 @@ nav a:hover {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  z-index: 999;
 }
-#openAnimation .carousel {
+.carousel {
   display: flex;
   overflow: hidden;
   width: 80%;
-  border: 3px solid #ff7b00;
+  border: 3px solid #ff8800;
   border-radius: 12px;
   background: #121212;
+  position: relative;
+}
+.carousel-track {
+  display: flex;
+  transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .carousel img {
   width: 120px;
@@ -116,35 +125,58 @@ nav a:hover {
   margin: 10px;
   border-radius: 8px;
 }
+#pointer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 4px;
+  background: red;
+  transform: translateX(-50%);
+}
 #result {
   font-size: 26px;
   margin-top: 20px;
   color: #ffb84a;
+  text-align: center;
 }
 #inventory {
   display: none;
-  padding: 20px;
+  padding: 30px;
 }
 .inventory-item {
-  background: #1f1f22;
+  background: #1f2025;
   border-radius: 10px;
   padding: 10px;
   margin: 10px;
   display: inline-block;
   width: 160px;
   text-align: center;
-  border: 1px solid #ff7b00;
+  border: 1px solid #ff8800;
 }
 .inventory-item img {
   width: 100px;
   height: 100px;
   border-radius: 6px;
 }
+.inventory-item button {
+  background: #ff3333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-top: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.inventory-item button:hover {
+  background: #ff5555;
+}
 </style>
 </head>
 <body>
 <header>
-  <h1>🦊 FoxDrop</h1>
+  <h1>🦊 FoxDrop 2.0</h1>
   <div class="balance">Баланс: <span id="balance">1000</span>$</div>
 </header>
 
@@ -154,41 +186,51 @@ nav a:hover {
   <a href="#" onclick="addBalance()">Поповнити баланс</a>
 </nav>
 
-<div id="cases" class="container">
-  <!-- Кейси -->
-</div>
+<div id="cases" class="container"></div>
 
 <div id="inventory">
   <h2>🎒 Твій інвентар</h2>
   <div id="inventoryItems"></div>
 </div>
 
-<!-- Вікно відкриття кейсу -->
 <div id="openAnimation">
-  <div class="carousel" id="carousel"></div>
+  <div class="carousel">
+    <div id="pointer"></div>
+    <div class="carousel-track" id="carouselTrack"></div>
+  </div>
   <div id="result"></div>
   <button onclick="closeAnimation()">Закрити</button>
 </div>
 
 <script>
 const cases = [
-  {name: "AK-47 Case", price: 100, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_race.c1b27b7b.png"},
-  {name: "Knife Case", price: 300, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_push_stiletto_blue_steel_light_large.4e8327b6.png"},
-  {name: "AWP Case", price: 200, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
-  {name: "USP-S Case", price: 80, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
-  {name: "M4A4 Case", price: 120, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_royal_paladin_light_large.7df92c09.png"}
+  {name: "AK-47 Case", price: 100, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_10.7bfa40c5b5b2213b657b1b8ab.png"},
+  {name: "Knife Case", price: 350, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_15.4e52f19b32472.png"},
+  {name: "AWP Case", price: 200, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_20.4e53fa19b14.png"},
+  {name: "USP-S Case", price: 80, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_17.15e0b2f.png"},
+  {name: "M4A4 Case", price: 120, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_21.12ebcfb3b0.png"}
 ];
+
 const skins = [
   {name: "AK-47 | Redline", price: 50, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.7d6e4a2b.png"},
   {name: "AWP | Dragon Lore", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.0e73c5a2.png"},
-  {name: "Butterfly Knife | Fade", price: 1000, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
-  {name: "USP-S | Kill Confirmed", price: 200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
-  {name: "M4A4 | Howl", price: 800, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
-  {name: "AK-47 | Vulcan", price: 300, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
-  {name: "AWP | Medusa", price: 900, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"}
+  {name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
+  {name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
+  {name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
+  {name: "AK-47 | Vulcan", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
+  {name: "AWP | Medusa", price: 980, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
+  {name: "Desert Eagle | Blaze", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_deagle_aq_deagle_blaze_light_large.287f2c88.png"}
 ];
-let balance = 1000;
-let inventory = [];
+
+let balance = parseInt(localStorage.getItem('balance')) || 1000;
+let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+
+document.getElementById("balance").innerText = balance;
+
+function saveData() {
+  localStorage.setItem('balance', balance);
+  localStorage.setItem('inventory', JSON.stringify(inventory));
+}
 
 function renderCases() {
   const container = document.getElementById("cases");
@@ -209,21 +251,32 @@ function openCase(name, price) {
   if(balance < price) return alert("Недостатньо балансу!");
   balance -= price;
   document.getElementById("balance").innerText = balance;
-  
+  saveData();
+
   document.getElementById("openAnimation").style.display = "flex";
-  const carousel = document.getElementById("carousel");
-  carousel.innerHTML = "";
-  for(let i=0; i<30; i++) {
+  const track = document.getElementById("carouselTrack");
+  track.innerHTML = "";
+
+  for(let i=0; i<40; i++) {
     const skin = skins[Math.floor(Math.random() * skins.length)];
     const img = document.createElement("img");
     img.src = skin.img;
-    carousel.appendChild(img);
+    track.appendChild(img);
   }
+
+  const rand = Math.floor(Math.random() * (skins.length));
+  const selected = skins[rand];
+  const moveX = -((rand + 20) * 140 - window.innerWidth/2 + 70);
+
   setTimeout(() => {
-    const win = skins[Math.floor(Math.random() * skins.length)];
-    document.getElementById("result").innerText = `Випав предмет: ${win.name} (${win.price}$)`;
-    inventory.push(win);
-  }, 3000);
+    track.style.transform = `translateX(${moveX}px)`;
+  }, 100);
+
+  setTimeout(() => {
+    document.getElementById("result").innerText = `🎉 Ти отримав: ${selected.name} (${selected.price}$)!`;
+    inventory.push(selected);
+    saveData();
+  }, 4000);
 }
 
 function closeAnimation() {
@@ -234,6 +287,7 @@ function closeAnimation() {
 function addBalance() {
   balance += 500;
   document.getElementById("balance").innerText = balance;
+  saveData();
 }
 
 function showCases() {
@@ -246,14 +300,24 @@ function showInventory() {
   document.getElementById("inventory").style.display = "block";
   const container = document.getElementById("inventoryItems");
   container.innerHTML = "";
-  inventory.forEach(item => {
+  inventory.forEach((item, i) => {
     container.innerHTML += `
       <div class="inventory-item">
         <img src="${item.img}">
         <p>${item.name}</p>
-        <span>${item.price}$</span>
+        <span>${item.price}$</span><br>
+        <button onclick="sellItem(${i})">Продати</button>
       </div>`;
   });
+}
+
+function sellItem(index) {
+  const item = inventory[index];
+  balance += item.price;
+  inventory.splice(index, 1);
+  saveData();
+  document.getElementById("balance").innerText = balance;
+  showInventory();
 }
 </script>
 </body>
