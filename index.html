@@ -47,18 +47,15 @@
   .small{font-size:13px;color:var(--muted)}
   .footer{margin-top:14px;font-size:13px;color:var(--muted)}
   .provably{font-family:monospace;font-size:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin-top:8px}
-  /* rarity colors */
   .r-common{color:#cbd5e1}
   .r-rare{color:#60a5fa}
   .r-epic{color:#a78bfa}
   .r-legend{color:#f6c85f}
-  /* big result card */
   .result{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
   .sparkle{position:absolute;pointer-events:none;mix-blend-mode:screen}
   .topup-input{width:120px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
   .small-btn{padding:6px 8px;border-radius:8px;border:none;background:#0f2540;color:#e6eef6;cursor:pointer}
   .row{display:flex;gap:8px;align-items:center}
-  /* responsive */
   @media(max-width:940px){ .grid{grid-template-columns:1fr} .cases{grid-template-columns:1fr} .opener{order:2} }
 </style>
 </head>
@@ -67,7 +64,7 @@
   <header>
     <div>
       <h1>FoxDrop — Демонстраційний відкривач кейсів</h1>
-      <div class="small">Вбудована демо-версія з provably-fair механікою</div>
+      <div class="small">Багато кейсів + скіни з CS2 + інвентар у окремому розділі</div>
     </div>
 
     <div class="balance">
@@ -83,7 +80,6 @@
   </header>
 
   <div class="grid">
-    <!-- left: cases + opener -->
     <div>
       <div class="panel">
         <h2 style="margin-top:0">Кейси</h2>
@@ -112,15 +108,8 @@
           <div id="resultArea"></div>
         </div>
       </div>
-
-      <div class="panel" style="margin-top:12px">
-        <h2 style="margin-top:0">Інвентар</h2>
-        <div class="inventory" id="inventory"></div>
-        <div class="footer">Предмети зберігаються в <strong>localStorage</strong> (демо).</div>
-      </div>
     </div>
 
-    <!-- right: active case + details -->
     <aside>
       <div class="panel">
         <h3 style="margin:0 0 8px 0">Активний кейс</h3>
@@ -139,6 +128,12 @@
         </div>
 
         <div style="margin-top:12px">
+          <h4 style="margin:6px 0">Інвентар</h4>
+          <div class="inventory" id="inventory"></div>
+          <div class="footer">Предмети збережено у <strong>localStorage</strong> (демо).</div>
+        </div>
+
+        <div style="margin-top:12px">
           <h4 style="margin:6px 0">Як верифікувати (коротко)</h4>
           <div class="small">Після відкриття видно <strong>serverSeed</strong>, <strong>clientSeed</strong> і <strong>nonce</strong>. Ви можете повторити rollFromSeeds(serverSeed, clientSeed, nonce) щоб отримати той самий результат.</div>
           <pre class="provably" id="provablyBox" style="display:none"></pre>
@@ -149,59 +144,34 @@
 </div>
 
 <script>
-/*
-  FoxDrop demo HTML-only logic
-  - local DB in JS + localStorage persistence
-  - provably-fair: generate serverSeed, reveal it after open
-  - rollFromSeeds uses HMAC-SHA256 (WebCrypto)
-  - reel animation: uses CSS transforms via JS timing
-*/
+function toMoney(c) { return (c/100).toFixed(2) + ' $'; }
+function uid() { return 'id_' + Math.random().toString(36).slice(2,10); }
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
 
-// ---------- Utility ----------
-function toMoney(cents){ return (cents/100).toFixed(2) + ' $'; }
-function uid(){ return 'id_' + Math.random().toString(36).slice(2,10); }
-function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-// ---------- Demo data ----------
+// Demo data: більше кейсів + скіни реальні/псевдореальні
 const DEMO = {
   items: [
-    { id: 'item_common', name:'Sticker: Fox Smile', rarity:'common', value:50, iconSVG: svgSticker() },
-    { id: 'item_rare', name:'Knife: Rusty Edge', rarity:'rare', value:700, iconSVG: svgKnife() },
-    { id: 'item_epic', name:'Rifle: Neon Burst', rarity:'epic', value:2500, iconSVG: svgRifle() },
-    { id: 'item_legend', name:'AK-47 | Blue Flame', rarity:'legend', value:15000, iconSVG: svgAK() }
+    { id:'item_common', name:'Sticker: Fox Smile', rarity:'common', value:50, iconSVG: svgSticker() },
+    { id:'item_rare', name:'Knife: Rusty Edge', rarity:'rare', value:700, iconSVG: svgKnife() },
+    { id:'item_epic', name:'Rifle: Neon Burst', rarity:'epic', value:2500, iconSVG: svgRifle() },
+    { id:'item_legend', name:'AK-47 | Blue Flame', rarity:'legend', value:15000, iconSVG: svgAK() },
+    // додані «скіни CS2» з приблизними цінами
+    { id:'item_cs2_1', name:'AWP | Dragon Lore', rarity:'legend', value:30000, iconSVG: svgCS2Skin1() },
+    { id:'item_cs2_2', name:'M4A4 | Howl', rarity:'legend', value:25000, iconSVG: svgCS2Skin2() }
   ],
   cases: [
-    {
-      id:'case_basic',
-      name:'Fox Basic Case',
-      desc:'Невеликий кейс з шансом знайти легендарку.',
-      price:200,
-      bannerColor:'#0b2540',
-      animationConfig:{spinDurationMs:4200, slotsToShow:9},
-      items: [
-        { itemId:'item_common', weight:7000 },
-        { itemId:'item_rare', weight:2000 },
-        { itemId:'item_epic', weight:900 },
-        { itemId:'item_legend', weight:100 }
-      ]
-    }
+    { id:'case_basic', name:'Fox Basic Case', desc:'Невеликий кейс з шансом знайти легендарку.', price:200, bannerColor:'#0b2540', animationConfig:{spinDurationMs:4200, slotsToShow:9}, items:[ {itemId:'item_common',weight:7000},{itemId:'item_rare',weight:2000},{itemId:'item_epic',weight:900},{itemId:'item_legend',weight:100} ] },
+    { id:'case_premium', name:'Fox Premium Case', desc:'Преміум кейс із вищим шансом епік/легендар.', price:1000, bannerColor:'#25404b', animationConfig:{spinDurationMs:4800, slotsToShow:12}, items:[ {itemId:'item_common',weight:5000},{itemId:'item_rare',weight:3000},{itemId:'item_epic',weight:1500},{itemId:'item_legend',weight:500} ] },
+    { id:'case_cs2', name:'Fox CS2 Legend Case', desc:'Ексклюзивний кейс із скінами CS2.', price:5000, bannerColor:'#402b1f', animationConfig:{spinDurationMs:5500, slotsToShow:15}, items:[ {itemId:'item_rare',weight:4000},{itemId:'item_epic',weight:3000},{itemId:'item_legend',weight:2000},{itemId:'item_cs2_1',weight:50},{itemId:'item_cs2_2',weight:30} ] }
   ]
 };
 
-// ---------- persistence + state ----------
 const STORAGE_KEY = 'foxdrop_demo_v1';
-let STATE = {
-  balance: 10000, // cents
-  inventory: [], // array of item objects
-  clientSeed: localStorage.getItem('fd_client_seed') || '',
-  nonce: parseInt(localStorage.getItem('fd_nonce')||'0'),
-  recent: []
-};
+let STATE = { balance: 10000, inventory: [], clientSeed: localStorage.getItem('fd_client_seed') || '', nonce: parseInt(localStorage.getItem('fd_nonce')||'0'), recent: [] };
 function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); localStorage.setItem('fd_client_seed', STATE.clientSeed); localStorage.setItem('fd_nonce', String(STATE.nonce)); }
 function loadState(){ const v = localStorage.getItem(STORAGE_KEY); if(v){ try{ Object.assign(STATE, JSON.parse(v)); } catch(e){} } }
 loadState();
 
-// ---------- DOM refs ----------
 const balanceEl = document.getElementById('balance');
 const casesList = document.getElementById('casesList');
 const caseNameEl = document.getElementById('caseName');
@@ -223,168 +193,161 @@ const recentEl = document.getElementById('recent');
 const provablyBox = document.getElementById('provablyBox');
 const showProvBtn = document.getElementById('showProv');
 
-// ---------- init ----------
 let ACTIVE_CASE = DEMO.cases[0];
 let isSpinning = false;
-renderBalance(); renderCases(); setActiveCase(ACTIVE_CASE.id);
+
+renderBalance();
+renderCases();
+setActiveCase(ACTIVE_CASE.id);
 clientSeedInput.value = STATE.clientSeed;
 nonceDisplay.textContent = STATE.nonce;
 renderInventory();
 renderRecent();
 
-genSeedBtn.onclick = ()=>{ const s = 'cs_' + Math.random().toString(36).slice(2) + Date.now().toString(36); STATE.clientSeed = s; clientSeedInput.value = s; saveState(); }
+genSeedBtn.onclick = ()=>{ const s='cs2_'+Math.random().toString(36).slice(2)+Date.now().toString(36); STATE.clientSeed=s; clientSeedInput.value=s; saveState(); }
 clientSeedInput.onchange = ()=>{ STATE.clientSeed = clientSeedInput.value; saveState(); }
-topupBtn.onclick = ()=>{ const amt = Number(topupAmount.value)||0; STATE.balance += Math.round(amt*100); renderBalance(); saveState(); }
+topupBtn.onclick = ()=>{ const amt=Number(topupAmount.value)||0; STATE.balance += Math.round(amt*100); renderBalance(); saveState(); }
 showProvBtn.onclick = ()=>{ provablyBox.style.display = provablyBox.style.display === 'none' ? 'block' : 'none'; }
 
-// ---------- rendering ----------
 function renderBalance(){ balanceEl.textContent = toMoney(STATE.balance); }
 function renderCases(){
   casesList.innerHTML = '';
-  DEMO.cases.forEach(c => {
-    const el = document.createElement('div'); el.className='case';
-    el.innerHTML = `<div class="banner">${c.name.split(' ')[0]}</div>
-      <div>
-        <h3>${c.name}</h3>
-        <div class="meta">${c.desc}</div>
-        <div class="meta">Ціна: ${toMoney(c.price)}</div>
-      </div>
+  DEMO.cases.forEach(c=>{
+    const el=document.createElement('div'); el.className='case';
+    el.innerHTML=`<div class="banner">${c.name.split(' ')[0]}</div>
+      <div><h3>${c.name}</h3><div class="meta">${c.desc}</div><div class="meta">Ціна: ${toMoney(c.price)}</div></div>
       <div class="open"><button class="small-btn" data-id="${c.id}">Select</button></div>`;
     casesList.appendChild(el);
-    el.querySelector('button').onclick = ()=> setActiveCase(c.id);
+    el.querySelector('button').onclick=()=>setActiveCase(c.id);
   });
 }
+
 function setActiveCase(caseId){
-  const c = DEMO.cases.find(x=>x.id===caseId); if(!c) return;
+  const c = DEMO.cases.find(x=>x.id===caseId);
+  if(!c) return;
   ACTIVE_CASE = c;
   caseNameEl.textContent = c.name;
   caseDescEl.textContent = c.desc;
   casePriceEl.textContent = toMoney(c.price);
   caseIconEl.textContent = c.name.split(' ')[0].slice(0,2).toUpperCase();
-  // show small probabilities summary
-  // build rarity table
 }
+
 function renderInventory(){
   inventoryEl.innerHTML = '';
   if(STATE.inventory.length===0){ inventoryEl.innerHTML = '<div class="small">Інвентар порожній</div>'; return; }
   STATE.inventory.slice().reverse().forEach(it=>{
-    const node = document.createElement('div'); node.className='inv-item';
+    const node=document.createElement('div'); node.className='inv-item';
     node.innerHTML = `<div style="width:64px;height:64px">${it.iconSVG}</div>
       <div style="flex:1">
         <div style="font-weight:700">${it.name} <span class="meta">${rarityText(it.rarity)}</span></div>
-        <div class="meta">${toMoney(it.value)}</div>
+        <div class="meta">Вартість: ${toMoney(it.value)}</div>
       </div>
-      <div style="text-align:right"><button class="small-btn" data-id="${it.id}">Sell</button></div>`;
+      <div style="text-align:right"><button class="small-btn" data-id="${it.id}">Продати</button></div>`;
     inventoryEl.appendChild(node);
-    node.querySelector('button').onclick = ()=>{ sellItem(it.id); };
+    node.querySelector('button').onclick=()=>{ sellItem(it.id); };
   });
 }
-function rarityText(r){ if(r==='common') return '<span class="r-common">common</span>'; if(r==='rare') return '<span class="r-rare">rare</span>'; if(r==='epic') return '<span class="r-epic">epic</span>'; return '<span class="r-legend">legend</span>'; }
-function renderRecent(){ recentEl.innerHTML = STATE.recent.slice().reverse().slice(0,6).map(r=>`<div style="margin:6px 0">${r}</div>`).join(''); }
 
-// ---------- selling ----------
+function rarityText(r){ if(r==='common') return '<span class="r-common">common</span>'; if(r==='rare') return '<span class="r-rare">rare</span>'; if(r==='epic') return '<span class="r-epic">epic</span>'; return '<span class="r-legend">legend</span>'; }
+
 function sellItem(id){
-  const idx = STATE.inventory.findIndex(x=>x.id===id); if(idx===-1) return;
+  const idx = STATE.inventory.findIndex(x=>x.id===id);
+  if(idx===-1) return;
   const it = STATE.inventory.splice(idx,1)[0];
   STATE.balance += it.value;
-  saveState(); renderInventory(); renderBalance();
-  alert('Продано: ' + it.name);
+  saveState();
+  renderInventory();
+  renderBalance();
+  alert('Продано: '+it.name);
 }
 
-// ---------- RNG helpers (webcrypto + HMAC) ----------
-async function hmacSha256Hex(keyHex, message){
-  // keyHex: hex string
+// RNG helpers
+async function hmacSha256Hex(keyHex,message){
   const keyBytes = hexToBytes(keyHex);
   const enc = new TextEncoder().encode(message);
-  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-256'}, false, ['sign']);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes,{name:'HMAC',hash:'SHA-256'},false,['sign']);
   const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc);
   return bytesToHex(new Uint8Array(sig));
 }
-function hexToBytes(hex){ const a = []; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
+function hexToBytes(hex){ const a=[]; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
 function bytesToHex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
 async function rollFromSeeds(serverSeed, clientSeed, nonce=0){
   const message = `${clientSeed}:${nonce}`;
-  const h = await hmacSha256Hex(serverSeed, message);
+  const h = await hmacSha256Hex(serverSeed,message);
   const slice = h.slice(0,15);
   const num = parseInt(slice,16);
-  const max = Math.pow(16, slice.length);
-  return num / max;
+  const max = Math.pow(16,slice.length);
+  return num/max;
 }
 
-// ---------- case open core ----------
+// Open logic
 openBtn.onclick = ()=> openCaseSingle();
 auto5Btn.onclick = async ()=>{ for(let i=0;i<5;i++){ if(STATE.balance < ACTIVE_CASE.price) break; await openCaseSingle(true); await sleep(700); } };
 
 async function openCaseSingle(isAuto=false){
   if(isSpinning) return;
   if(STATE.balance < ACTIVE_CASE.price){ alert('Немає балансу. Поповни.'); return; }
-  isSpinning = true;
-  // deduct
+  isSpinning=true;
   STATE.balance -= ACTIVE_CASE.price;
   STATE.nonce += 1;
-  saveState(); renderBalance(); nonceDisplay.textContent = STATE.nonce;
+  saveState();
+  renderBalance();
+  nonceDisplay.textContent = STATE.nonce;
 
-  // prepare seeds
-  const serverSeed = cryptoRandomHex(32); // hidden until reveal
-  const clientSeed = STATE.clientSeed || ('cs_' + Date.now().toString(36));
-  if(!STATE.clientSeed) { STATE.clientSeed = clientSeed; clientSeedInput.value = clientSeed; saveState(); }
+  const serverSeed = cryptoRandomHex(32);
+  const clientSeed = STATE.clientSeed||('cs2_'+Date.now().toString(36));
+  if(!STATE.clientSeed){ STATE.clientSeed = clientSeed; clientSeedInput.value=clientSeed; saveState(); }
   const nonce = STATE.nonce;
 
-  // compute roll
   const roll = await rollFromSeeds(serverSeed, clientSeed, nonce);
-  // choose item by weights
-  const chosenItem = chooseByWeight(ACTIVE_CASE.items, roll);
-  const itemDef = DEMO.items.find(it=>it.id===chosenItem.itemId);
+  const chosen = chooseByWeight(ACTIVE_CASE.items, roll);
+  const itemDef = DEMO.items.find(it=>it.id===chosen.itemId);
 
-  // build reel array large enough for nice animation
-  const reelArray = buildReelArray(itemDef, ACTIVE_CASE.items, DEMO.items, 40);
-  renderReelSlots(reelArray);
+  const reelArr = buildReelArray(itemDef, ACTIVE_CASE.items, DEMO.items, 50);
+  renderReelSlots(reelArr);
 
-  // animate: move reel such that target appears in center after duration
   const duration = ACTIVE_CASE.animationConfig.spinDurationMs || 4200;
-  await animateReelToIndex(reelArray, reelArray.findIndex(x=>x.isTarget), duration);
+  await animateReelToIndex(reelArr, reelArr.findIndex(x=>x.isTarget), duration);
 
-  // create item copy and add to inventory
   const newItem = Object.assign({}, itemDef, { id: uid(), acquiredAt: Date.now() });
   STATE.inventory.push(newItem);
   STATE.recent.push(`${new Date().toLocaleTimeString()} — Відкрито: ${newItem.name} (${newItem.rarity})`);
-  if(STATE.recent.length>40) STATE.recent.shift();
+  if(STATE.recent.length>100) STATE.recent.shift();
   saveState();
-  renderInventory(); renderRecent();
+  renderInventory();
+  renderRecent();
 
-  // reveal serverSeed & provably data
   showResult(newItem, { serverSeed, clientSeed, nonce, roll });
 
-  isSpinning = false;
-}
-function chooseByWeight(weightArr, roll){
-  const total = weightArr.reduce((s,e)=>s+e.weight,0);
-  let threshold = roll * total;
-  for(const ent of weightArr){
-    threshold -= ent.weight;
-    if(threshold <= 0) return ent;
-  }
-  return weightArr[weightArr.length-1];
+  isSpinning=false;
 }
 
-// ---------- reel helpers ----------
+function chooseByWeight(weights, roll){
+  const total = weights.reduce((s,e)=>s+e.weight,0);
+  let t = roll * total;
+  for(const ent of weights){
+    t -= ent.weight;
+    if(t <= 0) return ent;
+  }
+  return weights[weights.length-1];
+}
+
 function buildReelArray(targetItem, caseItems, allItems, length){
-  // Fill with random items according to weights, then insert target near center
-  const arr = [];
+  const arr=[];
   for(let i=0;i<length;i++){
     const pick = weightedPick(caseItems, allItems);
     arr.push(pick);
   }
-  const center = Math.floor(length/2);
-  arr[center] = Object.assign({}, targetItem, { isTarget:true });
+  const center=Math.floor(length/2);
+  arr[center]=Object.assign({}, targetItem, { isTarget:true });
   return arr;
 }
 function weightedPick(caseItems, allItems){
   const total = caseItems.reduce((s,e)=>s+e.weight,0);
-  let t = Math.random() * total;
+  let t=Math.random()*total;
   for(const ent of caseItems){
     t -= ent.weight;
-    if(t <= 0){
+    if(t<=0){
       const def = allItems.find(a=>a.id===ent.itemId);
       return def;
     }
@@ -392,9 +355,10 @@ function weightedPick(caseItems, allItems){
   return allItems[0];
 }
 function renderReelSlots(arr){
-  reel.innerHTML = '';
+  reel.innerHTML='';
   arr.forEach(it=>{
-    const d = document.createElement('div'); d.className='slot';
+    const d=document.createElement('div');
+    d.className='slot';
     d.innerHTML = `<div style="width:84px;height:84px;display:flex;align-items:center;justify-content:center">${it.iconSVG}</div>
       <div style="flex:1">
         <div class="name">${it.name}</div>
@@ -402,33 +366,27 @@ function renderReelSlots(arr){
       </div>`;
     reel.appendChild(d);
   });
-  // position top at 0
-  reel.style.transform = 'translateY(0px)';
+  reel.style.transform='translateY(0px)';
 }
 function rarityClass(r){ if(r==='common') return 'r-common'; if(r==='rare') return 'r-rare'; if(r==='epic') return 'r-epic'; return 'r-legend'; }
 
 async function animateReelToIndex(arr, targetIndex, duration){
-  const slotH = reelWindow.clientHeight; // each slot height equals window height
-  // ensure each slot element height matches
+  const slotH = reelWindow.clientHeight;
   const slots = reel.children;
-  // compute required translateY: so that targetIndex slot sits centered (top: -(targetIndex*slotH) + centerOffset)
-  const centerOffset = Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2);
-  const targetY = -(targetIndex * slots[0].clientHeight) + centerOffset;
-  // animate with easing
   const start = performance.now();
-  const from = 0;
-  const to = targetY - (Math.random()*slotH*3 + slotH*6); // add extra spins (negative)
+  const from=0;
+  const to = -(targetIndex * slots[0].clientHeight) + Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2) - (Math.random()*slotH*5 + slotH*10);
   return new Promise(resolve=>{
     function frame(now){
-      const t = Math.min(1, (now-start)/duration);
+      const t = Math.min(1,(now-start)/duration);
       const eased = easeOutCubic(t);
-      const current = from + (to - from) * eased;
-      reel.style.transform = `translateY(${current}px)`;
-      if(t < 1) requestAnimationFrame(frame); else {
-        // final settle (snap to exact targetY)
-        reel.style.transition = 'transform 280ms ease-out';
-        reel.style.transform = `translateY(${targetY}px)`;
-        setTimeout(()=>{ reel.style.transition = ''; resolve(); },300);
+      const current = from + (to-from)*eased;
+      reel.style.transform=`translateY(${current}px)`;
+      if(t<1) requestAnimationFrame(frame); else {
+        reel.style.transition='transform 300ms ease-out';
+        const finalY = -(targetIndex * slots[0].clientHeight) + Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2);
+        reel.style.transform=`translateY(${finalY}px)`;
+        setTimeout(()=>{ reel.style.transition=''; resolve(); },300);
       }
     }
     requestAnimationFrame(frame);
@@ -436,8 +394,7 @@ async function animateReelToIndex(arr, targetIndex, duration){
 }
 function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
 
-// ---------- result display ----------
-function showResult(item, provably){
+function showResult(item, prov){
   resultArea.innerHTML = `<div style="width:100%" class="result">
     <div style="width:80px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#062e3a,#073656)">${item.iconSVG}</div>
     <div style="flex:1">
@@ -445,77 +402,40 @@ function showResult(item, provably){
       <div style="margin-top:6px" class="small">Вартість предмета: ${toMoney(item.value)}</div>
       <div class="provably" style="margin-top:8px">
         <div style="font-weight:700">Provably fair:</div>
-        <div>serverSeed: <span style="font-family:monospace">${provably.serverSeed.slice(0,24)}…</span></div>
-        <div>clientSeed: <span style="font-family:monospace">${provably.clientSeed}</span></div>
-        <div>nonce: ${provably.nonce}</div>
-        <div>roll: ${provably.roll.toFixed(6)}</div>
+        <div>serverSeed: <span style="font-family:monospace">${prov.serverSeed.slice(0,24)}…</span></div>
+        <div>clientSeed: <span style="font-family:monospace">${prov.clientSeed}</span></div>
+        <div>nonce: ${prov.nonce}</div>
+        <div>roll: ${prov.roll.toFixed(6)}</div>
       </div>
     </div>
   </div>`;
-  provablyBox.textContent = JSON.stringify(provably, null, 2);
+  provablyBox.textContent = JSON.stringify(prov, null,2);
 }
 
-// ---------- utilities ----------
 function cryptoRandomHex(bytes=32){
   const arr = new Uint8Array(bytes);
   crypto.getRandomValues(arr);
   return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ---------- small SVG icons used inline ----------
-function svgSticker(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect rx="10" width="64" height="64" fill="#ffcc9a"/>
-  <circle cx="32" cy="26" r="8" fill="#fff3e8"/>
-  <rect x="18" y="40" width="28" height="8" rx="4" fill="#fff3e8"/>
-</svg>`;}
-function svgKnife(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect rx="8" width="64" height="64" fill="#0b2540"/>
-  <path d="M10 40 L36 14 L54 20 L22 46 Z" fill="#d7b39d"/>
-  <rect x="6" y="44" width="30" height="8" rx="4" fill="#4b5563"/>
-</svg>`;}
-function svgRifle(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect rx="8" width="64" height="64" fill="#04121a"/>
-  <rect x="8" y="28" width="40" height="8" rx="4" fill="#7c3aed"/>
-  <rect x="46" y="34" width="10" height="6" rx="3" fill="#111827"/>
-</svg>`;}
-function svgAK(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect rx="8" width="64" height="64" fill="#021122"/>
-  <path d="M8 36 L28 22 L56 28 L48 36 L20 48 Z" fill="#0ea5a4"/>
-  <circle cx="48" cy="30" r="3" fill="#fff"/>
-</svg>`;}
+function svgSticker(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="10" width="64" height="64" fill="#ffcc9a"/><circle cx="32" cy="26" r="8" fill="#fff3e8"/><rect x="18" y="40" width="28" height="8" rx="4" fill="#fff3e8"/></svg>`; }
+function svgKnife(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#0b2540"/><path d="M10 40 L36 14 L54 20 L22 46 Z" fill="#d7b39d"/><rect x="6" y="44" width="30" height="8" rx="4" fill="#4b5563"/></svg>`; }
+function svgRifle(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#04121a"/><rect x="8" y="28" width="40" height="8" rx="4" fill="#7c3aed"/><rect x="46" y="34" width="10" height="6" rx="3" fill="#111827"/></svg>`; }
+function svgAK(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#021122"/><path d="M8 36 L28 22 L56 28 L48 36 L20 48 Z" fill="#0ea5a4"/><circle cx="48" cy="30" r="3" fill="#fff"/></svg>`; }
+function svgCS2Skin1(){ return `<svg width="60" height="60" viewBox="0 0 64 64"><rect rx="8" width="64" height="64" fill="#421212"/><path d="M16 16 L48 48" stroke="#f6c85f" stroke-width="4"/><path d="M48 16 L16 48" stroke="#f6c85f" stroke-width="4"/></svg>`; }
+function svgCS2Skin2(){ return `<svg width="60" height="60" viewBox="0 0 64 64"><rect rx="8" width="64" height="64" fill="#122142"/><path d="M16 48 L48 16" stroke="#60a5fa" stroke-width="4"/><circle cx="32" cy="32" r="10" fill="#a78bfa"/></svg>`; }
 
-// ---------- misc helpers ----------
 function bytesToHex(arr){ return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-function hexToBytes(hex){ const a=[]; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
 
-// ---------- init styles for reel (create fixed slot height matching reel-window) ----------
 function prepareReelSlotHeight(){
-  // create a temporary slot to measure height
-  const tmp = document.createElement('div'); tmp.className='slot'; tmp.style.visibility='hidden';
-  tmp.innerHTML = `<div style="width:84px;height:84px"></div><div style="flex:1"><div>Sample</div><div class="rarity">rar</div></div>`;
+  const tmp=document.createElement('div'); tmp.className='slot'; tmp.style.visibility='hidden';
+  tmp.innerHTML=`<div style="width:84px;height:84px"></div><div style="flex:1"><div>Sample</div><div class="rarity">rar</div></div>`;
   reel.appendChild(tmp);
-  // set all slot heights to be equal to reel-window height to make animation easier
-  const h = reelWindow.clientHeight;
-  Array.from(document.getElementsByClassName('slot')).forEach(s=>s.style.height = h + 'px');
-  // cleanup tmp
+  const h=reelWindow.clientHeight;
+  Array.from(document.getElementsByClassName('slot')).forEach(s=>s.style.height=h+'px');
   if(reel.contains(tmp)) reel.removeChild(tmp);
 }
 window.addEventListener('resize', ()=>prepareReelSlotHeight());
 prepareReelSlotHeight();
 
-function initFromLocal(){
-  // if no client seed, set one
-  if(!STATE.clientSeed){ STATE.clientSeed = 'cs_' + Math.random().toString(36).slice(2); clientSeedInput.value = STATE.clientSeed; saveState(); }
-  renderInventory();
-  renderBalance();
-}
-initFromLocal();
-
-// ---------- recent initial demo ----------
-if(STATE.recent.length===0) STATE.recent.push(new Date().toLocaleTimeString() + ' — Демо: Відкрито Sticker: Fox Smile');
-renderRecent();
-
-// ---------- end of script ----------
-</script>
-</body>
-</html>
+if(!STATE.clientSeed){ STATE.clientSeed='cs2_'+Math.random().toString(36).slice(2); clientSeedInput.value=STATE.clientSeed; saveState(); }
