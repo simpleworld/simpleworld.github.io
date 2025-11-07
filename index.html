@@ -1,441 +1,260 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FoxDrop — Demo Case Opener</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoxDrop - Відкриття кейсів CS2</title>
 <style>
-  :root{
-    --bg:#0f1724;
-    --card:#0b1220;
-    --muted:#9aa4b2;
-    --accent:#ff7a59;
-    --glass: rgba(255,255,255,0.03);
-    --green:#10b981;
-    --pink:#ef476f;
-    --gold:#f6c85f;
-    --radius:16px;
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#071024 0%, #081427 60%);color:#e6eef6;min-height:100vh}
-  .wrap{max-width:1100px;margin:28px auto;padding:20px}
-  header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
-  h1{font-size:20px;margin:0;letter-spacing:0.2px}
-  .balance{background:linear-gradient(90deg,#06121f,#0b1b2a);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center}
-  .bal-amount{font-weight:700;font-size:18px}
-  .btn{background:linear-gradient(90deg,var(--accent),#ff9b7a);border:none;padding:8px 12px;border-radius:10px;color:#071024;font-weight:700;cursor:pointer}
-  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start}
-  .panel{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow: 0 6px 24px rgba(2,6,23,0.6)}
-  .cases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  .case{background:linear-gradient(180deg,#09121b 0%, #082033 100%);padding:12px;border-radius:12px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.03)}
-  .case .banner{width:84px;height:64px;border-radius:8px;background:linear-gradient(135deg,#132035,#0b2540);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold)}
-  .case h3{margin:0;font-size:14px}
-  .case .meta{font-size:12px;color:var(--muted)}
-  .case .open{margin-left:auto}
-  .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
-  .opener{height:220px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
-  .reel-window{width:100%;height:92px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
-  .reel{position:absolute;left:0;right:0;top:0}
-  .slot{height:92px;display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.02)}
-  .slot img{width:64px;height:64px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,#132035,#0b2540)}
-  .slot .name{font-weight:700}
-  .slot .rarity{font-size:12px;color:var(--muted)}
-  .inventory{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-  .inv-item{display:flex;gap:12px;align-items:center;background:var(--glass);padding:8px;border-radius:10px}
-  .inv-item .meta{font-size:13px;color:var(--muted)}
-  .small{font-size:13px;color:var(--muted)}
-  .footer{margin-top:14px;font-size:13px;color:var(--muted)}
-  .provably{font-family:monospace;font-size:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin-top:8px}
-  .r-common{color:#cbd5e1}
-  .r-rare{color:#60a5fa}
-  .r-epic{color:#a78bfa}
-  .r-legend{color:#f6c85f}
-  .result{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
-  .sparkle{position:absolute;pointer-events:none;mix-blend-mode:screen}
-  .topup-input{width:120px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-  .small-btn{padding:6px 8px;border-radius:8px;border:none;background:#0f2540;color:#e6eef6;cursor:pointer}
-  .row{display:flex;gap:8px;align-items:center}
-  @media(max-width:940px){ .grid{grid-template-columns:1fr} .cases{grid-template-columns:1fr} .opener{order:2} }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #0e0e10;
+  color: white;
+}
+header {
+  background: #141416;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  border-bottom: 2px solid #ff7b00;
+}
+header h1 {
+  color: #ff7b00;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+.balance {
+  background: #1f1f22;
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: 1px solid #ff7b00;
+}
+.balance span {
+  color: #ffb84a;
+  font-weight: bold;
+}
+nav {
+  background: #1a1a1d;
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  gap: 20px;
+  border-bottom: 2px solid #ff7b00;
+}
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+nav a:hover {
+  background: #ff7b00;
+  color: black;
+}
+.container {
+  padding: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+}
+.case {
+  background: #1c1c1f;
+  border-radius: 16px;
+  width: 250px;
+  padding: 20px;
+  text-align: center;
+  border: 2px solid #29292d;
+  transition: 0.3s;
+}
+.case:hover {
+  transform: scale(1.05);
+  border-color: #ff7b00;
+}
+.case img {
+  width: 200px;
+  border-radius: 10px;
+}
+.case h2 {
+  margin: 10px 0;
+}
+.case button {
+  background: #ff7b00;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.case button:hover {
+  background: #ffa733;
+}
+#openAnimation {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+#openAnimation .carousel {
+  display: flex;
+  overflow: hidden;
+  width: 80%;
+  border: 3px solid #ff7b00;
+  border-radius: 12px;
+  background: #121212;
+}
+.carousel img {
+  width: 120px;
+  height: 120px;
+  margin: 10px;
+  border-radius: 8px;
+}
+#result {
+  font-size: 26px;
+  margin-top: 20px;
+  color: #ffb84a;
+}
+#inventory {
+  display: none;
+  padding: 20px;
+}
+.inventory-item {
+  background: #1f1f22;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
+  width: 160px;
+  text-align: center;
+  border: 1px solid #ff7b00;
+}
+.inventory-item img {
+  width: 100px;
+  height: 100px;
+  border-radius: 6px;
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>FoxDrop — Демонстраційний відкривач кейсів</h1>
-      <div class="small">Багато кейсів + скіни з CS2 + інвентар у окремому розділі</div>
-    </div>
+<header>
+  <h1>🦊 FoxDrop</h1>
+  <div class="balance">Баланс: <span id="balance">1000</span>$</div>
+</header>
 
-    <div class="balance">
-      <div style="display:flex;flex-direction:column">
-        <div class="small">Баланс</div>
-        <div class="bal-amount" id="balance">0.00</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;margin-left:12px">
-        <input class="topup-input" id="topupAmount" value="50" />
-        <button class="btn" id="topupBtn">Поповнити</button>
-      </div>
-    </div>
-  </header>
+<nav>
+  <a href="#" onclick="showCases()">Кейси</a>
+  <a href="#" onclick="showInventory()">Інвентар</a>
+  <a href="#" onclick="addBalance()">Поповнити баланс</a>
+</nav>
 
-  <div class="grid">
-    <div>
-      <div class="panel">
-        <h2 style="margin-top:0">Кейси</h2>
-        <div class="cases" id="casesList"></div>
-        <div class="controls small" style="margin-top:10px">
-          <div>ClientSeed:</div>
-          <input id="clientSeed" class="topup-input" style="width:220px" />
-          <button class="small-btn" id="genSeed">Згенерувати</button>
-          <div style="margin-left:auto" class="small">Nonce: <span id="nonceDisplay">0</span></div>
-        </div>
-      </div>
+<div id="cases" class="container">
+  <!-- Кейси -->
+</div>
 
-      <div class="panel" style="margin-top:12px">
-        <h2 style="margin-top:0">Open Panel</h2>
-        <div class="opener">
-          <div class="reel-window" id="reelWindow" aria-hidden="true">
-            <div class="reel" id="reel"></div>
-          </div>
+<div id="inventory">
+  <h2>🎒 Твій інвентар</h2>
+  <div id="inventoryItems"></div>
+</div>
 
-          <div style="width:100%;display:flex;gap:8px">
-            <button class="btn" id="openBtn" style="flex:1">Open Case</button>
-            <button class="small-btn" id="auto5">Auto ×5</button>
-            <button class="small-btn" id="showProv">Показати Provably</button>
-          </div>
-
-          <div id="resultArea"></div>
-        </div>
-      </div>
-    </div>
-
-    <aside>
-      <div class="panel">
-        <h3 style="margin:0 0 8px 0">Активний кейс</h3>
-        <div id="activeCaseCard" class="result">
-          <div style="width:80px;height:80px;background:linear-gradient(135deg,#102434,#06324a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800" id="caseIcon">FD</div>
-          <div style="flex:1">
-            <div id="caseName" style="font-weight:800">-</div>
-            <div class="small" id="caseDesc">Опис кейсу</div>
-            <div style="margin-top:8px" class="row"><div class="small">Ціна:</div><div style="margin-left:6px;font-weight:800" id="casePrice">0.00</div></div>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <h4 style="margin:6px 0">Останні відкриття</h4>
-          <div id="recent" class="small"></div>
-        </div>
-
-        <div style="margin-top:12px">
-          <h4 style="margin:6px 0">Інвентар</h4>
-          <div class="inventory" id="inventory"></div>
-          <div class="footer">Предмети збережено у <strong>localStorage</strong> (демо).</div>
-        </div>
-
-        <div style="margin-top:12px">
-          <h4 style="margin:6px 0">Як верифікувати (коротко)</h4>
-          <div class="small">Після відкриття видно <strong>serverSeed</strong>, <strong>clientSeed</strong> і <strong>nonce</strong>. Ви можете повторити rollFromSeeds(serverSeed, clientSeed, nonce) щоб отримати той самий результат.</div>
-          <pre class="provably" id="provablyBox" style="display:none"></pre>
-        </div>
-      </div>
-    </aside>
-  </div>
+<!-- Вікно відкриття кейсу -->
+<div id="openAnimation">
+  <div class="carousel" id="carousel"></div>
+  <div id="result"></div>
+  <button onclick="closeAnimation()">Закрити</button>
 </div>
 
 <script>
-function toMoney(c) { return (c/100).toFixed(2) + ' $'; }
-function uid() { return 'id_' + Math.random().toString(36).slice(2,10); }
-function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+const cases = [
+  {name: "AK-47 Case", price: 100, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_race.c1b27b7b.png"},
+  {name: "Knife Case", price: 300, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_push_stiletto_blue_steel_light_large.4e8327b6.png"},
+  {name: "AWP Case", price: 200, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
+  {name: "USP-S Case", price: 80, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
+  {name: "M4A4 Case", price: 120, image: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_royal_paladin_light_large.7df92c09.png"}
+];
+const skins = [
+  {name: "AK-47 | Redline", price: 50, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.7d6e4a2b.png"},
+  {name: "AWP | Dragon Lore", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.0e73c5a2.png"},
+  {name: "Butterfly Knife | Fade", price: 1000, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
+  {name: "USP-S | Kill Confirmed", price: 200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
+  {name: "M4A4 | Howl", price: 800, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
+  {name: "AK-47 | Vulcan", price: 300, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
+  {name: "AWP | Medusa", price: 900, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"}
+];
+let balance = 1000;
+let inventory = [];
 
-// Demo data: більше кейсів + скіни реальні/псевдореальні
-const DEMO = {
-  items: [
-    { id:'item_common', name:'Sticker: Fox Smile', rarity:'common', value:50, iconSVG: svgSticker() },
-    { id:'item_rare', name:'Knife: Rusty Edge', rarity:'rare', value:700, iconSVG: svgKnife() },
-    { id:'item_epic', name:'Rifle: Neon Burst', rarity:'epic', value:2500, iconSVG: svgRifle() },
-    { id:'item_legend', name:'AK-47 | Blue Flame', rarity:'legend', value:15000, iconSVG: svgAK() },
-    // додані «скіни CS2» з приблизними цінами
-    { id:'item_cs2_1', name:'AWP | Dragon Lore', rarity:'legend', value:30000, iconSVG: svgCS2Skin1() },
-    { id:'item_cs2_2', name:'M4A4 | Howl', rarity:'legend', value:25000, iconSVG: svgCS2Skin2() }
-  ],
-  cases: [
-    { id:'case_basic', name:'Fox Basic Case', desc:'Невеликий кейс з шансом знайти легендарку.', price:200, bannerColor:'#0b2540', animationConfig:{spinDurationMs:4200, slotsToShow:9}, items:[ {itemId:'item_common',weight:7000},{itemId:'item_rare',weight:2000},{itemId:'item_epic',weight:900},{itemId:'item_legend',weight:100} ] },
-    { id:'case_premium', name:'Fox Premium Case', desc:'Преміум кейс із вищим шансом епік/легендар.', price:1000, bannerColor:'#25404b', animationConfig:{spinDurationMs:4800, slotsToShow:12}, items:[ {itemId:'item_common',weight:5000},{itemId:'item_rare',weight:3000},{itemId:'item_epic',weight:1500},{itemId:'item_legend',weight:500} ] },
-    { id:'case_cs2', name:'Fox CS2 Legend Case', desc:'Ексклюзивний кейс із скінами CS2.', price:5000, bannerColor:'#402b1f', animationConfig:{spinDurationMs:5500, slotsToShow:15}, items:[ {itemId:'item_rare',weight:4000},{itemId:'item_epic',weight:3000},{itemId:'item_legend',weight:2000},{itemId:'item_cs2_1',weight:50},{itemId:'item_cs2_2',weight:30} ] }
-  ]
-};
-
-const STORAGE_KEY = 'foxdrop_demo_v1';
-let STATE = { balance: 10000, inventory: [], clientSeed: localStorage.getItem('fd_client_seed') || '', nonce: parseInt(localStorage.getItem('fd_nonce')||'0'), recent: [] };
-function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); localStorage.setItem('fd_client_seed', STATE.clientSeed); localStorage.setItem('fd_nonce', String(STATE.nonce)); }
-function loadState(){ const v = localStorage.getItem(STORAGE_KEY); if(v){ try{ Object.assign(STATE, JSON.parse(v)); } catch(e){} } }
-loadState();
-
-const balanceEl = document.getElementById('balance');
-const casesList = document.getElementById('casesList');
-const caseNameEl = document.getElementById('caseName');
-const caseIconEl = document.getElementById('caseIcon');
-const casePriceEl = document.getElementById('casePrice');
-const caseDescEl = document.getElementById('caseDesc');
-const reel = document.getElementById('reel');
-const reelWindow = document.getElementById('reelWindow');
-const openBtn = document.getElementById('openBtn');
-const auto5Btn = document.getElementById('auto5');
-const inventoryEl = document.getElementById('inventory');
-const clientSeedInput = document.getElementById('clientSeed');
-const genSeedBtn = document.getElementById('genSeed');
-const topupBtn = document.getElementById('topupBtn');
-const topupAmount = document.getElementById('topupAmount');
-const resultArea = document.getElementById('resultArea');
-const nonceDisplay = document.getElementById('nonceDisplay');
-const recentEl = document.getElementById('recent');
-const provablyBox = document.getElementById('provablyBox');
-const showProvBtn = document.getElementById('showProv');
-
-let ACTIVE_CASE = DEMO.cases[0];
-let isSpinning = false;
-
-renderBalance();
-renderCases();
-setActiveCase(ACTIVE_CASE.id);
-clientSeedInput.value = STATE.clientSeed;
-nonceDisplay.textContent = STATE.nonce;
-renderInventory();
-renderRecent();
-
-genSeedBtn.onclick = ()=>{ const s='cs2_'+Math.random().toString(36).slice(2)+Date.now().toString(36); STATE.clientSeed=s; clientSeedInput.value=s; saveState(); }
-clientSeedInput.onchange = ()=>{ STATE.clientSeed = clientSeedInput.value; saveState(); }
-topupBtn.onclick = ()=>{ const amt=Number(topupAmount.value)||0; STATE.balance += Math.round(amt*100); renderBalance(); saveState(); }
-showProvBtn.onclick = ()=>{ provablyBox.style.display = provablyBox.style.display === 'none' ? 'block' : 'none'; }
-
-function renderBalance(){ balanceEl.textContent = toMoney(STATE.balance); }
-function renderCases(){
-  casesList.innerHTML = '';
-  DEMO.cases.forEach(c=>{
-    const el=document.createElement('div'); el.className='case';
-    el.innerHTML=`<div class="banner">${c.name.split(' ')[0]}</div>
-      <div><h3>${c.name}</h3><div class="meta">${c.desc}</div><div class="meta">Ціна: ${toMoney(c.price)}</div></div>
-      <div class="open"><button class="small-btn" data-id="${c.id}">Select</button></div>`;
-    casesList.appendChild(el);
-    el.querySelector('button').onclick=()=>setActiveCase(c.id);
-  });
-}
-
-function setActiveCase(caseId){
-  const c = DEMO.cases.find(x=>x.id===caseId);
-  if(!c) return;
-  ACTIVE_CASE = c;
-  caseNameEl.textContent = c.name;
-  caseDescEl.textContent = c.desc;
-  casePriceEl.textContent = toMoney(c.price);
-  caseIconEl.textContent = c.name.split(' ')[0].slice(0,2).toUpperCase();
-}
-
-function renderInventory(){
-  inventoryEl.innerHTML = '';
-  if(STATE.inventory.length===0){ inventoryEl.innerHTML = '<div class="small">Інвентар порожній</div>'; return; }
-  STATE.inventory.slice().reverse().forEach(it=>{
-    const node=document.createElement('div'); node.className='inv-item';
-    node.innerHTML = `<div style="width:64px;height:64px">${it.iconSVG}</div>
-      <div style="flex:1">
-        <div style="font-weight:700">${it.name} <span class="meta">${rarityText(it.rarity)}</span></div>
-        <div class="meta">Вартість: ${toMoney(it.value)}</div>
-      </div>
-      <div style="text-align:right"><button class="small-btn" data-id="${it.id}">Продати</button></div>`;
-    inventoryEl.appendChild(node);
-    node.querySelector('button').onclick=()=>{ sellItem(it.id); };
-  });
-}
-
-function rarityText(r){ if(r==='common') return '<span class="r-common">common</span>'; if(r==='rare') return '<span class="r-rare">rare</span>'; if(r==='epic') return '<span class="r-epic">epic</span>'; return '<span class="r-legend">legend</span>'; }
-
-function sellItem(id){
-  const idx = STATE.inventory.findIndex(x=>x.id===id);
-  if(idx===-1) return;
-  const it = STATE.inventory.splice(idx,1)[0];
-  STATE.balance += it.value;
-  saveState();
-  renderInventory();
-  renderBalance();
-  alert('Продано: '+it.name);
-}
-
-// RNG helpers
-async function hmacSha256Hex(keyHex,message){
-  const keyBytes = hexToBytes(keyHex);
-  const enc = new TextEncoder().encode(message);
-  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes,{name:'HMAC',hash:'SHA-256'},false,['sign']);
-  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc);
-  return bytesToHex(new Uint8Array(sig));
-}
-function hexToBytes(hex){ const a=[]; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
-function bytesToHex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-async function rollFromSeeds(serverSeed, clientSeed, nonce=0){
-  const message = `${clientSeed}:${nonce}`;
-  const h = await hmacSha256Hex(serverSeed,message);
-  const slice = h.slice(0,15);
-  const num = parseInt(slice,16);
-  const max = Math.pow(16,slice.length);
-  return num/max;
-}
-
-// Open logic
-openBtn.onclick = ()=> openCaseSingle();
-auto5Btn.onclick = async ()=>{ for(let i=0;i<5;i++){ if(STATE.balance < ACTIVE_CASE.price) break; await openCaseSingle(true); await sleep(700); } };
-
-async function openCaseSingle(isAuto=false){
-  if(isSpinning) return;
-  if(STATE.balance < ACTIVE_CASE.price){ alert('Немає балансу. Поповни.'); return; }
-  isSpinning=true;
-  STATE.balance -= ACTIVE_CASE.price;
-  STATE.nonce += 1;
-  saveState();
-  renderBalance();
-  nonceDisplay.textContent = STATE.nonce;
-
-  const serverSeed = cryptoRandomHex(32);
-  const clientSeed = STATE.clientSeed||('cs2_'+Date.now().toString(36));
-  if(!STATE.clientSeed){ STATE.clientSeed = clientSeed; clientSeedInput.value=clientSeed; saveState(); }
-  const nonce = STATE.nonce;
-
-  const roll = await rollFromSeeds(serverSeed, clientSeed, nonce);
-  const chosen = chooseByWeight(ACTIVE_CASE.items, roll);
-  const itemDef = DEMO.items.find(it=>it.id===chosen.itemId);
-
-  const reelArr = buildReelArray(itemDef, ACTIVE_CASE.items, DEMO.items, 50);
-  renderReelSlots(reelArr);
-
-  const duration = ACTIVE_CASE.animationConfig.spinDurationMs || 4200;
-  await animateReelToIndex(reelArr, reelArr.findIndex(x=>x.isTarget), duration);
-
-  const newItem = Object.assign({}, itemDef, { id: uid(), acquiredAt: Date.now() });
-  STATE.inventory.push(newItem);
-  STATE.recent.push(`${new Date().toLocaleTimeString()} — Відкрито: ${newItem.name} (${newItem.rarity})`);
-  if(STATE.recent.length>100) STATE.recent.shift();
-  saveState();
-  renderInventory();
-  renderRecent();
-
-  showResult(newItem, { serverSeed, clientSeed, nonce, roll });
-
-  isSpinning=false;
-}
-
-function chooseByWeight(weights, roll){
-  const total = weights.reduce((s,e)=>s+e.weight,0);
-  let t = roll * total;
-  for(const ent of weights){
-    t -= ent.weight;
-    if(t <= 0) return ent;
-  }
-  return weights[weights.length-1];
-}
-
-function buildReelArray(targetItem, caseItems, allItems, length){
-  const arr=[];
-  for(let i=0;i<length;i++){
-    const pick = weightedPick(caseItems, allItems);
-    arr.push(pick);
-  }
-  const center=Math.floor(length/2);
-  arr[center]=Object.assign({}, targetItem, { isTarget:true });
-  return arr;
-}
-function weightedPick(caseItems, allItems){
-  const total = caseItems.reduce((s,e)=>s+e.weight,0);
-  let t=Math.random()*total;
-  for(const ent of caseItems){
-    t -= ent.weight;
-    if(t<=0){
-      const def = allItems.find(a=>a.id===ent.itemId);
-      return def;
-    }
-  }
-  return allItems[0];
-}
-function renderReelSlots(arr){
-  reel.innerHTML='';
-  arr.forEach(it=>{
-    const d=document.createElement('div');
-    d.className='slot';
-    d.innerHTML = `<div style="width:84px;height:84px;display:flex;align-items:center;justify-content:center">${it.iconSVG}</div>
-      <div style="flex:1">
-        <div class="name">${it.name}</div>
-        <div class="rarity ${rarityClass(it.rarity)}">${it.rarity}</div>
+function renderCases() {
+  const container = document.getElementById("cases");
+  container.innerHTML = "";
+  cases.forEach(cs => {
+    container.innerHTML += `
+      <div class="case">
+        <img src="${cs.image}">
+        <h2>${cs.name}</h2>
+        <p>Ціна: ${cs.price}$</p>
+        <button onclick="openCase('${cs.name}', ${cs.price})">Відкрити</button>
       </div>`;
-    reel.appendChild(d);
-  });
-  reel.style.transform='translateY(0px)';
-}
-function rarityClass(r){ if(r==='common') return 'r-common'; if(r==='rare') return 'r-rare'; if(r==='epic') return 'r-epic'; return 'r-legend'; }
-
-async function animateReelToIndex(arr, targetIndex, duration){
-  const slotH = reelWindow.clientHeight;
-  const slots = reel.children;
-  const start = performance.now();
-  const from=0;
-  const to = -(targetIndex * slots[0].clientHeight) + Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2) - (Math.random()*slotH*5 + slotH*10);
-  return new Promise(resolve=>{
-    function frame(now){
-      const t = Math.min(1,(now-start)/duration);
-      const eased = easeOutCubic(t);
-      const current = from + (to-from)*eased;
-      reel.style.transform=`translateY(${current}px)`;
-      if(t<1) requestAnimationFrame(frame); else {
-        reel.style.transition='transform 300ms ease-out';
-        const finalY = -(targetIndex * slots[0].clientHeight) + Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2);
-        reel.style.transform=`translateY(${finalY}px)`;
-        setTimeout(()=>{ reel.style.transition=''; resolve(); },300);
-      }
-    }
-    requestAnimationFrame(frame);
   });
 }
-function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
+renderCases();
 
-function showResult(item, prov){
-  resultArea.innerHTML = `<div style="width:100%" class="result">
-    <div style="width:80px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#062e3a,#073656)">${item.iconSVG}</div>
-    <div style="flex:1">
-      <div style="font-weight:900">${item.name} <span style="font-size:13px;color:var(--muted)">(${item.rarity})</span></div>
-      <div style="margin-top:6px" class="small">Вартість предмета: ${toMoney(item.value)}</div>
-      <div class="provably" style="margin-top:8px">
-        <div style="font-weight:700">Provably fair:</div>
-        <div>serverSeed: <span style="font-family:monospace">${prov.serverSeed.slice(0,24)}…</span></div>
-        <div>clientSeed: <span style="font-family:monospace">${prov.clientSeed}</span></div>
-        <div>nonce: ${prov.nonce}</div>
-        <div>roll: ${prov.roll.toFixed(6)}</div>
-      </div>
-    </div>
-  </div>`;
-  provablyBox.textContent = JSON.stringify(prov, null,2);
+function openCase(name, price) {
+  if(balance < price) return alert("Недостатньо балансу!");
+  balance -= price;
+  document.getElementById("balance").innerText = balance;
+  
+  document.getElementById("openAnimation").style.display = "flex";
+  const carousel = document.getElementById("carousel");
+  carousel.innerHTML = "";
+  for(let i=0; i<30; i++) {
+    const skin = skins[Math.floor(Math.random() * skins.length)];
+    const img = document.createElement("img");
+    img.src = skin.img;
+    carousel.appendChild(img);
+  }
+  setTimeout(() => {
+    const win = skins[Math.floor(Math.random() * skins.length)];
+    document.getElementById("result").innerText = `Випав предмет: ${win.name} (${win.price}$)`;
+    inventory.push(win);
+  }, 3000);
 }
 
-function cryptoRandomHex(bytes=32){
-  const arr = new Uint8Array(bytes);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+function closeAnimation() {
+  document.getElementById("openAnimation").style.display = "none";
+  document.getElementById("result").innerText = "";
 }
 
-function svgSticker(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="10" width="64" height="64" fill="#ffcc9a"/><circle cx="32" cy="26" r="8" fill="#fff3e8"/><rect x="18" y="40" width="28" height="8" rx="4" fill="#fff3e8"/></svg>`; }
-function svgKnife(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#0b2540"/><path d="M10 40 L36 14 L54 20 L22 46 Z" fill="#d7b39d"/><rect x="6" y="44" width="30" height="8" rx="4" fill="#4b5563"/></svg>`; }
-function svgRifle(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#04121a"/><rect x="8" y="28" width="40" height="8" rx="4" fill="#7c3aed"/><rect x="46" y="34" width="10" height="6" rx="3" fill="#111827"/></svg>`; }
-function svgAK(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect rx="8" width="64" height="64" fill="#021122"/><path d="M8 36 L28 22 L56 28 L48 36 L20 48 Z" fill="#0ea5a4"/><circle cx="48" cy="30" r="3" fill="#fff"/></svg>`; }
-function svgCS2Skin1(){ return `<svg width="60" height="60" viewBox="0 0 64 64"><rect rx="8" width="64" height="64" fill="#421212"/><path d="M16 16 L48 48" stroke="#f6c85f" stroke-width="4"/><path d="M48 16 L16 48" stroke="#f6c85f" stroke-width="4"/></svg>`; }
-function svgCS2Skin2(){ return `<svg width="60" height="60" viewBox="0 0 64 64"><rect rx="8" width="64" height="64" fill="#122142"/><path d="M16 48 L48 16" stroke="#60a5fa" stroke-width="4"/><circle cx="32" cy="32" r="10" fill="#a78bfa"/></svg>`; }
-
-function bytesToHex(arr){ return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-
-function prepareReelSlotHeight(){
-  const tmp=document.createElement('div'); tmp.className='slot'; tmp.style.visibility='hidden';
-  tmp.innerHTML=`<div style="width:84px;height:84px"></div><div style="flex:1"><div>Sample</div><div class="rarity">rar</div></div>`;
-  reel.appendChild(tmp);
-  const h=reelWindow.clientHeight;
-  Array.from(document.getElementsByClassName('slot')).forEach(s=>s.style.height=h+'px');
-  if(reel.contains(tmp)) reel.removeChild(tmp);
+function addBalance() {
+  balance += 500;
+  document.getElementById("balance").innerText = balance;
 }
-window.addEventListener('resize', ()=>prepareReelSlotHeight());
-prepareReelSlotHeight();
 
-if(!STATE.clientSeed){ STATE.clientSeed='cs2_'+Math.random().toString(36).slice(2); clientSeedInput.value=STATE.clientSeed; saveState(); }
+function showCases() {
+  document.getElementById("cases").style.display = "flex";
+  document.getElementById("inventory").style.display = "none";
+}
+
+function showInventory() {
+  document.getElementById("cases").style.display = "none";
+  document.getElementById("inventory").style.display = "block";
+  const container = document.getElementById("inventoryItems");
+  container.innerHTML = "";
+  inventory.forEach(item => {
+    container.innerHTML += `
+      <div class="inventory-item">
+        <img src="${item.img}">
+        <p>${item.name}</p>
+        <span>${item.price}$</span>
+      </div>`;
+  });
+}
+</script>
+</body>
+</html>
