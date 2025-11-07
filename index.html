@@ -1,375 +1,406 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦊 FoxDrop | Відкриття кейсів CS2</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🦊FoxDrop — повна версія</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background: #0d0e11;
-  color: #fff;
-  overflow-x: hidden;
-}
-header {
-  background: #16181d;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 40px;
-  border-bottom: 2px solid #ff8800;
-}
-header h1 {
-  color: #ff8800;
-  font-size: 30px;
-  font-weight: 700;
-}
-.balance {
-  background: #1f2126;
-  padding: 10px 20px;
-  border-radius: 12px;
-  border: 1px solid #ff8800;
-}
-.balance span {
-  color: #ffcc66;
-  font-weight: bold;
-}
-nav {
-  background: #1a1c22;
-  display: flex;
-  justify-content: center;
-  padding: 15px;
-  gap: 25px;
-  border-bottom: 2px solid #ff8800;
-}
-nav a {
-  color: white;
-  text-decoration: none;
-  padding: 8px 18px;
-  border-radius: 8px;
-  transition: 0.3s;
-}
-nav a:hover {
-  background: #ff8800;
-  color: black;
-}
-.container {
-  padding: 30px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  justify-content: center;
-}
-.case {
-  background: #1c1e25;
-  border-radius: 16px;
-  width: 250px;
-  padding: 20px;
-  text-align: center;
-  border: 2px solid #29292d;
-  transition: 0.3s;
-}
-.case:hover {
-  transform: scale(1.05);
-  border-color: #ff8800;
-}
-.case img {
-  width: 200px;
-  height: 200px;
-  object-fit: contain;
-  border-radius: 10px;
-}
-.case h2 {
-  margin: 10px 0;
-}
-.case button {
-  background: #ff8800;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.case button:hover {
-  background: #ffaa33;
-}
-#openAnimation {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.9);
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 999;
-}
-.carousel {
-  display: flex;
-  overflow: hidden;
-  width: 80%;
-  border: 3px solid #ff8800;
-  border-radius: 12px;
-  background: #121212;
-  position: relative;
-}
-.carousel-track {
-  display: flex;
-  transition: transform 4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-.carousel img {
-  width: 120px;
-  height: 120px;
-  margin: 10px;
-  border-radius: 8px;
-}
-#pointer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 4px;
-  background: red;
-  transform: translateX(-50%);
-}
-#result {
-  font-size: 26px;
-  margin-top: 20px;
-  color: #ffb84a;
-  text-align: center;
-}
-#inventory {
-  display: none;
-  padding: 30px;
-}
-.inventory-item {
-  background: #1f2025;
-  border-radius: 10px;
-  padding: 10px;
-  margin: 10px;
-  display: inline-block;
-  width: 160px;
-  text-align: center;
-  border: 1px solid #ff8800;
-}
-.inventory-item img {
-  width: 100px;
-  height: 100px;
-  border-radius: 6px;
-}
-.inventory-item button {
-  background: #ff3333;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  margin-top: 8px;
-  padding: 5px 10px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-.inventory-item button:hover {
-  background: #ff5555;
-}
+  :root{--bg:#0d0e11;--accent:#ff8800;--card:#16181d;--muted:#9aa4b2}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,#07080a,#0d0e11);color:#eef2f7}
+  header{background:var(--card);display:flex;justify-content:space-between;align-items:center;padding:16px 28px;border-bottom:2px solid var(--accent)}
+  header h1{color:var(--accent);margin:0}
+  .balance{background:#111418;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
+  nav{display:flex;gap:12px;padding:12px 28px;background:#0f1114}
+  nav a{color:#cfd8df;text-decoration:none;padding:8px 12px;border-radius:8px}
+  nav a.active{background:var(--accent);color:#07121a}
+  .wrap{max-width:1100px;margin:20px auto;padding:0 18px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .panel{background:#0f1317;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .cases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .case{background:linear-gradient(180deg,#14171a,#0f1317);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);text-align:center}
+  .case img{width:100%;height:150px;object-fit:cover;border-radius:10px}
+  .case h3{margin:8px 0 4px 0}
+  .case .price{color:var(--muted);font-size:13px}
+  .btn{background:linear-gradient(90deg,var(--accent),#ffb176);border:none;padding:8px 12px;border-radius:10px;color:#07121a;font-weight:700;cursor:pointer}
+  .btn.small{padding:6px 8px}
+  /* opener */
+  #opener{display:flex;flex-direction:column;align-items:center;gap:12px}
+  .reel-window{width:100%;height:120px;background:#081018;border-radius:10px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
+  .reel{position:absolute;left:0;top:0;display:flex;gap:6px;padding:10px}
+  .reel .tile{width:120px;height:100px;background:#0b1b24;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px}
+  .reel img{width:100px;height:60px;object-fit:contain;border-radius:6px}
+  #pointer{position:absolute;left:50%;top:0;height:100%;width:4px;background:linear-gradient(180deg,#fff8,#fff0);transform:translateX(-50%);box-shadow:0 0 8px rgba(255,255,255,0.06)}
+  #resultCard{width:100%;padding:12px;border-radius:10px;background:linear-gradient(90deg,#0b1518,#0d1a1f);display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.03)}
+  #resultCard img{width:96px;height:60px;object-fit:contain;border-radius:8px}
+  /* inventory */
+  .inventory-list{display:flex;flex-direction:column;gap:10px}
+  .inv-item{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;background:#07161a;border:1px solid rgba(255,255,255,0.02)}
+  .inv-item img{width:100px;height:56px;object-fit:contain;border-radius:6px}
+  .inv-item .meta{flex:1}
+  .small{font-size:13px;color:var(--muted)}
+  footer{margin:18px 0 60px 0;color:var(--muted);text-align:center}
+  @media(max-width:980px){.grid{grid-template-columns:1fr} .cases{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
   <h1>🦊 FoxDrop</h1>
-  <div class="balance">Баланс: <span id="balance">1000</span>$</div>
+  <div class="balance">Баланс: <strong id="balance">0</strong>$</div>
 </header>
 
 <nav>
-  <a href="#" onclick="showCases()">Кейси</a>
-  <a href="#" onclick="showInventory()">Інвентар</a>
-  <a href="#" onclick="addBalance()">Поповнити баланс</a>
+  <a href="#" id="navCases" class="active" onclick="showPanel('cases')">Кейси</a>
+  <a href="#" id="navInv" onclick="showPanel('inventory')">Інвентар</a>
+  <a href="#" onclick="topUp()">Поповнити +5$</a>
 </nav>
 
-<div id="cases" class="container"></div>
+<div class="wrap">
+  <div class="grid">
+    <div>
+      <div class="panel" id="casesPanel">
+        <h2>Кейси</h2>
+        <div class="cases" id="casesList"></div>
+        <div style="margin-top:12px" class="small">ClientSeed: <input id="clientSeed" style="width:260px;padding:6px;border-radius:6px;background:#07121a;border:1px solid rgba(255,255,255,0.04);color:inherit" /></div>
+      </div>
 
-<div id="inventory">
-  <h2>🎒 Твій інвентар</h2>
-  <div id="inventoryItems"></div>
-</div>
+      <div class="panel" style="margin-top:12px">
+        <h2>Відкривання кейсу</h2>
+        <div id="opener">
+          <div class="reel-window" id="reelWindow">
+            <div id="pointer"></div>
+            <div class="reel" id="reel"></div>
+          </div>
+          <div style="display:flex;gap:8px;width:100%">
+            <button class="btn" id="openBtn" onclick="openSelected()">Open</button>
+            <button class="btn small" onclick="autoOpen(5)">Auto ×5</button>
+            <button class="btn small" onclick="generateSeed()">Gen seed</button>
+          </div>
+          <div id="resultCardArea"></div>
+        </div>
+      </div>
+    </div>
 
-<div id="openAnimation">
-  <div class="carousel">
-    <div id="pointer"></div>
-    <div class="carousel-track" id="carouselTrack"></div>
+    <aside>
+      <div class="panel" id="inventoryPanel" style="display:none">
+        <h3>Інвентар</h3>
+        <div class="inventory-list" id="inventoryList"></div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>Активний кейс</h3>
+        <div id="activeCaseCard" style="display:flex;gap:12px;align-items:center">
+          <img id="activeCaseImg" src="" alt="" style="width:100px;height:70px;object-fit:cover;border-radius:8px"/>
+          <div>
+            <div id="activeCaseName" style="font-weight:700">-</div>
+            <div class="small" id="activeCasePrice">-</div>
+            <div style="margin-top:8px"><button class="btn small" onclick="openSelected()">Open</button></div>
+          </div>
+        </div>
+        <div style="margin-top:12px" class="small">Останні: <div id="recent" style="margin-top:6px;color:var(--muted)"></div></div>
+      </div>
+    </aside>
   </div>
-  <div id="result"></div>
-  <button onclick="closeAnimation()">Закрити</button>
+
+  <footer>FoxDrop demo — скопіюй код, налаштуй шляхи до картинок, підключи бекенд для реальних цін</footer>
 </div>
 
 <script>
-const cases = [
-  {name: "AK-47 Case", price: 100, type: "ak", image: "https://th.bing.com/th/id/OIP.SRf_KFp_u1PKs253w3MGyQHaEK?w=314&h=180&c=7&r=0&o=7"},
-  {name: "Knife Case", price: 350, type: "knife", image: "https://th.bing.com/th?id=OIF.1gYvXQtIu%2bS9xuxaaPeRbA&w=244&h=180&c=7&r=0&o=7"},
-  {name: "AWP Case", price: 200, type: "awp", image: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186"},
-  {name: "USP-S Case", price: 80, type: "usp", image: "https://th.bing.com/th/id/OIP.ooThcnez66kmNfZf_PFuBAHaFj?w=213&h=180"},
-  {name: "M4A4 Case", price: 120, type: "m4a4", image: "https://th.bing.com/th/id/OIP.bqmvEJZw5aS4zkbk8haBgAHaHa?w=153&h=180"}
+/* ========= SKIN TEMPLATES (копіюй повністю в свій код якщо треба) =========
+   Нижче — помірний набір скінів у форматі {name, price, img}
+   Зображення вибрані з Steam CDN / публічних джерел, якщо щось не вантажиться — заміни URL.
+*/
+
+// AK-47
+const akSkins = [
+  {name: "AK-47 | Redline", price: 45, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.1baf2652.png"},
+  {name: "AK-47 | Vulcan", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
+  {name: "AK-47 | Neon Rider", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_neon_rider_light_large.60264f23.png"},
+  {name: "AK-47 | The Empress", price: 600, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_empress_light_large.5e4d3c2b.png"},
+  {name: "AK-47 | Fuel Injector", price: 420, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_fuel_injector_light_large.1c2d3e4f.png"}
 ];
 
-const skins = {
-  ak: [
-    { name: "AK-47 | Redline", price: 50, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.1baf2652.png" },
-  { name: "AK-47 | Vulcan", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png" },
-  { name: "AK-47 | Fire Serpent", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_fire_serpent_light_large.0a3b7f1f.png" },
-  { name: "AK-47 | Neon Rider", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_neon_rider_light_large.60264f23.png" },
-  { name: "AK-47 | Cartel", price: 180, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_cartel_light_large.0f3b3f2c.png" },
-  { name: "AK-47 | Bloodsport", price: 280, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_bloodsport_light_large.a1b2c3d4.png" },
-  { name: "AK-47 | Frontside Misty", price: 75, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_frontside_misty_light_large.9f8e7d6c.png" },
-  { name: "AK-47 | Point Disarray", price: 95, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_point_disarray_light_large.8a7b6c5d.png" },
-  { name: "AK-47 | The Empress", price: 600, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_empress_light_large.5e4d3c2b.png" },
-  { name: "AK-47 | Hydroponic", price: 140, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_hydroponic_light_large.3c2b1a09.png" },
-  { name: "AK-47 | Neon Revolution", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_neon_revolution_light_large.7b6a5c4d.png" },
-  { name: "AK-47 | Jaguar", price: 260, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_jaguar_light_large.6c5b4a39.png" },
-  { name: "AK-47 | Unholy", price: 480, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_unholy_light_large.2b3c4d5e.png" },
-  { name: "AK-47 | Elite Build", price: 110, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_elite_build_light_large.4a3b2c1d.png" },
-  { name: "AK-47 | Fuel Injector", price: 420, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_fuel_injector_light_large.1c2d3e4f.png" }
+// AWP
+const awpSkins = [
+  {name: "AWP | Dragon Lore", price: 3500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.48c95fa1.png"},
+  {name: "AWP | Medusa", price: 980, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
+  {name: "AWP | Asiimov", price: 380, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_asiimov_light_large.9dcb3f4f.png"},
+  {name: "AWP | Graphite", price: 45, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_graphite_light_large.2d3c4b5a.png"}
 ];
 
-  awp: [
-    { name: "AWP | Dragon Lore", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.48c95fa1.png" },
-  { name: "AWP | Medusa", price: 980, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png" },
-  { name: "AWP | Asiimov", price: 350, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_asiimov_light_large.9dcb3f4f.png" },
-  { name: "AWP | Lightning Strike", price: 450, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_lightning_strike_light_large.5d6e7f8a.png" },
-  { name: "AWP | Fever Dream", price: 210, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_fever_dream_light_large.3a4b5c6d.png" },
-  { name: "AWP | Graphite", price: 40, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_graphite_light_large.2d3c4b5a.png" },
-  { name: "AWP | Mortis", price: 520, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_mortis_light_large.7e6d5c4b.png" },
-  { name: "AWP | Neo-Noir", price: 300, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_neo_noir_light_large.6f5e4d3c.png" },
-  { name: "AWP | Corticera", price: 140, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_corticera_light_large.5b4a3928.png" },
-  { name: "AWP | Desert Hydra", price: 420, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_desert_hydra_light_large.9a8b7c6d.png" }
-];
-  knife: [
-    { name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png" },
-  { name: "Karambit | Doppler", price: 1800, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_karambit_am_doppler_phase2_light_large.3ccf56ee.png" },
-  { name: "M9 Bayonet | Marble Fade", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_m9_bayonet_am_marble_fade_light_large.07f86e9c.png" },
-  { name: "Talon Knife | Tiger Tooth", price: 1600, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_widowmaker_am_tiger_orange_light_large.73db87cf.png" },
-  { name: "Flip Knife | Slaughter", price: 700, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_flip_am_slaughter_light_large.4f3e2d1c.png" },
-  { name: "Bayonet | Night", price: 480, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_bayonet_am_night_light_large.2b3c4d5f.png" },
-  { name: "Huntsman Knife | Crimson Web", price: 650, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_huntsman_am_crimson_web_light_large.8c9d0e1f.png" },
-  { name: "Gut Knife | Doppler", price: 420, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_gut_am_doppler_light_large.6b7c8d9e.png" },
-  { name: "Shadow Daggers | Gamma Doppler", price: 900, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_shadow_daggers_am_gamma_doppler_light_large.12345678.png" },
-  { name: "Ursus Knife | Blue Steel", price: 350, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_ursus_am_blue_steel_light_large.9f8e7d6c.png" }
-];
-  usp: [
-   { name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png" },
-  { name: "USP-S | Orion", price: 150, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_orion_light_large.77bda123.png" },
-  { name: "USP-S | Road Rash", price: 90, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_road_rash_light_large.2a3b4c5d.png" },
-  { name: "USP-S | Cortex", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_cortex_light_large.6a5b4c3d.png" },
-  { name: "USP-S | Blueprint", price: 70, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_blueprint_light_large.5f6e7d8c.png" },
-  { name: "USP-S | Neo-Noir", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_neonoir_light_large.4e3d2c1b.png" }
-];
-  m4a4: [
-    { name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png" },
-  { name: "M4A4 | Desolate Space", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_desolate_space_light_large.55a0ef2a.png" },
-  { name: "M4A4 | Asiimov", price: 430, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_asiimov_light_large.a1b2c3d4.png" },
-  { name: "M4A4 | Royal Paladin", price: 160, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_royal_paladin_light_large.7df92c09.png" },
-  { name: "M4A4 | Neo-Noir", price: 290, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_neo_noir_light_large.6f5e4d3c.png" },
-  { name: "M4A4 | Buzz Kill", price: 75, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_buzz_kill_light_large.2c3d4e5f.png" }
+// Knife
+const knifeSkins = [
+  {name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
+  {name: "Karambit | Doppler", price: 1800, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_karambit_am_doppler_phase2_light_large.3ccf56ee.png"},
+  {name: "M9 Bayonet | Marble Fade", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_m9_bayonet_am_marble_fade_light_large.07f86e9c.png"},
+  {name: "Flip Knife | Slaughter", price: 700, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_flip_am_slaughter_light_large.4f3e2d1c.png"}
 ];
 
+// USP-S
+const uspSkins = [
+  {name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
+  {name: "USP-S | Orion", price: 150, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_orion_light_large.77bda123.png"},
+  {name: "USP-S | Neo-Noir", price: 420, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_neonoir_light_large.4e3d2c1b.png"}
+];
+
+// M4A4
+const m4a4Skins = [
+  {name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
+  {name: "M4A4 | Desolate Space", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_desolate_space_light_large.55a0ef2a.png"},
+  {name: "M4A4 | Neo-Noir", price: 290, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_neo_noir_light_large.6f5e4d3c.png"}
+];
+
+// Map of case types to arrays
+const skinsMap = {
+  ak: akSkins,
+  awp: awpSkins,
+  knife: knifeSkins,
+  usp: uspSkins,
+  m4a4: m4a4Skins
 };
 
-let balance = parseInt(localStorage.getItem('balance')) || 1000;
-let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
+/* ========= APPLICATION LOGIC ========= */
 
-document.getElementById("balance").innerText = balance;
+const CASES = [
+  {id:'c1', name:'AK-47 Case', price:100, type:'ak', image:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_10.7bfa40c5b5b2213b657b1b8ab.png'},
+  {id:'c2', name:'Knife Case', price:350, type:'knife', image:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_15.4e52f19b32472.png'},
+  {id:'c3', name:'AWP Case', price:200, type:'awp', image:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_20.4e53fa19b14.png'},
+  {id:'c4', name:'USP-S Case', price:80, type:'usp', image:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_17.15e0b2f.png'},
+  {id:'c5', name:'M4A4 Case', price:120, type:'m4a4', image:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_21.12ebcfb3b0.png'}
+];
 
-function saveData() {
-  localStorage.setItem('balance', balance);
-  localStorage.setItem('inventory', JSON.stringify(inventory));
+let state = {
+  balance: parseInt(localStorage.getItem('fd_balance')) || 50,
+  inventory: JSON.parse(localStorage.getItem('fd_inventory')||'[]'),
+  clientSeed: localStorage.getItem('fd_clientSeed') || ''
+};
+
+const el = {
+  casesList: document.getElementById('casesList'),
+  activeCaseImg: document.getElementById('activeCaseImg'),
+  activeCaseName: document.getElementById('activeCaseName'),
+  activeCasePrice: document.getElementById('activeCasePrice'),
+  balance: document.getElementById('balance'),
+  reel: document.getElementById('reel'),
+  resultCardArea: document.getElementById('resultCardArea'),
+  inventoryList: document.getElementById('inventoryList'),
+  clientSeedInput: document.getElementById('clientSeed'),
+  recent: document.getElementById('recent')
+};
+
+el.balance.innerText = state.balance;
+el.clientSeedInput.value = state.clientSeed;
+
+let selectedCase = CASES[0];
+let spinning = false;
+let recentList = JSON.parse(localStorage.getItem('fd_recent')||'[]');
+
+function saveAll(){
+  localStorage.setItem('fd_balance', String(state.balance));
+  localStorage.setItem('fd_inventory', JSON.stringify(state.inventory));
+  localStorage.setItem('fd_clientSeed', state.clientSeed);
+  localStorage.setItem('fd_recent', JSON.stringify(recentList));
 }
 
-function renderCases() {
-  const container = document.getElementById("cases");
-  container.innerHTML = "";
-  cases.forEach(cs => {
-    container.innerHTML += `
-      <div class="case">
-        <img src="${cs.image}">
-        <h2>${cs.name}</h2>
-        <p>Ціна: ${cs.price}$</p>
-        <button onclick="openCase('${cs.type}', ${cs.price})">Відкрити</button>
-      </div>`;
+function renderCases(){
+  el.casesList.innerHTML = '';
+  CASES.forEach(c=>{
+    const d = document.createElement('div'); d.className='case';
+    d.innerHTML = `
+      <img src="${c.image}" alt="${c.name}">
+      <h3>${c.name}</h3>
+      <div class="price">Ціна: ${c.price}$</div>
+      <div style="margin-top:8px"><button class="btn small" onclick="selectCase('${c.id}')">Select</button></div>
+    `;
+    el.casesList.appendChild(d);
   });
+  selectCase(selectedCase.id);
 }
 renderCases();
 
-function openCase(type, price) {
-  if(balance < price) return alert("Недостатньо балансу!");
-  balance -= price;
-  document.getElementById("balance").innerText = balance;
-  saveData();
+function selectCase(id){
+  const c = CASES.find(x=>x.id===id);
+  if(!c) return;
+  selectedCase = c;
+  el.activeCaseImg.src = c.image;
+  el.activeCaseName.innerText = c.name;
+  el.activeCasePrice.innerText = 'Ціна: ' + c.price + '$';
+}
 
-  document.getElementById("openAnimation").style.display = "flex";
-  const track = document.getElementById("carouselTrack");
-  track.innerHTML = "";
+function generateSeed(){
+  state.clientSeed = 'cs_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+  el.clientSeedInput.value = state.clientSeed;
+  saveAll();
+}
 
-  const caseSkins = skins[type];
-  for(let i=0; i<40; i++) {
-    const skin = caseSkins[Math.floor(Math.random() * caseSkins.length)];
-    const img = document.createElement("img");
-    img.src = skin.img;
-    track.appendChild(img);
+el.clientSeedInput.onchange = ()=>{ state.clientSeed = el.clientSeedInput.value; saveAll(); }
+
+function topUp(){
+  state.balance += 5; el.balance.innerText = state.balance; saveAll();
+  alert('+5$ зараховано (демо)');
+}
+
+/* animation helpers */
+function buildReelArray(caseType, target) {
+  const pool = skinsMap[caseType];
+  const arr = [];
+  for(let i=0;i<30;i++){
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    arr.push(pick);
   }
-
-  const rand = Math.floor(Math.random() * caseSkins.length);
-  const selected = caseSkins[rand];
-  const moveX = -((rand + 20) * 140 - window.innerWidth/2 + 70);
-
-  setTimeout(() => {
-    track.style.transform = `translateX(${moveX}px)`;
-  }, 100);
-
-  setTimeout(() => {
-    document.getElementById("result").innerText = `🎉 Ти отримав: ${selected.name} (${selected.price}$)!`;
-    inventory.push(selected);
-    saveData();
-  }, 4000);
+  // insert target near middle
+  const mid = Math.floor(arr.length/2);
+  arr[mid] = target;
+  return arr;
 }
 
-function closeAnimation() {
-  document.getElementById("openAnimation").style.display = "none";
-  document.getElementById("result").innerText = "";
+function renderReel(arr){
+  el.reel.innerHTML = '';
+  arr.forEach(item=>{
+    const tile = document.createElement('div'); tile.className = 'tile';
+    tile.innerHTML = `<img src="${item.img}" alt="${item.name}"/><div class="small" style="margin-top:6px">${item.name}</div>`;
+    el.reel.appendChild(tile);
+  });
+  // adjust left so first tile visible
+  el.reel.style.transform = 'translateX(0px)';
 }
 
-function addBalance() {
-  balance += 500;
-  document.getElementById("balance").innerText = balance;
-  saveData();
+/* provably-fair in-browser (deterministic selection) */
+async function hmacHex(keyHex, msg){
+  // keyHex is hex string (serverSeed); but here we use random serverSeed generated in client for demo
+  const keyBytes = hexToBytes(keyHex);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC',hash:'SHA-256'}, false, ['sign']);
+  const enc = new TextEncoder().encode(msg);
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc);
+  return Array.from(new Uint8Array(sig)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function hexToBytes(hex){ const res=[]; for(let i=0;i<hex.length;i+=2) res.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(res); }
+async function rollFromSeeds(serverSeedHex, clientSeed, nonce=0){
+  const msg = `${clientSeed}:${nonce}`;
+  const h = await hmacHex(serverSeedHex, msg);
+  const slice = h.slice(0,15);
+  const num = parseInt(slice,16);
+  const max = Math.pow(16, slice.length);
+  return num / max;
 }
 
-function showCases() {
-  document.getElementById("cases").style.display = "flex";
-  document.getElementById("inventory").style.display = "none";
+async function openSelected(){
+  if(spinning) return;
+  if(state.balance < selectedCase.price){ alert('Немає балансу — поповни'); return; }
+  spinning = true;
+  state.balance -= selectedCase.price; el.balance.innerText = state.balance; saveAll();
+
+  // generate serverSeed (client-side demo). In real server flow server provides serverSeedHash before open and serverSeed after.
+  const serverSeed = cryptoRandomHex(32);
+  const clientSeed = state.clientSeed || ('cs_demo_' + Date.now().toString(36));
+  if(!state.clientSeed){ state.clientSeed = clientSeed; el.clientSeedInput.value = clientSeed; saveAll(); }
+
+  const nonce = (parseInt(localStorage.getItem('fd_nonce')||'0')||0) + 1;
+  localStorage.setItem('fd_nonce', String(nonce));
+
+  const pool = skinsMap[selectedCase.type];
+  // compute roll -> choose index deterministically
+  const roll = await rollFromSeeds(serverSeed, clientSeed, nonce); // 0..1
+  const index = Math.floor(roll * pool.length);
+  const chosen = pool[index];
+
+  // build reel and animate
+  const arr = buildReelArray(selectedCase.type, chosen);
+  renderReel(arr);
+
+  // animate: translateX to center chosen tile
+  const tiles = el.reel.children;
+  // measure tile width+gap
+  await sleep(50); // allow layout
+  const tileW = tiles[0].offsetWidth + 6; // gap 6
+  const centerIndex = Math.floor(arr.length/2);
+  const targetIndex = centerIndex; // chosen placed at center
+  // add extra spins distance
+  const extra = 8 + Math.floor(Math.random()*8);
+  const totalShift = -( (targetIndex + extra) * tileW ) + ( (el.reel.parentElement.clientWidth / 2) - (tileW/2) );
+  // animate with JS
+  el.reel.style.transition = 'transform 3.8s cubic-bezier(.22,.98,.32,1)';
+  requestAnimationFrame(()=> el.reel.style.transform = `translateX(${totalShift}px)`);
+  setTimeout(()=> {
+    // finalize
+    el.reel.style.transition = '';
+    // give chosen item
+    state.inventory.push(Object.assign({}, chosen, {id: 'it_' + Date.now()}));
+    recentList.push(new Date().toLocaleTimeString() + ' — ' + chosen.name + ' ('+chosen.price+'$)');
+    if(recentList.length>20) recentList.shift();
+    saveAll();
+    showResultCard(chosen, {serverSeed, clientSeed, nonce, roll});
+    renderInventory();
+    renderRecent();
+    spinning = false;
+  }, 4100);
 }
 
-function showInventory() {
-  document.getElementById("cases").style.display = "none";
-  document.getElementById("inventory").style.display = "block";
-  const container = document.getElementById("inventoryItems");
-  container.innerHTML = "";
-  inventory.forEach((item, i) => {
-    container.innerHTML += `
-      <div class="inventory-item">
-        <img src="${item.img}">
-        <p>${item.name}</p>
-        <span>${item.price}$</span><br>
-        <button onclick="sellItem(${i})">Продати</button>
-      </div>`;
+function showResultCard(item, prov){
+  const area = el.resultCardArea;
+  area.innerHTML = '';
+  const card = document.createElement('div'); card.id='resultCard';
+  card.innerHTML = `<img src="${item.img}" alt="${item.name}"/><div><div style="font-weight:800">${item.name}</div><div class="small">Вартість: ${item.price}$</div>
+    <div style="margin-top:8px" class="small">Provably (demo): serverSeed ${prov.serverSeed.slice(0,16)}… clientSeed ${prov.clientSeed} nonce ${prov.nonce} roll ${prov.roll.toFixed(6)}</div></div>`;
+  area.appendChild(card);
+}
+
+/* inventory rendering + sell */
+function renderInventory(){
+  const list = el.inventoryList;
+  list.innerHTML = '';
+  if(state.inventory.length===0){ list.innerHTML = '<div class="small">Інвентар порожній</div>'; return; }
+  state.inventory.slice().reverse().forEach((it, idx) => {
+    const i = document.createElement('div'); i.className='inv-item';
+    i.innerHTML = `<img src="${it.img}" alt="${it.name}"><div class="meta"><div style="font-weight:700">${it.name}</div><div class="small">Ціна: ${it.price}$</div></div>
+      <div><button class="btn small" onclick="sellItem('${it.id}')">Продати</button></div>`;
+    list.appendChild(i);
   });
 }
 
-function sellItem(index) {
-  const item = inventory[index];
-  balance += item.price;
-  inventory.splice(index, 1);
-  saveData();
-  document.getElementById("balance").innerText = balance;
-  showInventory();
+function sellItem(id){
+  const idx = state.inventory.findIndex(x=>x.id===id);
+  if(idx===-1) return alert('Не знайдено');
+  const item = state.inventory.splice(idx,1)[0];
+  // demo: return 80% of price
+  const back = Math.round(item.price * 0.8);
+  state.balance += back; el.balance.innerText = state.balance;
+  saveAll(); renderInventory();
+  alert('Продано ' + item.name + ' за ' + back + '$ (80%)');
+}
+
+/* render recent */
+function renderRecent(){ el.recent.innerText = recentList.slice().reverse().slice(0,8).join('\\n'); }
+
+/* panels */
+function showPanel(name){
+  document.getElementById('casesPanel').style.display = name==='cases' ? 'block' : 'none';
+  document.getElementById('inventoryPanel').style.display = name==='inventory' ? 'block' : 'none';
+  document.getElementById('navCases').classList.toggle('active', name==='cases');
+  document.getElementById('navInv').classList.toggle('active', name==='inventory');
+}
+
+/* helpers */
+function cryptoRandomHex(bytes=32){
+  const arr = new Uint8Array(bytes); crypto.getRandomValues(arr);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* init */
+renderCases();
+renderInventory();
+renderRecent();
+el.balance.innerText = state.balance;
+if(state.clientSeed) el.clientSeedInput.value = state.clientSeed;
+
+/* quick auto open */
+async function autoOpen(n){
+  for(let i=0;i<n;i++){
+    if(state.balance < selectedCase.price) break;
+    openSelected();
+    await sleep(1400);
+  }
 }
 </script>
 </body>
