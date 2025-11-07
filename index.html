@@ -781,3 +781,200 @@
 
         function openCaseModal(caseItem) {
             currentCase = caseItem;
+            document.getElementById('openingCaseTitle').textContent = `🎁 ${caseItem.name}`;
+            document.getElementById('caseOpeningModal').classList.add('active');
+            document.getElementById('openCaseBtn').disabled = false;
+            generateRouletteItems();
+        }
+
+        function closeCaseModal() {
+            document.getElementById('caseOpeningModal').classList.remove('active');
+            currentCase = null;
+            isSpinning = false;
+        }
+
+        function generateRouletteItems() {
+            const container = document.getElementById('rouletteItems');
+            container.innerHTML = '';
+            container.style.left = '0px';
+            
+            const allItems = [];
+            currentCase.items.forEach(item => {
+                const count = Math.floor(item.chance / 2);
+                for (let i = 0; i < count; i++) {
+                    allItems.push(item);
+                }
+            });
+            
+            for (let i = 0; i < 50; i++) {
+                const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'roulette-item';
+                itemDiv.innerHTML = `
+                    <div style="font-size: 60px;">${randomItem.icon}</div>
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${randomItem.name}</div>
+                    <div style="font-size: 18px; color: #ffd700;">💰 ${randomItem.value}</div>
+                `;
+                container.appendChild(itemDiv);
+            }
+        }
+
+        function spinRoulette() {
+            if (isSpinning) return;
+            
+            if (userBalance < currentCase.price) {
+                alert('Недостатньо коштів! Поповніть баланс.');
+                return;
+            }
+            
+            isSpinning = true;
+            userBalance -= currentCase.price;
+            updateBalance();
+            document.getElementById('openCaseBtn').disabled = true;
+            
+            const winningItem = selectWinningItem();
+            wonItem = winningItem;
+            
+            const container = document.getElementById('rouletteItems');
+            const itemWidth = 230;
+            const totalItems = container.children.length;
+            const winningIndex = Math.floor(totalItems * 0.7 + Math.random() * 5);
+            
+            const winningItemDiv = container.children[winningIndex];
+            winningItemDiv.innerHTML = `
+                <div style="font-size: 60px;">${winningItem.icon}</div>
+                <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${winningItem.name}</div>
+                <div style="font-size: 18px; color: #ffd700;">💰 ${winningItem.value}</div>
+            `;
+            
+            const centerOffset = window.innerWidth / 2;
+            const targetPosition = -(winningIndex * itemWidth - centerOffset + itemWidth / 2);
+            
+            container.style.transition = 'left 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
+            container.style.left = targetPosition + 'px';
+            
+            setTimeout(() => {
+                showWonItem(winningItem);
+                isSpinning = false;
+            }, 4500);
+        }
+
+        function selectWinningItem() {
+            const random = Math.random() * 100;
+            let cumulative = 0;
+            
+            for (const item of currentCase.items) {
+                cumulative += item.chance;
+                if (random <= cumulative) {
+                    return item;
+                }
+            }
+            
+            return currentCase.items[currentCase.items.length - 1];
+        }
+
+        function showWonItem(item) {
+            document.getElementById('wonItemIcon').textContent = item.icon;
+            document.getElementById('wonItemName').textContent = item.name;
+            document.getElementById('wonItemValue').textContent = `💰 ${item.value}`;
+            document.getElementById('wonItemDisplay').classList.add('active');
+        }
+
+        function collectItem() {
+            if (!wonItem) return;
+            
+            const existingItem = userInventory.find(i => i.name === wonItem.name);
+            if (existingItem) {
+                existingItem.count++;
+            } else {
+                userInventory.push({ ...wonItem, count: 1 });
+            }
+            
+            document.getElementById('wonItemDisplay').classList.remove('active');
+            wonItem = null;
+            closeCaseModal();
+        }
+
+        function openInventory() {
+            document.getElementById('inventoryModal').classList.add('active');
+            renderInventory();
+        }
+
+        function closeInventory() {
+            document.getElementById('inventoryModal').classList.remove('active');
+        }
+
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            
+            if (userInventory.length === 0) {
+                grid.innerHTML = '<div class="empty-inventory">Ваш інвентар порожній. Відкрийте кейси, щоб отримати предмети!</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            userInventory.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'inventory-item';
+                itemDiv.innerHTML = `
+                    ${item.count > 1 ? `<div class="item-count">x${item.count}</div>` : ''}
+                    <div class="inventory-item-icon">${item.icon}</div>
+                    <div class="inventory-item-name">${item.name}</div>
+                    <div class="inventory-item-value">💰 ${item.value}</div>
+                    <button onclick="sellItem(${index})" style="
+                        background: linear-gradient(45deg, #ff6b35, #ff8c42);
+                        border: none;
+                        padding: 8px 20px;
+                        border-radius: 8px;
+                        color: white;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin-top: 10px;
+                        transition: all 0.3s;
+                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        Продати
+                    </button>
+                `;
+                grid.appendChild(itemDiv);
+            });
+        }
+
+        function sellItem(index) {
+            const item = userInventory[index];
+            userBalance += item.value;
+            updateBalance();
+            
+            if (item.count > 1) {
+                item.count--;
+            } else {
+                userInventory.splice(index, 1);
+            }
+            
+            renderInventory();
+        }
+
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('active');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('active');
+        }
+
+        function deposit(amount) {
+            let bonus = 0;
+            if (amount === 500) bonus = amount * 0.05;
+            else if (amount === 1000) bonus = amount * 0.10;
+            else if (amount === 5000) bonus = amount * 0.15;
+            
+            const total = amount + bonus;
+            userBalance += total;
+            updateBalance();
+            
+            const bonusText = bonus > 0 ? ` (+ ${bonus.toFixed(2)} бонус)` : '';
+            alert(`✅ Баланс поповнено на ${total.toFixed(2)}₴${bonusText}`);
+            closeDepositModal();
+        }
+
+        renderCases();
+        updateBalance();
