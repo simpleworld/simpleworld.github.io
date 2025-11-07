@@ -1,518 +1,783 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FoxDrop — Pro Demo (heavy)</title>
-<style>
-  /* ========== RESET & THEME ========== */
-  :root{
-    --bg:#07101a;
-    --panel:#0b1620;
-    --muted:#9fb0c1;
-    --accent:#ff7b00;
-    --accent-2:#ffb26e;
-    --glass: rgba(255,255,255,0.03);
-    --good:#16a34a;
-    --bad:#ef4444;
-    --radius:14px;
-    --shadow: 0 10px 30px rgba(2,6,23,0.7);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;background:linear-gradient(180deg,var(--bg),#021018 70%);color:#e8f0f7;
-    -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
-  }
-  a{color:inherit}
-  /* ========== LAYOUT ========== */
-  header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;background:linear-gradient(180deg,#07131b,#07121a);border-bottom:1px solid rgba(255,255,255,0.02)}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ff8a3d,#ffb77f);display:flex;align-items:center;justify-content:center;font-weight:800;color:#07121a}
-  .brand h1{margin:0;font-size:18px}
-  .controls{display:flex;gap:12px;align-items:center}
-  .balance{padding:8px 12px;background:var(--panel);border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;padding:8px 12px;border-radius:10px;color:#07121a;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.4)}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-  /* ========== MAIN GRID ========== */
-  .wrap{max-width:1200px;margin:20px auto;padding:0 18px}
-  .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
-  .panel{background:var(--panel);padding:16px;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.02)}
-  h2{margin:0 0 12px 0}
-  .cases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-  .case-card{display:flex;flex-direction:column;gap:8px;padding:12px;background:linear-gradient(180deg,#081a20,#061218);border-radius:12px;border:1px solid rgba(255,255,255,0.03);transition:transform .18s}
-  .case-card:hover{transform:translateY(-6px)}
-  .case-card img{width:100%;height:140px;object-fit:cover;border-radius:8px}
-  .case-row{display:flex;justify-content:space-between;align-items:center}
-  .case-info{font-weight:700}
-  .case-price{color:var(--muted);font-size:13px}
-  /* ========== OPENER ========== */
-  #opener{display:flex;flex-direction:column;gap:12px;align-items:center}
-  .reel-window{width:100%;height:140px;border-radius:12px;background:linear-gradient(180deg,#041218,#031018);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.03)}
-  .reel{display:flex;position:absolute;left:0;top:0;gap:10px;padding:12px}
-  .tile{width:140px;height:116px;background:linear-gradient(180deg,#071a24,#031016);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;border:1px solid rgba(255,255,255,0.02)}
-  .tile img{width:100px;height:60px;object-fit:contain;border-radius:6px}
-  #pointer{position:absolute;left:50%;top:0;transform:translateX(-50%);height:100%;width:4px;background:linear-gradient(180deg,#fff6,#fff0);box-shadow:0 0 18px rgba(255,255,255,0.06);pointer-events:none}
-  .open-controls{display:flex;gap:10px;width:100%}
-  .open-controls .left{flex:1;display:flex;gap:8px}
-  /* ========== RESULT CARD ========== */
-  .result-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(90deg,#071820,#0b2330);border:1px solid rgba(255,255,255,0.03)}
-  .result-card img{width:120px;height:64px;object-fit:contain;border-radius:8px}
-  .rarity-common{color:#d1e8ff}
-  .rarity-rare{color:#60a5fa}
-  .rarity-epic{color:#a78bfa}
-  .rarity-legend{color:#f6c85f}
-  /* ========== INVENTORY ========== */
-  .inv-list{display:flex;flex-direction:column;gap:10px}
-  .inv-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(90deg,#06131a,#041018);border:1px solid rgba(255,255,255,0.02)}
-  .inv-item img{width:120px;height:64px;object-fit:contain;border-radius:6px}
-  .inv-meta{flex:1}
-  .sell-btn{background:#ef4444;padding:6px 10px;border-radius:8px;border:none;color:white;cursor:pointer}
-  /* ========== FOOTER / SMALL ========== */
-  .small{font-size:13px;color:var(--muted)}
-  footer{margin-top:18px;text-align:center;color:var(--muted)}
-  @media(max-width:980px){ .grid{grid-template-columns:1fr} .cases{grid-template-columns:1fr} .reel-window{height:120px} .tile{width:110px;height:96px} }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoxDrop - Відкриття Кейсів</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #1a1f3a 0%, #2d3561 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fox-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .balance {
+            background: linear-gradient(135deg, #2d3561 0%, #3d4771 100%);
+            padding: 12px 24px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .balance:hover {
+            transform: translateY(-2px);
+        }
+
+        .balance-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .balance-amount {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .deposit-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .deposit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .inventory-btn {
+            background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+            padding: 12px 28px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(156, 39, 176, 0.3);
+        }
+
+        .inventory-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(156, 39, 176, 0.4);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .cases-section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b35, #ff8c42, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .case-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2d3561 100%);
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+
+        .case-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(255, 107, 53, 0.4);
+            border-color: #ff6b35;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 53, 0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .case-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2d3561, #3d4771);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.3) 0%, transparent 70%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(0.95); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .case-name {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .case-price {
+            font-size: 28px;
+            color: #ffd700;
+            text-align: center;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .rarity-legendary { border-color: #ffd700; }
+        .rarity-epic { border-color: #9c27b0; }
+        .rarity-rare { border-color: #2196F3; }
+        .rarity-common { border-color: #4CAF50; }
+
+        .case-opening-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .case-opening-modal.active {
+            display: flex;
+        }
+
+        .opening-container {
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .opening-title {
+            font-size: 42px;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #ff6b35, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .roulette-container {
+            position: relative;
+            height: 300px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1f3a, #2d3561);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 3px solid #ff6b35;
+        }
+
+        .roulette-items {
+            display: flex;
+            position: absolute;
+            left: 0;
+            transition: left 4s cubic-bezier(0.25, 0.1, 0.25, 1);
+            padding: 30px 0;
+        }
+
+        .roulette-item {
+            min-width: 200px;
+            margin: 0 15px;
+            background: linear-gradient(135deg, #2d3561, #3d4771);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid #444;
+        }
+
+        .roulette-item img {
+            width: 120px;
+            height: 120px;
+            font-size: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .roulette-selector {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, #ff6b35, transparent);
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px #ff6b35;
+        }
+
+        .open-btn {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            padding: 18px 60px;
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
+            margin-right: 20px;
+        }
+
+        .open-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255, 107, 53, 0.6);
+        }
+
+        .open-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .close-modal-btn {
+            background: linear-gradient(45deg, #666, #888);
+            padding: 18px 60px;
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .inventory-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .inventory-modal.active {
+            display: block;
+        }
+
+        .inventory-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1f3a, #2d3561);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+        }
+
+        .inventory-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .inventory-title {
+            font-size: 42px;
+            background: linear-gradient(45deg, #9c27b0, #7b1fa2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .close-inventory-btn {
+            background: linear-gradient(45deg, #666, #888);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .inventory-item {
+            background: linear-gradient(135deg, #2d3561, #3d4771);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #444;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .inventory-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(156, 39, 176, 0.4);
+        }
+
+        .inventory-item-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .inventory-item-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .inventory-item-value {
+            font-size: 20px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .item-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 107, 53, 0.9);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .empty-inventory {
+            text-align: center;
+            padding: 60px;
+            font-size: 24px;
+            color: #888;
+        }
+
+        .deposit-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .deposit-modal.active {
+            display: flex;
+        }
+
+        .deposit-content {
+            background: linear-gradient(135deg, #1a1f3a, #2d3561);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .deposit-title {
+            font-size: 36px;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .deposit-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .deposit-option {
+            background: linear-gradient(135deg, #2d3561, #3d4771);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deposit-option:hover {
+            border-color: #4CAF50;
+            transform: translateX(5px);
+        }
+
+        .deposit-option-amount {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .deposit-option-bonus {
+            color: #4CAF50;
+            font-size: 14px;
+        }
+
+        .won-item-display {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #1a1f3a, #2d3561);
+            padding: 60px;
+            border-radius: 30px;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
+            z-index: 3000;
+            text-align: center;
+            animation: itemWon 0.6s forwards;
+        }
+
+        .won-item-display.active {
+            display: block;
+        }
+
+        @keyframes itemWon {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); }
+            60% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        .won-item-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
+            animation: wonIconFloat 2s infinite;
+        }
+
+        @keyframes wonIconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .won-item-name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .won-item-value {
+            font-size: 48px;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .won-item-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .collect-btn {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .collect-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .case-card {
+            animation: fadeIn 0.5s ease-out backwards;
+        }
+
+        .case-card:nth-child(1) { animation-delay: 0.1s; }
+        .case-card:nth-child(2) { animation-delay: 0.2s; }
+        .case-card:nth-child(3) { animation-delay: 0.3s; }
+        .case-card:nth-child(4) { animation-delay: 0.4s; }
+        .case-card:nth-child(5) { animation-delay: 0.5s; }
+        .case-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="logo">FD</div>
-    <div><h1>FoxDrop <span class="small">(demo heavy build)</span></h1></div>
-  </div>
-  <div class="controls">
-    <div class="balance small">Balance: <strong id="balanceDisplay">0</strong>$</div>
-    <button class="btn" onclick="ui.topUp()">Поповнити +5$</button>
-  </div>
-</header>
-
-<main class="wrap">
-  <div class="grid">
-    <!-- LEFT: Cases + Opener -->
-    <div>
-      <div class="panel" id="casesPanel">
-        <h2>Кейси</h2>
-        <div class="cases" id="casesList"></div>
-      </div>
-
-      <div class="panel" style="margin-top:12px">
-        <h2>Відкриття кейсу</h2>
-        <div id="opener">
-          <div class="small">Активний кейс: <strong id="activeCaseName"></strong> — <span id="activeCasePrice" class="small"></span></div>
-          <div class="reel-window" id="reelWindow">
-            <div id="pointer"></div>
-            <div class="reel" id="reel"></div>
-          </div>
-
-          <div class="open-controls">
-            <div class="left">
-              <button class="btn" id="openButton" onclick="actions.openCase()">Open</button>
-              <button class="btn ghost" onclick="actions.autoOpen(5)">Auto ×5</button>
-              <button class="btn ghost" onclick="actions.generateClientSeed()">Gen seed</button>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end">
-              <div class="small">ClientSeed</div>
-              <input id="clientSeedInput" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit" />
-              <div class="small" style="margin-top:6px">Nonce: <span id="nonceDisplay">0</span></div>
-            </div>
-          </div>
-
-          <div id="resultArea" style="width:100%;margin-top:12px"></div>
+    <div class="header">
+        <div class="logo">
+            <div class="fox-icon">🦊</div>
+            FoxDrop
         </div>
-      </div>
+        <div class="user-info">
+            <div class="balance">
+                <div class="balance-icon">💰</div>
+                <div class="balance-amount" id="userBalance">1000.00</div>
+            </div>
+            <button class="deposit-btn" onclick="openDepositModal()">Поповнити</button>
+            <button class="inventory-btn" onclick="openInventory()">Інвентар</button>
+        </div>
     </div>
 
-    <!-- RIGHT: Inventory + Active case -->
-    <aside>
-      <div class="panel" id="activePanel">
-        <h3>Активний кейс</h3>
-        <div style="display:flex;gap:12px;align-items:center">
-          <img id="activeCaseImg" src="" alt="case" style="width:110px;height:72px;object-fit:cover;border-radius:8px"/>
-          <div>
-            <div id="activeCaseTitle" style="font-weight:800">-</div>
-            <div class="small" id="activeCaseSubtitle">-</div>
-            <div style="margin-top:8px"><button class="btn small" onclick="actions.openCase()">Open</button></div>
-          </div>
+    <div class="main-container">
+        <div class="cases-section">
+            <h2 class="section-title">🎁 Доступні Кейси</h2>
+            <div class="cases-grid" id="casesGrid"></div>
         </div>
-        <div style="margin-top:12px">
-          <h4 style="margin:0 0 8px 0">Останні відкриття</h4>
-          <div id="recentList" class="small" style="white-space:pre-line;max-height:220px;overflow:auto"></div>
+    </div>
+
+    <div class="case-opening-modal" id="caseOpeningModal">
+        <div class="opening-container">
+            <h2 class="opening-title" id="openingCaseTitle"></h2>
+            <div class="roulette-container">
+                <div class="roulette-selector"></div>
+                <div class="roulette-items" id="rouletteItems"></div>
+            </div>
+            <button class="open-btn" id="openCaseBtn" onclick="spinRoulette()">Відкрити Кейс</button>
+            <button class="close-modal-btn" onclick="closeCaseModal()">Закрити</button>
         </div>
-      </div>
+    </div>
 
-      <div class="panel" style="margin-top:12px">
-        <h3>Інвентар</h3>
-        <div id="inventoryList" class="inv-list"></div>
-      </div>
-    </aside>
-  </div>
+    <div class="won-item-display" id="wonItemDisplay">
+        <div class="won-item-icon" id="wonItemIcon"></div>
+        <div class="won-item-name" id="wonItemName"></div>
+        <div class="won-item-value" id="wonItemValue"></div>
+        <div class="won-item-actions">
+            <button class="collect-btn" onclick="collectItem()">Забрати в інвентар</button>
+        </div>
+    </div>
 
-  <footer>FoxDrop demo — provably-fair client-side demo. Для продакшна: реалізуй serverSeed на бекенді + платежі.</footer>
-</main>
+    <div class="inventory-modal" id="inventoryModal">
+        <div class="inventory-content">
+            <div class="inventory-header">
+                <h2 class="inventory-title">🎒 Мій Інвентар</h2>
+                <button class="close-inventory-btn" onclick="closeInventory()">Закрити</button>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid"></div>
+        </div>
+    </div>
 
-<!-- Confetti canvas -->
-<canvas id="confettiCanvas" style="position:fixed;left:0;top:0;pointer-events:none;z-index:9999"></canvas>
+    <div class="deposit-modal" id="depositModal">
+        <div class="deposit-content">
+            <h2 class="deposit-title">💳 Поповнення Балансу</h2>
+            <div class="deposit-options">
+                <div class="deposit-option" onclick="deposit(100)">
+                    <span class="deposit-option-amount">100₴</span>
+                    <span class="deposit-option-bonus">+0% бонус</span>
+                </div>
+                <div class="deposit-option" onclick="deposit(500)">
+                    <span class="deposit-option-amount">500₴</span>
+                    <span class="deposit-option-bonus">+5% бонус</span>
+                </div>
+                <div class="deposit-option" onclick="deposit(1000)">
+                    <span class="deposit-option-amount">1000₴</span>
+                    <span class="deposit-option-bonus">+10% бонус</span>
+                </div>
+                <div class="deposit-option" onclick="deposit(5000)">
+                    <span class="deposit-option-amount">5000₴</span>
+                    <span class="deposit-option-bonus">+15% бонус</span>
+                </div>
+            </div>
+            <button class="close-modal-btn" onclick="closeDepositModal()" style="width: 100%;">Закрити</button>
+        </div>
+    </div>
 
-<script>
-/* ========= DATA: cases + skins (with weights + rarity) =========
-   - Each case has type that maps to skinsMap[type]
-   - Each skin has {name, price, img, rarity, weight}
-   - weight used to calculate probabilities (higher = more common)
-*/
+    <script>
+        const cases = [
+            { id: 1, name: 'Стартовий Кейс', icon: '📦', price: 50, rarity: 'common', items: [
+                { name: 'Бронзова Монета', icon: '🥉', value: 10, chance: 40 },
+                { name: 'Срібна Монета', icon: '🥈', value: 30, chance: 30 },
+                { name: 'Золота Монета', icon: '🥇', value: 80, chance: 20 },
+                { name: 'Діамант', icon: '💎', value: 150, chance: 10 }
+            ]},
+            { id: 2, name: 'Рідкісний Кейс', icon: '🎁', price: 150, rarity: 'rare', items: [
+                { name: 'Срібний Меч', icon: '⚔️', value: 100, chance: 35 },
+                { name: 'Золотий Щит', icon: '🛡️', value: 200, chance: 30 },
+                { name: 'Магічний Посох', icon: '🔮', value: 350, chance: 25 },
+                { name: 'Легендарний Шолом', icon: '👑', value: 500, chance: 10 }
+            ]},
+            { id: 3, name: 'Епічний Кейс', icon: '🏆', price: 300, rarity: 'epic', items: [
+                { name: 'Вогняний Меч', icon: '🔥', value: 250, chance: 30 },
+                { name: 'Крижаний Щит', icon: '❄️', value: 400, chance: 25 },
+                { name: 'Драконяча Броня', icon: '🐉', value: 700, chance: 25 },
+                { name: 'Королівська Корона', icon: '👑', value: 1200, chance: 15 },
+                { name: 'Метеоритний Камінь', icon: '☄️', value: 2000, chance: 5 }
+            ]},
+            { id: 4, name: 'Легендарний Кейс', icon: '⭐', price: 500, rarity: 'legendary', items: [
+                { name: 'Меч Світанку', icon: '🌅', value: 500, chance: 25 },
+                { name: 'Зоряний Лук', icon: '🏹', value: 800, chance: 20 },
+                { name: 'Феніксове Перо', icon: '🔥', value: 1200, chance: 20 },
+                { name: 'Космічна Сфера', icon: '🌌', value: 2000, chance: 15 },
+                { name: 'Артефакт Часу', icon: '⏰', value: 3500, chance: 15 },
+                { name: 'Міфрильний Скіпетр', icon: '✨', value: 5000, chance: 5 }
+            ]},
+            { id: 5, name: 'Космічний Кейс', icon: '🚀', price: 800, rarity: 'legendary', items: [
+                { name: 'Астероїдний Осколок', icon: '☄️', value: 700, chance: 25 },
+                { name: 'Місячний Кристал', icon: '🌙', value: 1100, chance: 20 },
+                { name: 'Зоряний Пил', icon: '✨', value: 1800, chance: 20 },
+                { name: 'Галактичний Камінь', icon: '🌌', value: 3000, chance: 15 },
+                { name: 'Чорна Дірка', icon: '🕳️', value: 5500, chance: 15 },
+                { name: 'Створення Всесвіту', icon: '💫', value: 10000, chance: 5 }
+            ]},
+            { id: 6, name: 'Міфічний Кейс', icon: '🌟', price: 1200, rarity: 'legendary', items: [
+                { name: 'Плазмова Зброя', icon: '⚡', value: 1000, chance: 20 },
+                { name: 'Древній Артефакт', icon: '🗿', value: 2000, chance: 20 },
+                { name: 'Божественний Амулет', icon: '📿', value: 3500, chance: 20 },
+                { name: 'Екскалібур', icon: '🗡️', value: 6000, chance: 15 },
+                { name: 'Скарб Дракона', icon: '🐲', value: 10000, chance: 15 },
+                { name: 'Безсмертя', icon: '♾️', value: 20000, chance: 10 }
+            ]}
+        ];
 
-const CASES = [
-  { id:'case_ak', name:'AK-47 Case', price: 100, type:'ak', img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_10.7bfa40c5b5b2213b657b1b8ab.png' },
-  { id:'case_awp', name:'AWP Case', price: 250, type:'awp', img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_20.4e53fa19b14.png' },
-  { id:'case_m4', name:'M4A4 Case', price: 120, type:'m4a4', img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_21.12ebcfb3b0.png' },
-  { id:'case_usp', name:'USP-S Case', price: 80, type:'usp', img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_17.15e0b2f.png' },
-  { id:'case_knife', name:'Knife Case', price: 500, type:'knife', img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_15.4e52f19b32472.png' }
-];
+        let userBalance = 1000;
+        let userInventory = [];
+        let currentCase = null;
+        let isSpinning = false;
+        let wonItem = null;
 
-const skinsMap = {
-  ak: [
-    { name:'AK-47 | Redline', price:45, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.1baf2652.png', rarity:'common', weight:7000 },
-    { name:'AK-47 | Frontside Misty', price:70, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_frontside_misty_light_large.9f8e7d6c.png', rarity:'common', weight:5000 },
-    { name:'AK-47 | Vulcan', price:320, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png', rarity:'rare', weight:1200 },
-    { name:'AK-47 | Neon Rider', price:400, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_neon_rider_light_large.60264f23.png', rarity:'epic', weight:250 },
-    { name:'AK-47 | The Empress', price:600, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_empress_light_large.5e4d3c2b.png', rarity:'legend', weight:50 }
-  ],
-  awp: [
-    { name:'AWP | Graphite', price:40, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_graphite_light_large.2d3c4b5a.png', rarity:'common', weight:7000 },
-    { name:'AWP | Asiimov', price:380, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_asiimov_light_large.9dcb3f4f.png', rarity:'rare', weight:1500 },
-    { name:'AWP | Neo-Noir', price:300, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_neo_noir_light_large.6f5e4d3c.png', rarity:'epic', weight:200 },
-    { name:'AWP | Dragon Lore', price:3500, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.48c95fa1.png', rarity:'legend', weight:40 }
-  ],
-  m4a4: [
-    { name:'M4A4 | Buzz Kill', price:75, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_buzz_kill_light_large.2c3d4e5f.png', rarity:'common', weight:7000 },
-    { name:'M4A4 | Royal Paladin', price:160, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_royal_paladin_light_large.7df92c09.png', rarity:'rare', weight:1800 },
-    { name:'M4A4 | Asiimov', price:430, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_asiimov_light_large.a1b2c3d4.png', rarity:'epic', weight:300 },
-    { name:'M4A4 | Howl', price:850, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png', rarity:'legend', weight:50 }
-  ],
-  usp: [
-    { name:'USP-S | Blueprint', price:70, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_blueprint_light_large.5f6e7d8c.png', rarity:'common', weight:7500 },
-    { name:'USP-S | Orion', price:150, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_orion_light_large.77bda123.png', rarity:'rare', weight:2000 },
-    { name:'USP-S | Neo-Noir', price:420, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_neonoir_light_large.4e3d2c1b.png', rarity:'epic', weight:200 }
-  ],
-  knife: [
-    { name:'Flip Knife | Slaughter', price:700, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_flip_am_slaughter_light_large.4f3e2d1c.png', rarity:'rare', weight:1500 },
-    { name:'M9 Bayonet | Marble Fade', price:1500, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_m9_bayonet_am_marble_fade_light_large.07f86e9c.png', rarity:'legend', weight:60 },
-    { name:'Karambit | Doppler', price:1800, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_karambit_am_doppler_phase2_light_large.3ccf56ee.png', rarity:'legend', weight:40 },
-    { name:'Butterfly Knife | Fade', price:1200, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png', rarity:'epic', weight:300 },
-    { name:'Gut Knife | Doppler', price:420, img:'https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_gut_am_doppler_light_large.6b7c8d9e.png', rarity:'rare', weight:1200 }
-  ]
-};
+        function updateBalance() {
+            document.getElementById('userBalance').textContent = userBalance.toFixed(2);
+        }
 
-/* ========= STATE & STORAGE ========= */
-const STORAGE_KEY = 'foxdrop_pro_v1';
-let state = {
-  balance: parseInt(localStorage.getItem('fd_balance')||'200'),
-  inventory: JSON.parse(localStorage.getItem('fd_inventory')||'[]'),
-  clientSeed: localStorage.getItem('fd_clientSeed') || '',
-  nonce: parseInt(localStorage.getItem('fd_nonce')||'0'),
-  recent: JSON.parse(localStorage.getItem('fd_recent')||'[]'),
-  selectedCaseId: CASES[0].id
-};
+        function renderCases() {
+            const grid = document.getElementById('casesGrid');
+            grid.innerHTML = '';
+            
+            cases.forEach(caseItem => {
+                const card = document.createElement('div');
+                card.className = `case-card rarity-${caseItem.rarity}`;
+                card.onclick = () => openCaseModal(caseItem);
+                
+                card.innerHTML = `
+                    <div class="case-image">
+                        <div class="case-glow"></div>
+                        <span style="font-size: 80px; position: relative; z-index: 1;">${caseItem.icon}</span>
+                    </div>
+                    <div class="case-name">${caseItem.name}</div>
+                    <div class="case-price">
+                        <span>💰</span>
+                        <span>${caseItem.price}</span>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
 
-function saveState(){ localStorage.setItem('fd_balance', String(state.balance)); localStorage.setItem('fd_inventory', JSON.stringify(state.inventory)); localStorage.setItem('fd_clientSeed', state.clientSeed); localStorage.setItem('fd_nonce', String(state.nonce)); localStorage.setItem('fd_recent', JSON.stringify(state.recent)); }
-
-/* ========= UI HELPERS ========= */
-const ui = {
-  init(){ this.casesList = document.getElementById('casesList'); this.activeCaseName = document.getElementById('activeCaseName'); this.activeCasePrice = document.getElementById('activeCasePrice'); this.activeCaseImg = document.getElementById('activeCaseImg'); this.activeCaseTitle = document.getElementById('activeCaseTitle'); this.balanceDisplay = document.getElementById('balanceDisplay'); this.reel = document.getElementById('reel'); this.reelWindow = document.getElementById('reelWindow'); this.resultArea = document.getElementById('resultArea'); this.clientSeedInput = document.getElementById('clientSeedInput'); this.nonceDisplay = document.getElementById('nonceDisplay'); this.recentList = document.getElementById('recentList'); this.inventoryList = document.getElementById('inventoryList'); this.updateBalance(); this.clientSeedInput.value = state.clientSeed; this.nonceDisplay.innerText = state.nonce; this.renderCases(); this.selectCase(state.selectedCaseId); this.renderInventory(); this.renderRecent(); window.addEventListener('resize', confetti.resize); confetti.init(); },
-  renderCases(){
-    this.casesList.innerHTML = '';
-    CASES.forEach(c=>{
-      const el = document.createElement('div'); el.className='case-card';
-      el.innerHTML = `<img src="${c.img}" alt="${c.name}"/><div class="case-row"><div><div class="case-info">${c.name}</div><div class="case-price">${c.price}$</div></div><div><button class="btn small" onclick="actions.selectCase('${c.id}')">Select</button></div></div>`;
-      this.casesList.appendChild(el);
-    });
-  },
-  selectCase(c){
-    const cc = CASES.find(x=>x.id===c) || CASES[0];
-    state.selectedCaseId = cc.id;
-    this.activeCaseName.innerText = cc.name;
-    this.activeCasePrice.innerText = cc.price + '$';
-    this.activeCaseImg.src = cc.img;
-    this.activeCaseTitle.innerText = cc.name;
-    saveState();
-  },
-  updateBalance(){ this.balanceDisplay.innerText = state.balance; },
-  renderReel(arr){
-    // arr: array of items
-    this.reel.innerHTML = '';
-    arr.forEach(it=>{
-      const t = document.createElement('div'); t.className='tile';
-      t.innerHTML = `<img src="${it.img}" alt="${it.name}"/><div class="small" style="margin-top:6px;text-align:center">${it.name}</div>`;
-      this.reel.appendChild(t);
-    });
-    // reset transform
-    this.reel.style.transform = 'translateX(0px)';
-  },
-  showResult(item, prov){
-    this.resultArea.innerHTML = '';
-    const rc = document.createElement('div'); rc.className='result-card';
-    const rarityClass = { common:'rarity-common', rare:'rarity-rare', epic:'rarity-epic', legend:'rarity-legend' }[item.rarity] || '';
-    rc.innerHTML = `<img src="${item.img}" alt="${item.name}"/><div><div style="font-weight:900">${item.name}</div><div class="${rarityClass}" style="margin-top:6px">${item.rarity.toUpperCase()} • ${item.price}$</div><div class="small" style="margin-top:8px">Provably (demo): roll ${prov.roll.toFixed(6)} nonce ${prov.nonce}</div></div>`;
-    this.resultArea.appendChild(rc);
-  },
-  renderInventory(){
-    this.inventoryList.innerHTML = '';
-    if(state.inventory.length===0){ this.inventoryList.innerHTML = '<div class="small">Інвентар порожній</div>'; return; }
-    state.inventory.slice().reverse().forEach(it=>{
-      const el = document.createElement('div'); el.className='inv-item';
-      el.innerHTML = `<img src="${it.img}" alt="${it.name}"/><div class="inv-meta"><div style="font-weight:800">${it.name}</div><div class="small">Ціна: ${it.price}$ • ${it.rarity}</div></div><div><button class="sell-btn" onclick="actions.sellItem('${it.id}')">Продати</button></div>`;
-      this.inventoryList.appendChild(el);
-    });
-  },
-  renderRecent(){
-    this.recentList.innerText = state.recent.slice().reverse().slice(0,20).join('\\n');
-  },
-  topUp(){ state.balance += 5; saveState(); this.updateBalance(); alert('+5$ (демо)'); }
-};
-
-/* ========= PROVABLY-FAIR UTIL (client-side demo) ========= */
-function hexFromBytes(arr){ return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join(''); }
-function cryptoRandomHex(bytes=32){ const a = new Uint8Array(bytes); crypto.getRandomValues(a); return hexFromBytes(a); }
-async function hmacSha256Hex(keyHex, message){
-  const keyBytes = hexToBytes(keyHex);
-  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-256'}, false, ['sign']);
-  const enc = new TextEncoder().encode(message);
-  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc);
-  return hexFromBytes(new Uint8Array(sig));
-}
-function hexToBytes(hex){ const r=[]; for(let i=0;i<hex.length;i+=2) r.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(r); }
-async function rollFromSeeds(serverSeedHex, clientSeed, nonce=0){
-  const msg = `${clientSeed}:${nonce}`;
-  const h = await hmacSha256Hex(serverSeedHex, msg);
-  const slice = h.slice(0,15);
-  const num = parseInt(slice,16);
-  const max = Math.pow(16, slice.length);
-  return num / max;
-}
-
-/* ========= ACTIONS: core logic ========= */
-const actions = {
-  selectCase(id){
-    ui.selectCase(id);
-  },
-  generateClientSeed(){
-    state.clientSeed = 'cs_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    document.getElementById('clientSeedInput').value = state.clientSeed;
-    saveState();
-    alert('Client seed generated');
-  },
-  async openCase(){
-    if(window._spinning) return;
-    const c = CASES.find(x=>x.id===state.selectedCaseId);
-    if(!c) return alert('Select case');
-    if(state.balance < c.price) return alert('Недостатньо балансу');
-    // deduct
-    state.balance -= c.price;
-    ui.updateBalance();
-    saveState();
-
-    // prepare seeds
-    const serverSeed = cryptoRandomHex(32);
-    const clientSeed = state.clientSeed || ('cs_demo_' + Date.now().toString(36));
-    if(!state.clientSeed){ state.clientSeed = clientSeed; document.getElementById('clientSeedInput').value = clientSeed; saveState(); }
-    state.nonce = (state.nonce||0) + 1; document.getElementById('nonceDisplay').innerText = state.nonce; saveState();
-
-    // choose pool and compute deterministic index
-    const pool = skinsMap[c.type];
-    // compute roll and deterministic index
-    const roll = await rollFromSeeds(serverSeed, clientSeed, state.nonce);
-    // choose index by weights
-    const totalW = pool.reduce((s,i)=>s+(i.weight||1),0);
-    let threshold = roll * totalW;
-    let chosen = pool[pool.length-1];
-    for(const it of pool){ threshold -= (it.weight||1); if(threshold <= 0){ chosen = it; break; } }
-
-    // build reel array (with chosen in middle)
-    const reelArr = buildReelForAnimation(pool, chosen, 28);
-    ui.renderReel(reelArr);
-
-    // animate reel (complex easing + extra spins)
-    await animateReelToTarget(ui.reel, reelArr, chosen);
-
-    // finalize: add to inventory, show result, recent, confetti for rare/legend
-    const newItem = Object.assign({}, chosen, { id: 'it_' + Date.now() });
-    state.inventory.push(newItem);
-    state.recent.push(`${new Date().toLocaleTimeString()} — ${newItem.name} (${newItem.rarity})`);
-    if(state.recent.length > 80) state.recent.shift();
-    saveState();
-    ui.renderInventory();
-    ui.renderRecent();
-    ui.showResult(newItem, { serverSeed, clientSeed, nonce: state.nonce, roll });
-
-    // confetti if epic or legend
-    if(newItem.rarity === 'legend' || newItem.rarity === 'epic') confetti.fire();
-
-    // play sound? (omitted — can add)
-  },
-  async autoOpen(n){
-    for(let i=0;i<n;i++){
-      if(state.balance < CASES.find(x=>x.id===state.selectedCaseId).price) break;
-      await actions.openCase();
-      await wait(900);
-    }
-  },
-  sellItem(id){
-    const idx = state.inventory.findIndex(x=>x.id===id);
-    if(idx === -1) return alert('Item not found');
-    const it = state.inventory.splice(idx,1)[0];
-    // return 80% of price
-    const back = Math.round(it.price * 0.8);
-    state.balance += back;
-    saveState();
-    ui.updateBalance();
-    ui.renderInventory();
-    alert(`Продано ${it.name} за ${back}$ (80%)`);
-  }
-};
-
-/* ========= ANIMATION HELPERS ========= */
-function buildReelForAnimation(pool, chosen, length=30){
-  const arr = [];
-  for(let i=0;i<length;i++){
-    // pick random by weight
-    arr.push(weightedPick(pool));
-  }
-  const mid = Math.floor(length/2);
-  arr[mid] = chosen;
-  return arr;
-}
-function weightedPick(pool){
-  const total = pool.reduce((s,i)=>s+(i.weight||1),0);
-  let t = Math.random() * total;
-  for(const p of pool){ t -= (p.weight||1); if(t <= 0) return p; }
-  return pool[pool.length-1];
-}
-function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
-
-async function animateReelToTarget(reelEl, arr, chosen){
-  window._spinning = true;
-  // compute target index (first occurrence from center)
-  const tiles = reelEl.children;
-  // find index of first tile whose name equals chosen.name near center
-  let targetIndex = -1;
-  for(let i=0;i<arr.length;i++){ if(arr[i].name === chosen.name){ targetIndex = i; break; } }
-  if(targetIndex === -1) targetIndex = Math.floor(arr.length/2);
-  // tile width + gap
-  const tileW = tiles[0].offsetWidth + 10; // gap 10
-  // center offset
-  const centerX = (reelEl.parentElement.clientWidth / 2) - (tileW/2);
-  // total translation: we want to land chosen at center, but add extra full-spins distance
-  const extraSpins = 8 + Math.floor(Math.random()*6);
-  const finalTranslate = -((targetIndex + extraSpins) * tileW) + centerX;
-  // measure current (0) -> animate to final with custom easing
-  const duration = 3800 + Math.floor(Math.random()*700);
-  const start = performance.now();
-  const from = 0;
-  const to = finalTranslate;
-  function easeOutExpo(t){ return t===1?1:1-Math.pow(2,-10*t); }
-  return new Promise(resolve=>{
-    function frame(now){
-      const t = Math.min(1, (now-start)/duration);
-      const eased = easeOutExpo(t);
-      const cur = from + (to - from) * eased;
-      reelEl.style.transform = `translateX(${cur}px)`;
-      if(t < 1) requestAnimationFrame(frame); else {
-        // small settle bounce
-        reelEl.style.transition = 'transform 260ms cubic-bezier(.2,.9,.3,1)';
-        reelEl.style.transform = `translateX(${to + 6}px)`;
-        setTimeout(()=> { reelEl.style.transform = `translateX(${to}px)`; setTimeout(()=>{ reelEl.style.transition = ''; window._spinning = false; resolve(); },250); },120);
-      }
-    }
-    requestAnimationFrame(frame);
-  });
-}
-
-/* ========= CONFETTI (simple lightweight) ========= */
-const confetti = (function(){
-  const canvas = document.getElementById('confettiCanvas');
-  const ctx = canvas.getContext('2d');
-  let W=window.innerWidth, H=window.innerHeight; canvas.width=W; canvas.height=H;
-  let particles = [];
-  function resize(){ W=window.innerWidth; H=window.innerHeight; canvas.width=W; canvas.height=H; }
-  function init(){ resize(); }
-  function spawn(n=60){
-    for(let i=0;i<n;i++){
-      particles.push({
-        x: Math.random()*W,
-        y: -20 - Math.random()*H*0.2,
-        vx: (Math.random()-0.5)*6,
-        vy: 2+Math.random()*6,
-        size: 6+Math.random()*8,
-        rot: Math.random()*360,
-        vr: (Math.random()-0.5)*8,
-        color: ['#ffd166','#06d6a0','#118ab2','#ef476f'][Math.floor(Math.random()*4)]
-      });
-    }
-    if(particles.length>0 && !running){ running=true; loop(); }
-  }
-  let running=false;
-  function loop(){
-    ctx.clearRect(0,0,W,H);
-    for(let i=particles.length-1;i>=0;i--){
-      const p = particles[i];
-      p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.rot += p.vr;
-      ctx.save();
-      ctx.translate(p.x,p.y);
-      ctx.rotate(p.rot*Math.PI/180);
-      ctx.fillStyle = p.color;
-      ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
-      ctx.restore();
-      if(p.y > H+50){ particles.splice(i,1); }
-    }
-    if(particles.length>0) requestAnimationFrame(loop); else running=false;
-  }
-  return { init, spawn, fire(n){ spawn(n||80); }, resize };
-})();
-
-/* ========= INIT UI & BIND ========= */
-ui.init();
-
-// wire client seed input
-document.getElementById('clientSeedInput').addEventListener('change', (e)=>{ state.clientSeed = e.target.value; saveState(); });
-
-// expose ui.topUp
-ui.topUp = ui.topUp.bind(ui);
-
-/* ========= EXPORTED small helpers for console/testing ========= */
-window.actions = actions;
-window.ui = ui;
-window.state = state;
-
-/* ========= initial tip: ensure selectedCase set ========= */
-if(!state.selectedCaseId) state.selectedCaseId = CASES[0].id;
-ui.selectCase(state.selectedCaseId);
-
-/* ========= small additions: renderInventory on load ========= */
-ui.renderInventory();
-ui.renderRecent();
-
-/* ========= utility: sellItem wrapper ========= */
-actions.sellItem = function(id){
-  const idx = state.inventory.findIndex(x=>x.id===id);
-  if(idx === -1) return alert('Item not found');
-  const item = state.inventory.splice(idx,1)[0];
-  const back = Math.round(item.price * 0.8);
-  state.balance += back;
-  saveState();
-  ui.updateBalance();
-  ui.renderInventory();
-  alert('Продано '+ item.name + ' за ' + back + '$ (80%)');
-};
-
-/* ========= helper: weighted selection (external use) ========= */
-function chooseByWeight(list, roll){
-  const tot = list.reduce((s,i)=>s+(i.weight||1),0);
-  let t = roll * tot;
-  for(const it of list){ t -= (it.weight||1); if(t <= 0) return it; }
-  return list[list.length-1];
-}
-
-/* ========= small cookie-cutter end ========= */
-</script>
-</body>
-</html>
+        function openCaseModal(caseItem) {
+            currentCase = caseItem;
