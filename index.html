@@ -205,15 +205,15 @@ nav a:hover {
 <script>
 const cases = [
   {name: "AK-47 Case", price: 100, image: "https://th.bing.com/th/id/OIP.SRf_KFp_u1PKs253w3MGyQHaEK?w=314&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "Knife Case", price: 350, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_15.4e52f19b32472.png"},
-  {name: "AWP Case", price: 200, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_20.4e53fa19b14.png"},
+  {name: "Knife Case", price: 350, image: "https://th.bing.com/th?id=OIF.JrGuhXYu8xyG4x6v%2bF4v0A&w=221&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
+  {name: "AWP Case", price: 200, image: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
   {name: "USP-S Case", price: 80, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_17.15e0b2f.png"},
   {name: "M4A4 Case", price: 120, image: "https://cdn.akamai.steamstatic.com/apps/730/icons/econ/weapon_cases/case_community_21.12ebcfb3b0.png"}
 ];
 
 const skins = [
   {name: "AK-47 | Redline", price: 50, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.7d6e4a2b.png"},
-  {name: "AWP | Dragon Lore", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.0e73c5a2.png"},
+  {name: "AWP | Dragon Lore", price: 1500, img: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
   {name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
   {name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
   {name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
@@ -222,7 +222,7 @@ const skins = [
   {name: "Desert Eagle | Blaze", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_deagle_aq_deagle_blaze_light_large.287f2c88.png"}
 ];
 
-let balance = parseInt(localStorage.getItem('balance')) || 1000;
+let balance = parseInt(localStorage.getItem('balance')) || 0;
 let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
 document.getElementById("balance").innerText = balance;
