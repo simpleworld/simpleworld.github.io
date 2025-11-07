@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦊 FoxDrop 2.0 | Відкриття кейсів CS2</title>
+<title>🦊 FoxDrop | Відкриття кейсів CS2</title>
 <style>
 body {
   margin: 0;
@@ -176,7 +176,7 @@ nav a:hover {
 </head>
 <body>
 <header>
-  <h1>🦊 FoxDrop 2.0</h1>
+  <h1>🦊 FoxDrop</h1>
   <div class="balance">Баланс: <span id="balance">1000</span>$</div>
 </header>
 
@@ -204,25 +204,41 @@ nav a:hover {
 
 <script>
 const cases = [
-  {name: "AK-47 Case", price: 100, image: "https://th.bing.com/th/id/OIP.SRf_KFp_u1PKs253w3MGyQHaEK?w=314&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "Knife Case", price: 350, image: "https://th.bing.com/th?id=OIF.1gYvXQtIu%2bS9xuxaaPeRbA&w=244&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "AWP Case", price: 200, image: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "USP-S Case", price: 80, image: "https://th.bing.com/th/id/OIP.ooThcnez66kmNfZf_PFuBAHaFj?w=213&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "M4A4 Case", price: 120, image: "https://th.bing.com/th/id/OIP.bqmvEJZw5aS4zkbk8haBgAHaHa?w=153&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"}
+  {name: "AK-47 Case", price: 100, type: "ak", image: "https://th.bing.com/th/id/OIP.SRf_KFp_u1PKs253w3MGyQHaEK?w=314&h=180&c=7&r=0&o=7"},
+  {name: "Knife Case", price: 350, type: "knife", image: "https://th.bing.com/th?id=OIF.1gYvXQtIu%2bS9xuxaaPeRbA&w=244&h=180&c=7&r=0&o=7"},
+  {name: "AWP Case", price: 200, type: "awp", image: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186"},
+  {name: "USP-S Case", price: 80, type: "usp", image: "https://th.bing.com/th/id/OIP.ooThcnez66kmNfZf_PFuBAHaFj?w=213&h=180"},
+  {name: "M4A4 Case", price: 120, type: "m4a4", image: "https://th.bing.com/th/id/OIP.bqmvEJZw5aS4zkbk8haBgAHaHa?w=153&h=180"}
 ];
 
-const skins = [
-  {name: "AK-47 | Redline", price: 50, img: "https://th.bing.com/th/id/OIP.uhf32MC6l_Q0KfbGOlEX-gHaEK?w=331&h=186&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "AWP | Dragon Lore", price: 1500, img: "https://th.bing.com/th/id/OIP.IAY8dRWghKDdI12IteyNWAHaEJ?w=333&h=186&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3"},
-  {name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
-  {name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
-  {name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
-  {name: "AK-47 | Vulcan", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
-  {name: "AWP | Medusa", price: 980, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
-  {name: "Desert Eagle | Blaze", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_deagle_aq_deagle_blaze_light_large.287f2c88.png"}
-];
+const skins = {
+  ak: [
+    {name: "AK-47 | Redline", price: 50, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_redline_light_large.1baf2652.png"},
+    {name: "AK-47 | Vulcan", price: 320, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak47_vulcan_light_large.c6e2e6b6.png"},
+    {name: "AK-47 | Neon Rider", price: 400, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_ak47_cu_ak_neon_rider_light_large.60264f23.png"}
+  ],
+  awp: [
+    {name: "AWP | Dragon Lore", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_dragon_lore_light_large.48c95fa1.png"},
+    {name: "AWP | Medusa", price: 980, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_medusa_awp_light_large.20e0a21d.png"},
+    {name: "AWP | Asiimov", price: 350, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_awp_cu_awp_asiimov_light_large.9dcb3f4f.png"}
+  ],
+  knife: [
+    {name: "Butterfly Knife | Fade", price: 1200, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_butterfly_am_zebra_light_large.1b4936ee.png"},
+    {name: "Karambit | Doppler", price: 1800, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_karambit_am_doppler_phase2_light_large.3ccf56ee.png"},
+    {name: "M9 Bayonet | Marble Fade", price: 1500, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_m9_bayonet_am_marble_fade_light_large.07f86e9c.png"},
+    {name: "Talon Knife | Tiger Tooth", price: 1600, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_knife_widowmaker_am_tiger_orange_light_large.73db87cf.png"}
+  ],
+  usp: [
+    {name: "USP-S | Kill Confirmed", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_usp_kill_confirmed_light_large.32ac7d8b.png"},
+    {name: "USP-S | Orion", price: 150, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_usp_silencer_cu_orion_light_large.77bda123.png"}
+  ],
+  m4a4: [
+    {name: "M4A4 | Howl", price: 850, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_howl_light_large.76b0c72b.png"},
+    {name: "M4A4 | Desolate Space", price: 220, img: "https://cdn.cloudflare.steamstatic.com/apps/730/icons/econ/default_generated/weapon_m4a4_cu_m4a4_desolate_space_light_large.55a0ef2a.png"}
+  ]
+};
 
-let balance = parseInt(localStorage.getItem('balance')) || 0;
+let balance = parseInt(localStorage.getItem('balance')) || 1000;
 let inventory = JSON.parse(localStorage.getItem('inventory')) || [];
 
 document.getElementById("balance").innerText = balance;
@@ -241,13 +257,13 @@ function renderCases() {
         <img src="${cs.image}">
         <h2>${cs.name}</h2>
         <p>Ціна: ${cs.price}$</p>
-        <button onclick="openCase('${cs.name}', ${cs.price})">Відкрити</button>
+        <button onclick="openCase('${cs.type}', ${cs.price})">Відкрити</button>
       </div>`;
   });
 }
 renderCases();
 
-function openCase(name, price) {
+function openCase(type, price) {
   if(balance < price) return alert("Недостатньо балансу!");
   balance -= price;
   document.getElementById("balance").innerText = balance;
@@ -257,15 +273,16 @@ function openCase(name, price) {
   const track = document.getElementById("carouselTrack");
   track.innerHTML = "";
 
+  const caseSkins = skins[type];
   for(let i=0; i<40; i++) {
-    const skin = skins[Math.floor(Math.random() * skins.length)];
+    const skin = caseSkins[Math.floor(Math.random() * caseSkins.length)];
     const img = document.createElement("img");
     img.src = skin.img;
     track.appendChild(img);
   }
 
-  const rand = Math.floor(Math.random() * (skins.length));
-  const selected = skins[rand];
+  const rand = Math.floor(Math.random() * caseSkins.length);
+  const selected = caseSkins[rand];
   const moveX = -((rand + 20) * 140 - window.innerWidth/2 + 70);
 
   setTimeout(() => {
