@@ -541,11 +541,11 @@
             box-shadow: 0 0 60px rgba(255, 215, 0, 0.6);
             z-index: 3000;
             text-align: center;
-            animation: itemWon 0.6s forwards;
         }
 
         .won-item-display.active {
             display: block;
+            animation: itemWon 0.6s forwards;
         }
 
         @keyframes itemWon {
@@ -599,6 +599,22 @@
         .collect-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .sell-btn {
+            background: linear-gradient(45deg, #ff6b35, #ff8c42);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .sell-btn:hover {
+            transform: translateY(-2px);
         }
 
         @keyframes fadeIn {
@@ -699,49 +715,91 @@
 
     <script>
         const cases = [
-            { id: 1, name: 'Стартовий Кейс', icon: '📦', price: 50, rarity: 'common', items: [
-                { name: 'Бронзова Монета', icon: '🥉', value: 10, chance: 40 },
-                { name: 'Срібна Монета', icon: '🥈', value: 30, chance: 30 },
-                { name: 'Золота Монета', icon: '🥇', value: 80, chance: 20 },
-                { name: 'Діамант', icon: '💎', value: 150, chance: 10 }
-            ]},
-            { id: 2, name: 'Рідкісний Кейс', icon: '🎁', price: 150, rarity: 'rare', items: [
-                { name: 'Срібний Меч', icon: '⚔️', value: 100, chance: 35 },
-                { name: 'Золотий Щит', icon: '🛡️', value: 200, chance: 30 },
-                { name: 'Магічний Посох', icon: '🔮', value: 350, chance: 25 },
-                { name: 'Легендарний Шолом', icon: '👑', value: 500, chance: 10 }
-            ]},
-            { id: 3, name: 'Епічний Кейс', icon: '🏆', price: 300, rarity: 'epic', items: [
-                { name: 'Вогняний Меч', icon: '🔥', value: 250, chance: 30 },
-                { name: 'Крижаний Щит', icon: '❄️', value: 400, chance: 25 },
-                { name: 'Драконяча Броня', icon: '🐉', value: 700, chance: 25 },
-                { name: 'Королівська Корона', icon: '👑', value: 1200, chance: 15 },
-                { name: 'Метеоритний Камінь', icon: '☄️', value: 2000, chance: 5 }
-            ]},
-            { id: 4, name: 'Легендарний Кейс', icon: '⭐', price: 500, rarity: 'legendary', items: [
-                { name: 'Меч Світанку', icon: '🌅', value: 500, chance: 25 },
-                { name: 'Зоряний Лук', icon: '🏹', value: 800, chance: 20 },
-                { name: 'Феніксове Перо', icon: '🔥', value: 1200, chance: 20 },
-                { name: 'Космічна Сфера', icon: '🌌', value: 2000, chance: 15 },
-                { name: 'Артефакт Часу', icon: '⏰', value: 3500, chance: 15 },
-                { name: 'Міфрильний Скіпетр', icon: '✨', value: 5000, chance: 5 }
-            ]},
-            { id: 5, name: 'Космічний Кейс', icon: '🚀', price: 800, rarity: 'legendary', items: [
-                { name: 'Астероїдний Осколок', icon: '☄️', value: 700, chance: 25 },
-                { name: 'Місячний Кристал', icon: '🌙', value: 1100, chance: 20 },
-                { name: 'Зоряний Пил', icon: '✨', value: 1800, chance: 20 },
-                { name: 'Галактичний Камінь', icon: '🌌', value: 3000, chance: 15 },
-                { name: 'Чорна Дірка', icon: '🕳️', value: 5500, chance: 15 },
-                { name: 'Створення Всесвіту', icon: '💫', value: 10000, chance: 5 }
-            ]},
-            { id: 6, name: 'Міфічний Кейс', icon: '🌟', price: 1200, rarity: 'legendary', items: [
-                { name: 'Плазмова Зброя', icon: '⚡', value: 1000, chance: 20 },
-                { name: 'Древній Артефакт', icon: '🗿', value: 2000, chance: 20 },
-                { name: 'Божественний Амулет', icon: '📿', value: 3500, chance: 20 },
-                { name: 'Екскалібур', icon: '🗡️', value: 6000, chance: 15 },
-                { name: 'Скарб Дракона', icon: '🐲', value: 10000, chance: 15 },
-                { name: 'Безсмертя', icon: '♾️', value: 20000, chance: 10 }
-            ]}
+            { 
+                id: 1, 
+                name: 'Стартовий Кейс', 
+                icon: '📦', 
+                price: 50, 
+                rarity: 'common', 
+                items: [
+                    { name: 'Бронзова Монета', icon: '🥉', value: 10, chance: 40 },
+                    { name: 'Срібна Монета', icon: '🥈', value: 30, chance: 30 },
+                    { name: 'Золота Монета', icon: '🥇', value: 80, chance: 20 },
+                    { name: 'Діамант', icon: '💎', value: 150, chance: 10 }
+                ]
+            },
+            { 
+                id: 2, 
+                name: 'Рідкісний Кейс', 
+                icon: '🎁', 
+                price: 150, 
+                rarity: 'rare', 
+                items: [
+                    { name: 'Срібний Меч', icon: '⚔️', value: 100, chance: 35 },
+                    { name: 'Золотий Щит', icon: '🛡️', value: 200, chance: 30 },
+                    { name: 'Магічний Посох', icon: '🔮', value: 350, chance: 25 },
+                    { name: 'Легендарний Шолом', icon: '👑', value: 500, chance: 10 }
+                ]
+            },
+            { 
+                id: 3, 
+                name: 'Епічний Кейс', 
+                icon: '🏆', 
+                price: 300, 
+                rarity: 'epic', 
+                items: [
+                    { name: 'Вогняний Меч', icon: '🔥', value: 250, chance: 30 },
+                    { name: 'Крижаний Щит', icon: '❄️', value: 400, chance: 25 },
+                    { name: 'Драконяча Броня', icon: '🐉', value: 700, chance: 25 },
+                    { name: 'Королівська Корона', icon: '👑', value: 1200, chance: 15 },
+                    { name: 'Метеоритний Камінь', icon: '☄️', value: 2000, chance: 5 }
+                ]
+            },
+            { 
+                id: 4, 
+                name: 'Легендарний Кейс', 
+                icon: '⭐', 
+                price: 500, 
+                rarity: 'legendary', 
+                items: [
+                    { name: 'Меч Світанку', icon: '🌅', value: 500, chance: 25 },
+                    { name: 'Зоряний Лук', icon: '🏹', value: 800, chance: 20 },
+                    { name: 'Феніксове Перо', icon: '🔥', value: 1200, chance: 20 },
+                    { name: 'Космічна Сфера', icon: '🌌', value: 2000, chance: 15 },
+                    { name: 'Артефакт Часу', icon: '⏰', value: 3500, chance: 15 },
+                    { name: 'Міфрильний Скіпетр', icon: '✨', value: 5000, chance: 5 }
+                ]
+            },
+            { 
+                id: 5, 
+                name: 'Космічний Кейс', 
+                icon: '🚀', 
+                price: 800, 
+                rarity: 'legendary', 
+                items: [
+                    { name: 'Астероїдний Осколок', icon: '☄️', value: 700, chance: 25 },
+                    { name: 'Місячний Кристал', icon: '🌙', value: 1100, chance: 20 },
+                    { name: 'Зоряний Пил', icon: '✨', value: 1800, chance: 20 },
+                    { name: 'Галактичний Камінь', icon: '🌌', value: 3000, chance: 15 },
+                    { name: 'Чорна Дірка', icon: '🕳️', value: 5500, chance: 15 },
+                    { name: 'Створення Всесвіту', icon: '💫', value: 10000, chance: 5 }
+                ]
+            },
+            { 
+                id: 6, 
+                name: 'Міфічний Кейс', 
+                icon: '🌟', 
+                price: 1200, 
+                rarity: 'legendary', 
+                items: [
+                    { name: 'Плазмова Зброя', icon: '⚡', value: 1000, chance: 20 },
+                    { name: 'Древній Артефакт', icon: '🗿', value: 2000, chance: 20 },
+                    { name: 'Божественний Амулет', icon: '📿', value: 3500, chance: 20 },
+                    { name: 'Екскалібур', icon: '🗡️', value: 6000, chance: 15 },
+                    { name: 'Скарб Дракона', icon: '🐲', value: 10000, chance: 15 },
+                    { name: 'Безсмертя', icon: '♾️', value: 20000, chance: 10 }
+                ]
+            }
         ];
 
         let userBalance = 1000;
@@ -759,222 +817,4 @@
             grid.innerHTML = '';
             
             cases.forEach(caseItem => {
-                const card = document.createElement('div');
-                card.className = `case-card rarity-${caseItem.rarity}`;
-                card.onclick = () => openCaseModal(caseItem);
-                
-                card.innerHTML = `
-                    <div class="case-image">
-                        <div class="case-glow"></div>
-                        <span style="font-size: 80px; position: relative; z-index: 1;">${caseItem.icon}</span>
-                    </div>
-                    <div class="case-name">${caseItem.name}</div>
-                    <div class="case-price">
-                        <span>💰</span>
-                        <span>${caseItem.price}</span>
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-            });
-        }
-
-        function openCaseModal(caseItem) {
-            currentCase = caseItem;
-            document.getElementById('openingCaseTitle').textContent = `🎁 ${caseItem.name}`;
-            document.getElementById('caseOpeningModal').classList.add('active');
-            document.getElementById('openCaseBtn').disabled = false;
-            generateRouletteItems();
-        }
-
-        function closeCaseModal() {
-            document.getElementById('caseOpeningModal').classList.remove('active');
-            currentCase = null;
-            isSpinning = false;
-        }
-
-        function generateRouletteItems() {
-            const container = document.getElementById('rouletteItems');
-            container.innerHTML = '';
-            container.style.left = '0px';
-            
-            const allItems = [];
-            currentCase.items.forEach(item => {
-                const count = Math.floor(item.chance / 2);
-                for (let i = 0; i < count; i++) {
-                    allItems.push(item);
-                }
-            });
-            
-            for (let i = 0; i < 50; i++) {
-                const randomItem = allItems[Math.floor(Math.random() * allItems.length)];
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'roulette-item';
-                itemDiv.innerHTML = `
-                    <div style="font-size: 60px;">${randomItem.icon}</div>
-                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${randomItem.name}</div>
-                    <div style="font-size: 18px; color: #ffd700;">💰 ${randomItem.value}</div>
-                `;
-                container.appendChild(itemDiv);
-            }
-        }
-
-        function spinRoulette() {
-            if (isSpinning) return;
-            
-            if (userBalance < currentCase.price) {
-                alert('Недостатньо коштів! Поповніть баланс.');
-                return;
-            }
-            
-            isSpinning = true;
-            userBalance -= currentCase.price;
-            updateBalance();
-            document.getElementById('openCaseBtn').disabled = true;
-            
-            const winningItem = selectWinningItem();
-            wonItem = winningItem;
-            
-            const container = document.getElementById('rouletteItems');
-            const itemWidth = 230;
-            const totalItems = container.children.length;
-            const winningIndex = Math.floor(totalItems * 0.7 + Math.random() * 5);
-            
-            const winningItemDiv = container.children[winningIndex];
-            winningItemDiv.innerHTML = `
-                <div style="font-size: 60px;">${winningItem.icon}</div>
-                <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${winningItem.name}</div>
-                <div style="font-size: 18px; color: #ffd700;">💰 ${winningItem.value}</div>
-            `;
-            
-            const centerOffset = window.innerWidth / 2;
-            const targetPosition = -(winningIndex * itemWidth - centerOffset + itemWidth / 2);
-            
-            container.style.transition = 'left 4s cubic-bezier(0.25, 0.1, 0.25, 1)';
-            container.style.left = targetPosition + 'px';
-            
-            setTimeout(() => {
-                showWonItem(winningItem);
-                isSpinning = false;
-            }, 4500);
-        }
-
-        function selectWinningItem() {
-            const random = Math.random() * 100;
-            let cumulative = 0;
-            
-            for (const item of currentCase.items) {
-                cumulative += item.chance;
-                if (random <= cumulative) {
-                    return item;
-                }
-            }
-            
-            return currentCase.items[currentCase.items.length - 1];
-        }
-
-        function showWonItem(item) {
-            document.getElementById('wonItemIcon').textContent = item.icon;
-            document.getElementById('wonItemName').textContent = item.name;
-            document.getElementById('wonItemValue').textContent = `💰 ${item.value}`;
-            document.getElementById('wonItemDisplay').classList.add('active');
-        }
-
-        function collectItem() {
-            if (!wonItem) return;
-            
-            const existingItem = userInventory.find(i => i.name === wonItem.name);
-            if (existingItem) {
-                existingItem.count++;
-            } else {
-                userInventory.push({ ...wonItem, count: 1 });
-            }
-            
-            document.getElementById('wonItemDisplay').classList.remove('active');
-            wonItem = null;
-            closeCaseModal();
-        }
-
-        function openInventory() {
-            document.getElementById('inventoryModal').classList.add('active');
-            renderInventory();
-        }
-
-        function closeInventory() {
-            document.getElementById('inventoryModal').classList.remove('active');
-        }
-
-        function renderInventory() {
-            const grid = document.getElementById('inventoryGrid');
-            
-            if (userInventory.length === 0) {
-                grid.innerHTML = '<div class="empty-inventory">Ваш інвентар порожній. Відкрийте кейси, щоб отримати предмети!</div>';
-                return;
-            }
-            
-            grid.innerHTML = '';
-            userInventory.forEach((item, index) => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'inventory-item';
-                itemDiv.innerHTML = `
-                    ${item.count > 1 ? `<div class="item-count">x${item.count}</div>` : ''}
-                    <div class="inventory-item-icon">${item.icon}</div>
-                    <div class="inventory-item-name">${item.name}</div>
-                    <div class="inventory-item-value">💰 ${item.value}</div>
-                    <button onclick="sellItem(${index})" style="
-                        background: linear-gradient(45deg, #ff6b35, #ff8c42);
-                        border: none;
-                        padding: 8px 20px;
-                        border-radius: 8px;
-                        color: white;
-                        font-weight: bold;
-                        cursor: pointer;
-                        margin-top: 10px;
-                        transition: all 0.3s;
-                    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                        Продати
-                    </button>
-                `;
-                grid.appendChild(itemDiv);
-            });
-        }
-
-        function sellItem(index) {
-            const item = userInventory[index];
-            userBalance += item.value;
-            updateBalance();
-            
-            if (item.count > 1) {
-                item.count--;
-            } else {
-                userInventory.splice(index, 1);
-            }
-            
-            renderInventory();
-        }
-
-        function openDepositModal() {
-            document.getElementById('depositModal').classList.add('active');
-        }
-
-        function closeDepositModal() {
-            document.getElementById('depositModal').classList.remove('active');
-        }
-
-        function deposit(amount) {
-            let bonus = 0;
-            if (amount === 500) bonus = amount * 0.05;
-            else if (amount === 1000) bonus = amount * 0.10;
-            else if (amount === 5000) bonus = amount * 0.15;
-            
-            const total = amount + bonus;
-            userBalance += total;
-            updateBalance();
-            
-            const bonusText = bonus > 0 ? ` (+ ${bonus.toFixed(2)} бонус)` : '';
-            alert(`✅ Баланс поповнено на ${total.toFixed(2)}₴${bonusText}`);
-            closeDepositModal();
-        }
-
-        renderCases();
-        updateBalance();
+                const card =
