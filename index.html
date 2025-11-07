@@ -1,611 +1,521 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SimpleWorld — Minecraft Сервер</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>FoxDrop — Demo Case Opener</title>
 <style>
-:root{
-  --clr-bg:#ffffff;
-  --clr-accent:#ff8c00;
-  --clr-accent-hover:#e67800;
-  --clr-text-main:#222;
-  --clr-text-sub:#555;
-  --shadow-lg:0 8px 25px rgba(255,140,0,.25);
-  --radius-lg:15px;
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:'Montserrat',sans-serif;
-  background:var(--clr-bg);
-  color:var(--clr-text-main);
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow-x:hidden;
-}
-
-/* Header */
-header{
-  background:#fff;
-  padding:20px 40px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:fixed;
-  inset:0 0 auto;
-  z-index:1000;
-  box-shadow:var(--shadow-lg);
-}
-header h1{
-  font-family:'Orbitron',sans-serif;
-  font-size:2.3rem;
-  color:var(--clr-accent);
-}
-nav{display:flex;gap:30px}
-nav a{
-  color:var(--clr-text-main);
-  font-weight:600;
-  font-size:1.1rem;
-  padding:10px 15px;
-  border-radius:var(--radius-lg);
-  transition:.3s;
-  text-decoration:none;
-}
-nav a:hover,nav a.active{background:var(--clr-accent);color:#fff}
-#burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer}
-#burger span{width:28px;height:3px;background:var(--clr-text-main)}
-
-/* Main */
-main{flex:1;max-width:1100px;margin:auto;padding:120px 20px 40px}
-section{margin-bottom:80px;opacity:0;transform:translateY(50px);transition:.7s}
-section.active{opacity:1;transform:none}
-h2{
-  font-family:'Orbitron',sans-serif;
-  font-size:2.6rem;
-  color:var(--clr-accent);
-  text-align:center;
-  margin-bottom:20px;
-}
-p,li{font-size:1.1rem;color:var(--clr-text-sub);line-height:1.6}
-ul{list-style:none;margin-top:10px}
-ul li::before{content:'➤';color:var(--clr-accent);margin-right:10px}
-
-/* IP copy */
-.copy-ip{display:flex;justify-content:center;margin:30px 0 50px}
-.copy-ip input{
-  width:300px;
-  padding:12px 20px;
-  border:2px solid var(--clr-accent);
-  border-radius:25px 0 0 25px;
-  background:#fff;
-  font-size:1.2rem;
-  color:var(--clr-text-main);
-}
-.copy-ip button{
-  padding:12px 25px;
-  border:none;
-  border-radius:0 25px 25px 0;
-  background:var(--clr-accent);
-  color:#fff;
-  font-weight:700;
-  cursor:pointer;
-  transition:.3s;
-}
-.copy-ip button:hover{background:var(--clr-accent-hover)}
-
-/* Cards */
-.status-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-  gap:30px;
-  margin-top:40px;
-}
-.status-box,.donate-card{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:30px 25px;
-  text-align:center;
-  box-shadow:var(--shadow-lg);
-  transition:.3s;
-}
-.status-box:hover,.donate-card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 12px 35px rgba(255,140,0,.3);
-}
-.donate-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:25px;width:100%}
-.donate-card{width:260px}
-.donate-card:hover{transform:scale(1.06)}
-.buy-btn{
-  display:inline-block;
-  margin-top:12px;
-  padding:10px 16px;
-  border-radius:12px;
-  background:var(--clr-accent);
-  color:#fff;
-  font-weight:700;
-  border:none;
-  cursor:pointer;
-  transition:.3s;
-}
-.buy-btn:hover{background:var(--clr-accent-hover)}
-
-/* Form */
-form{max-width:480px;margin:auto;display:flex;flex-direction:column;gap:15px}
-input,textarea,select{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  border-radius:var(--radius-lg);
-  padding:12px 15px;
-  color:var(--clr-text-main);
-  font-size:1rem;
-}
-button.send{
-  background:var(--clr-accent);
-  color:#fff;
-  border:none;
-  border-radius:var(--radius-lg);
-  padding:14px;
-  font-weight:700;
-  font-size:1.1rem;
-  cursor:pointer;
-  transition:.3s;
-}
-button.send:hover{background:var(--clr-accent-hover)}
-
-/* Modal */
-.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:2000}
-.modal{
-  background:#fff;
-  border:2px solid var(--clr-accent);
-  padding:20px;
-  border-radius:12px;
-  width:92%;
-  max-width:520px;
-  box-shadow:var(--shadow-lg);
-}
-.modal h3{color:var(--clr-accent);margin-bottom:12px;font-family:'Orbitron',sans-serif}
-
-/* Mobile */
-@media(max-width:768px){
-  nav{position:fixed;top:70px;right:-100%;width:220px;height:calc(100% - 70px);flex-direction:column;gap:20px;padding:30px;background:#fff;transition:right .4s;box-shadow:var(--shadow-lg)}
-  nav.open{right:0}
-  #burger{display:flex}
-}
+  :root{
+    --bg:#0f1724;
+    --card:#0b1220;
+    --muted:#9aa4b2;
+    --accent:#ff7a59;
+    --glass: rgba(255,255,255,0.03);
+    --green:#10b981;
+    --pink:#ef476f;
+    --gold:#f6c85f;
+    --radius:16px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#071024 0%, #081427 60%);color:#e6eef6;min-height:100vh}
+  .wrap{max-width:1100px;margin:28px auto;padding:20px}
+  header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+  h1{font-size:20px;margin:0;letter-spacing:0.2px}
+  .balance{background:linear-gradient(90deg,#06121f,#0b1b2a);padding:10px 14px;border-radius:12px;display:flex;gap:12px;align-items:center}
+  .bal-amount{font-weight:700;font-size:18px}
+  .btn{background:linear-gradient(90deg,var(--accent),#ff9b7a);border:none;padding:8px 12px;border-radius:10px;color:#071024;font-weight:700;cursor:pointer}
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start}
+  .panel{background:var(--card);padding:16px;border-radius:var(--radius);box-shadow: 0 6px 24px rgba(2,6,23,0.6)}
+  .cases{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .case{background:linear-gradient(180deg,#09121b 0%, #082033 100%);padding:12px;border-radius:12px;display:flex;gap:12px;align-items:center;border:1px solid rgba(255,255,255,0.03)}
+  .case .banner{width:84px;height:64px;border-radius:8px;background:linear-gradient(135deg,#132035,#0b2540);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold)}
+  .case h3{margin:0;font-size:14px}
+  .case .meta{font-size:12px;color:var(--muted)}
+  .case .open{margin-left:auto}
+  .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .opener{height:220px;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center}
+  .reel-window{width:100%;height:92px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border-radius:10px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.03)}
+  .reel{position:absolute;left:0;right:0;top:0}
+  .slot{height:92px;display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.02)}
+  .slot img{width:64px;height:64px;border-radius:8px;flex-shrink:0;background:linear-gradient(135deg,#132035,#0b2540)}
+  .slot .name{font-weight:700}
+  .slot .rarity{font-size:12px;color:var(--muted)}
+  .inventory{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .inv-item{display:flex;gap:12px;align-items:center;background:var(--glass);padding:8px;border-radius:10px}
+  .inv-item .meta{font-size:13px;color:var(--muted)}
+  .small{font-size:13px;color:var(--muted)}
+  .footer{margin-top:14px;font-size:13px;color:var(--muted)}
+  .provably{font-family:monospace;font-size:12px;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;margin-top:8px}
+  /* rarity colors */
+  .r-common{color:#cbd5e1}
+  .r-rare{color:#60a5fa}
+  .r-epic{color:#a78bfa}
+  .r-legend{color:#f6c85f}
+  /* big result card */
+  .result{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.03)}
+  .sparkle{position:absolute;pointer-events:none;mix-blend-mode:screen}
+  .topup-input{width:120px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  .small-btn{padding:6px 8px;border-radius:8px;border:none;background:#0f2540;color:#e6eef6;cursor:pointer}
+  .row{display:flex;gap:8px;align-items:center}
+  /* responsive */
+  @media(max-width:940px){ .grid{grid-template-columns:1fr} .cases{grid-template-columns:1fr} .opener{order:2} }
 </style>
 </head>
 <body>
-
-<header>
-  <h1>SimpleWorld</h1>
-  <nav>
-    <a href="#home"   class="nav-link active">Головна</a>
-    <a href="#about"  class="nav-link">Про сервер</a>
-    <a href="#donate" class="nav-link">Донати</a>
-    <a href="#rules"  class="nav-link">Правила</a>
-    <a href="#support" class="nav-link">Тех. підтримка</a>
-  </nav>
-  <button id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
-</header>
-
-<main>
-  <!-- HOME -->
-  <section id="home" class="active">
-    <h2>Вітаємо на SimpleWorld!</h2>
-    <p style="text-align:center;max-width:600px;margin:auto">Офіційний Minecraft-сервер з унікальним геймплеєм, стабільною роботою та дружньою спільнотою.</p>
-
-    <div class="copy-ip">
-      <input id="ipInput" type="text" value="simpleworldl.aternos.me" readonly />
-      <button onclick="copyIP()">Копіювати IP</button>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>FoxDrop — Демонстраційний відкривач кейсів</h1>
+      <div class="small">Вбудована демо-версія з provably-fair механікою</div>
     </div>
 
-    <div class="status-grid">
-      <div class="status-box"><h3>IP Адреса</h3><p>simpleworldl.aternos.me</p></div>
-      <div class="status-box"><h3>Версія</h3><p>1.16 – 1.20+</p></div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <h2>Про сервер</h2>
-    <p>SimpleWorld — це Minecraft-сервер, який пропонує класичний геймплей із сучасними можливостями:</p>
-    <ul>
-      <li>Стабільна робота 24/7</li>
-      <li>Регулярні івенти та оновлення</li>
-      <li>Велика спільнота гравців</li>
-      <li>Дружня адміністрація</li>
-    </ul>
-  </section>
-
-  <!-- DONATE -->
-  <section id="donate">
-    <h2>Донати на сервері</h2>
-    <div class="donate-grid" id="donate-grid">
-      <!-- cards populated by JS (see bottom) -->
-    </div>
-  </section>
-
-  <!-- RULES -->
-  <section id="rules">
-    <h2>📘 Правила сервера</h2>
-    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 1. ЧАТ</h3>
-    <ul>
-      <li><b>1.1</b> Образа гравців — <i>мут 1 год</i></li>
-      <li><b>1.2</b> Образа адміністрації — <i>мут 2 год / бан 1 день</i></li>
-      <li><b>1.3</b> Токсична поведінка — <i>мут 1 год</i></li>
-      <li><b>1.4</b> Капс (>70%) — <i>мут 15 хв</i></li>
-      <li><b>1.5</b> Флуд (3+ повтори) — <i>мут 30 хв</i></li>
-      <li><b>1.6</b> Спам — <i>мут 30 хв</i></li>
-      <li><b>1.7</b> Провокації — <i>мут 1 год</i></li>
-      <li><b>1.8</b> Політичні/релігійні теми — <i>мут 1 год</i></li>
-      <li><b>1.9</b> Реклама сторонніх проєктів — <i>перманентний бан</i></li>
-      <li><b>1.10</b> Побори в чаті — <i>мут 20 хв</i></li>
-      <li><b>1.11</b> Підбурювання — <i>мут 1 год</i></li>
-      <li><b>1.12</b> Fake-розіграші/скам — <i>бан 7 днів</i></li>
-      <li><b>1.13</b> Видавання за адміна — <i>бан 3 дні</i></li>
-      <li><b>1.14</b> Обман новачків — <i>бан 1 день</i></li>
-      <li><b>1.15</b> Тролінг модерації — <i>мут 2 год</i></li>
-    </ul>
-
-    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
-    <ul>
-      <li><b>2.1</b> Чити / взломки — <i>бан 30-50 днів</i></li>
-      <li><b>2.2</b> Автоклікери / макроси — <i>бан 7 днів</i></li>
-      <li><b>2.3</b> X-ray — <i>бан 5 днів + конфіскація ресурсів</i></li>
-      <li><b>2.4</b> Багозловживання — <i>бан 3 дні</i></li>
-      <li><b>2.5</b> Дюп — <i>бан 14 днів + вайп інвентаря</i></li>
-      <li><b>2.6</b> PvP-зрада — <i>бан 1 день</i></li>
-      <li><b>2.7</b> TP-ловушки — <i>бан 3 дні</i></li>
-      <li><b>2.8</b> Гриф у неанархії — <i>бан 2 дні</i></li>
-      <li><b>2.9</b> Залив територій — <i>бан 1 день</i></li>
-      <li><b>2.10</b> Лаг-машини — <i>бан 2 дні</i></li>
-      <li><b>2.11</b> Намагання зламати сервер — <i>перманентний бан</i></li>
-      <li><b>2.13</b> Смертельні пастки у приваті — <i>бан 2 дні</i></li>
-      <li><b>2.14</b> Фарм гравців на арені — <i>бан 1 день</i></li>
-      <li><b>2.15</b> Некоректні назви предметів — <i>бан 1 день</i></li>
-    </ul>
-
-    <p style="margin-top:15px">Порушення правил тягне за собою попередження, мут або бан. Дотримуйтесь регламенту та отримуйте задоволення від гри!</p>
-  </section>
-
-  <!-- SUPPORT -->
-  <section id="support">
-    <h2>Тех. підтримка</h2>
-    <p style="text-align:center">Заповніть форму — ми відповімо на вашу пошту.</p>
-
-    <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST" id="support-form">
-      <input type="hidden" name="_captcha"  value="false">
-      <input type="hidden" name="_subject" value="Повідомлення з SimpleWorld">
-      <input type="hidden" name="_template" value="box">
-
-      <input   name="name"    type="text"  placeholder="Ваше ім'я" required>
-      <input   name="email"   type="email" placeholder="Email для відповіді" required>
-      <textarea name="message" rows="5"    placeholder="Опишіть питання чи проблему" required></textarea>
-
-      <button type="submit" class="send">Надіслати ✉️</button>
-    </form>
-
-    <div style="text-align:center;margin-top:25px">
-      <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank"
-         style="display:inline-block;padding:10px 26px;background:var(--clr-accent);color:#000;font-weight:600;border-radius:28px;transition:.3s">
-         Відкрити Gmail →
-      </a>
-    </div>
-  </section>
-</main>
-
-<!-- ========== ADMIN LOGIN & PANEL (додано) ========== -->
-<section id="admin-login">
-  <h3 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:10px;">Вхід у адмін-панель</h3>
-  <input id="admin-pass" type="password" placeholder="Пароль" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--clr-accent);background:#111;color:#fff;">
-  <button id="admin-login-btn" style="margin-top:12px;width:100%;padding:10px;background:var(--clr-accent);border:none;color:#000;font-weight:700;border-radius:8px;cursor:pointer;">Увійти</button>
-  <p id="admin-login-err" style="display:none;color:#ff4444;text-align:center;margin-top:10px">Невірний пароль</p>
-</section>
-
-<section id="admin-panel">
-  <h2 style="text-align:center;color:var(--clr-accent);font-family:'Orbitron',sans-serif;margin-bottom:15px">Адмін-панель SimpleWorld</h2>
-
-  <div style="display:flex;flex-wrap:wrap;gap:15px;justify-content:center;margin-bottom:20px">
-    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
-      <h4 style="color:var(--clr-accent);margin-bottom:6px">IP сервера</h4>
-      <p id="admin-ip">—</p>
-    </div>
-    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
-      <h4 style="color:var(--clr-accent);margin-bottom:6px">Гравців онлайн</h4>
-      <p id="admin-players">—</p>
-    </div>
-    <div style="flex:1 1 220px;background:#222;padding:12px;border-radius:8px;text-align:center;">
-      <h4 style="color:var(--clr-accent);margin-bottom:6px">Нещодавні замовлення</h4>
-      <p id="admin-orders-count">0</p>
-    </div>
-  </div>
-
-  <div style="background:#222;padding:12px;border-radius:8px;">
-    <h4 style="color:var(--clr-accent);margin-bottom:8px">Швидкі дії</h4>
-    <button onclick="alert('Рестарт сервера (демо)')" style="padding:8px 14px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer">Рестарт (демо)</button>
-  </div>
-
-  <h3 style="margin-top:16px;color:var(--clr-accent)">Список замовлень</h3>
-  <div class="orders-list" id="orders-list">
-    <!-- заповнюється JS -->
-  </div>
-
-  <button id="admin-logout" style="margin-top:15px;padding:10px 16px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer;">Вийти</button>
-</section>
-
-<footer style="margin-top:30px">&copy; 2025 SimpleWorld Minecraft</footer>
-
-<!-- Modal для покупки -->
-<div class="modal-backdrop" id="modal-backdrop">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <h3 id="modal-title">Оформлення покупки</h3>
-    <form id="order-form">
-      <input type="hidden" name="_form_id" id="order-id">
-      <label style="display:block;margin-bottom:8px">Пакет:</label>
-      <input id="order-package" name="package" type="text" readonly style="width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:2px solid var(--clr-accent);background:#111;color:#fff;">
-      <label style="display:block;margin-bottom:8px">Minecraft нік (опційно):</label>
-      <input id="order-nick" name="nick" type="text" placeholder="Ваш нік у грі">
-      <label style="display:block;margin:8px 0">Ім'я:</label>
-      <input id="order-name" name="name" type="text" placeholder="Ім'я для контакту" required>
-      <label style="display:block;margin:8px 0">Email або телеграм:</label>
-      <input id="order-contact" name="contact" type="text" placeholder="email або @telegram" required>
-      <label style="display:block;margin:8px 0">Спосіб оплати (як домовимося):</label>
-      <select id="order-pay" name="payment" required>
-        <option value="manual">Вручну (домовитись з адміністратором)</option>
-        <option value="paypal">PayPal</option>
-        <option value="liqpay">LiqPay</option>
-        <option value="other">Інше</option>
-      </select>
-
-      <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end">
-        <button type="button" id="modal-close" style="padding:8px 12px;border-radius:8px;background:#333;border:1px solid #444;color:#fff;cursor:pointer">Скасувати</button>
-        <button type="submit" class="send" style="padding:8px 12px;border-radius:8px;">Відправити замовлення</button>
+    <div class="balance">
+      <div style="display:flex;flex-direction:column">
+        <div class="small">Баланс</div>
+        <div class="bal-amount" id="balance">0.00</div>
       </div>
-    </form>
-    <p style="margin-top:10px;color:var(--clr-text-sub);font-size:0.9rem">Після відправки ти отримаєш лист на пошту адміністрації — звʼяжемося для оплати та видачі привілеїв.</p>
+      <div style="display:flex;align-items:center;gap:8px;margin-left:12px">
+        <input class="topup-input" id="topupAmount" value="50" />
+        <button class="btn" id="topupBtn">Поповнити</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- left: cases + opener -->
+    <div>
+      <div class="panel">
+        <h2 style="margin-top:0">Кейси</h2>
+        <div class="cases" id="casesList"></div>
+        <div class="controls small" style="margin-top:10px">
+          <div>ClientSeed:</div>
+          <input id="clientSeed" class="topup-input" style="width:220px" />
+          <button class="small-btn" id="genSeed">Згенерувати</button>
+          <div style="margin-left:auto" class="small">Nonce: <span id="nonceDisplay">0</span></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h2 style="margin-top:0">Open Panel</h2>
+        <div class="opener">
+          <div class="reel-window" id="reelWindow" aria-hidden="true">
+            <div class="reel" id="reel"></div>
+          </div>
+
+          <div style="width:100%;display:flex;gap:8px">
+            <button class="btn" id="openBtn" style="flex:1">Open Case</button>
+            <button class="small-btn" id="auto5">Auto ×5</button>
+            <button class="small-btn" id="showProv">Показати Provably</button>
+          </div>
+
+          <div id="resultArea"></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h2 style="margin-top:0">Інвентар</h2>
+        <div class="inventory" id="inventory"></div>
+        <div class="footer">Предмети зберігаються в <strong>localStorage</strong> (демо).</div>
+      </div>
+    </div>
+
+    <!-- right: active case + details -->
+    <aside>
+      <div class="panel">
+        <h3 style="margin:0 0 8px 0">Активний кейс</h3>
+        <div id="activeCaseCard" class="result">
+          <div style="width:80px;height:80px;background:linear-gradient(135deg,#102434,#06324a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800" id="caseIcon">FD</div>
+          <div style="flex:1">
+            <div id="caseName" style="font-weight:800">-</div>
+            <div class="small" id="caseDesc">Опис кейсу</div>
+            <div style="margin-top:8px" class="row"><div class="small">Ціна:</div><div style="margin-left:6px;font-weight:800" id="casePrice">0.00</div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0">Останні відкриття</h4>
+          <div id="recent" class="small"></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <h4 style="margin:6px 0">Як верифікувати (коротко)</h4>
+          <div class="small">Після відкриття видно <strong>serverSeed</strong>, <strong>clientSeed</strong> і <strong>nonce</strong>. Ви можете повторити rollFromSeeds(serverSeed, clientSeed, nonce) щоб отримати той самий результат.</div>
+          <pre class="provably" id="provablyBox" style="display:none"></pre>
+        </div>
+      </div>
+    </aside>
   </div>
 </div>
 
 <script>
-/* ---------- Налаштування донатів ---------- */
-const DONATES = [
-  { id: 'premium',  name: 'Premium',  price: '29 UAH',       desc: '' },
-  { id: 'elite',    name: 'Elite',    price: '49 UAH',       desc: '' },
-  { id: 'deluxe',   name: 'Deluxe',   price: '69 UAH',       desc: '' },
-  { id: 'ultra',    name: 'Ultra',    price: '99 UAH',       desc: '' },
-  { id: 'immortal', name: 'Immortal', price: '119 UAH',      desc: '' },
-  { id: 'supreme',  name: 'Supreme',  price: '149 UAH',      desc: '' },
-  { id: 'legend',   name: 'Legend',   price: '199 UAH',      desc: '' },
-  { id: 'infinity', name: 'Infinity', price: '249 UAH',      desc: '' },
-];
+/*
+  FoxDrop demo HTML-only logic
+  - local DB in JS + localStorage persistence
+  - provably-fair: generate serverSeed, reveal it after open
+  - rollFromSeeds uses HMAC-SHA256 (WebCrypto)
+  - reel animation: uses CSS transforms via JS timing
+*/
 
-/* ---------- Допоміжне: рендер донатів ---------- */
-const donateGrid = document.getElementById('donate-grid');
-DONATES.forEach(d => {
-  const card = document.createElement('div');
-  card.className = 'donate-card';
-  card.innerHTML = `
-    <h4>${d.name}</h4>
-    <p style="color:var(--clr-text-sub)">${d.desc}</p>
-    <p style="font-weight:700;margin-top:8px">${d.price}</p>
-    <button class="buy-btn" data-id="${d.id}" data-name="${d.name}" data-price="${d.price}">Придбати</button>
-  `;
-  donateGrid.appendChild(card);
-});
+// ---------- Utility ----------
+function toMoney(cents){ return (cents/100).toFixed(2) + ' $'; }
+function uid(){ return 'id_' + Math.random().toString(36).slice(2,10); }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-/* ---------- Модальне замовлення ---------- */
-const modalBackdrop = document.getElementById('modal-backdrop');
-const orderForm = document.getElementById('order-form');
-const orderIdInput = document.getElementById('order-id');
-const orderPackage = document.getElementById('order-package');
-
-document.querySelectorAll('.buy-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const name = btn.dataset.name;
-    const id = btn.dataset.id;
-    // створимо унікальний id замовлення
-    const orderId = 'ORD-' + Date.now() + '-' + Math.floor(Math.random()*900+100);
-    orderIdInput.value = orderId;
-    orderPackage.value = `${name} — ${btn.dataset.price}`;
-    // покажемо модал
-    modalBackdrop.style.display = 'flex';
-    document.getElementById('order-name').focus();
-  });
-});
-
-document.getElementById('modal-close').addEventListener('click', () => {
-  modalBackdrop.style.display = 'none';
-});
-
-/* ---------- Надсилання замовлення (FormSubmit AJAX) ---------- */
-orderForm.addEventListener('submit', function(e){
-  e.preventDefault();
-
-  // зібрати дані
-  const data = new FormData(orderForm);
-  // додати приховані поля для FormSubmit:
-  data.append('_subject', `Новий донат: ${data.get('package')} (ID ${data.get('_form_id')})`);
-  data.append('_template', 'box');
-
-  // збережемо локально (щоб бачити в адмінці)
-  const orderObj = {
-    id: data.get('_form_id'),
-    package: data.get('package'),
-    nick: data.get('nick') || '',
-    name: data.get('name'),
-    contact: data.get('contact'),
-    payment: data.get('payment'),
-    created: new Date().toLocaleString()
-  };
-  saveOrderLocal(orderObj);
-
-  // AJAX POST на FormSubmit (ajax endpoint)
-  fetch('https://formsubmit.co/ajax/simpleworld237@gmail.com', {
-    method: 'POST',
-    body: data,
-    headers: { 'Accept': 'application/json' }
-  })
-  .then(res => res.json())
-  .then(json => {
-    if (json.success === 'true' || json.success === true) {
-      alert('Замовлення успішно надіслано! Ми скоро звʼяжемося.');
-      modalBackdrop.style.display = 'none';
-      orderForm.reset();
-      updateOrdersView(); // оновити адмінку
-    } else {
-      // FormSubmit sometimes returns different structure — treat as success if ok
-      alert('Замовлення надіслано (результат сервісу неочікуваний).');
-      modalBackdrop.style.display = 'none';
-      orderForm.reset();
-      updateOrdersView();
+// ---------- Demo data ----------
+const DEMO = {
+  items: [
+    { id: 'item_common', name:'Sticker: Fox Smile', rarity:'common', value:50, iconSVG: svgSticker() },
+    { id: 'item_rare', name:'Knife: Rusty Edge', rarity:'rare', value:700, iconSVG: svgKnife() },
+    { id: 'item_epic', name:'Rifle: Neon Burst', rarity:'epic', value:2500, iconSVG: svgRifle() },
+    { id: 'item_legend', name:'AK-47 | Blue Flame', rarity:'legend', value:15000, iconSVG: svgAK() }
+  ],
+  cases: [
+    {
+      id:'case_basic',
+      name:'Fox Basic Case',
+      desc:'Невеликий кейс з шансом знайти легендарку.',
+      price:200,
+      bannerColor:'#0b2540',
+      animationConfig:{spinDurationMs:4200, slotsToShow:9},
+      items: [
+        { itemId:'item_common', weight:7000 },
+        { itemId:'item_rare', weight:2000 },
+        { itemId:'item_epic', weight:900 },
+        { itemId:'item_legend', weight:100 }
+      ]
     }
-  })
-  .catch(err => {
-    console.error(err);
-    alert('Помилка надсилання. Спробуй ще раз або напиши на пошту.');
-    // fallback: закрити модал та залишити замовлення локально
-    modalBackdrop.style.display = 'none';
-    orderForm.reset();
-    updateOrdersView();
+  ]
+};
+
+// ---------- persistence + state ----------
+const STORAGE_KEY = 'foxdrop_demo_v1';
+let STATE = {
+  balance: 10000, // cents
+  inventory: [], // array of item objects
+  clientSeed: localStorage.getItem('fd_client_seed') || '',
+  nonce: parseInt(localStorage.getItem('fd_nonce')||'0'),
+  recent: []
+};
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); localStorage.setItem('fd_client_seed', STATE.clientSeed); localStorage.setItem('fd_nonce', String(STATE.nonce)); }
+function loadState(){ const v = localStorage.getItem(STORAGE_KEY); if(v){ try{ Object.assign(STATE, JSON.parse(v)); } catch(e){} } }
+loadState();
+
+// ---------- DOM refs ----------
+const balanceEl = document.getElementById('balance');
+const casesList = document.getElementById('casesList');
+const caseNameEl = document.getElementById('caseName');
+const caseIconEl = document.getElementById('caseIcon');
+const casePriceEl = document.getElementById('casePrice');
+const caseDescEl = document.getElementById('caseDesc');
+const reel = document.getElementById('reel');
+const reelWindow = document.getElementById('reelWindow');
+const openBtn = document.getElementById('openBtn');
+const auto5Btn = document.getElementById('auto5');
+const inventoryEl = document.getElementById('inventory');
+const clientSeedInput = document.getElementById('clientSeed');
+const genSeedBtn = document.getElementById('genSeed');
+const topupBtn = document.getElementById('topupBtn');
+const topupAmount = document.getElementById('topupAmount');
+const resultArea = document.getElementById('resultArea');
+const nonceDisplay = document.getElementById('nonceDisplay');
+const recentEl = document.getElementById('recent');
+const provablyBox = document.getElementById('provablyBox');
+const showProvBtn = document.getElementById('showProv');
+
+// ---------- init ----------
+let ACTIVE_CASE = DEMO.cases[0];
+let isSpinning = false;
+renderBalance(); renderCases(); setActiveCase(ACTIVE_CASE.id);
+clientSeedInput.value = STATE.clientSeed;
+nonceDisplay.textContent = STATE.nonce;
+renderInventory();
+renderRecent();
+
+genSeedBtn.onclick = ()=>{ const s = 'cs_' + Math.random().toString(36).slice(2) + Date.now().toString(36); STATE.clientSeed = s; clientSeedInput.value = s; saveState(); }
+clientSeedInput.onchange = ()=>{ STATE.clientSeed = clientSeedInput.value; saveState(); }
+topupBtn.onclick = ()=>{ const amt = Number(topupAmount.value)||0; STATE.balance += Math.round(amt*100); renderBalance(); saveState(); }
+showProvBtn.onclick = ()=>{ provablyBox.style.display = provablyBox.style.display === 'none' ? 'block' : 'none'; }
+
+// ---------- rendering ----------
+function renderBalance(){ balanceEl.textContent = toMoney(STATE.balance); }
+function renderCases(){
+  casesList.innerHTML = '';
+  DEMO.cases.forEach(c => {
+    const el = document.createElement('div'); el.className='case';
+    el.innerHTML = `<div class="banner">${c.name.split(' ')[0]}</div>
+      <div>
+        <h3>${c.name}</h3>
+        <div class="meta">${c.desc}</div>
+        <div class="meta">Ціна: ${toMoney(c.price)}</div>
+      </div>
+      <div class="open"><button class="small-btn" data-id="${c.id}">Select</button></div>`;
+    casesList.appendChild(el);
+    el.querySelector('button').onclick = ()=> setActiveCase(c.id);
   });
-});
-
-/* ---------- LocalStorage: зберігання замовлень ---------- */
-function saveOrderLocal(order){
-  const list = JSON.parse(localStorage.getItem('sw_orders') || '[]');
-  list.unshift(order); // нові в початок
-  localStorage.setItem('sw_orders', JSON.stringify(list.slice(0,200))); // зберігаємо максимум 200
 }
-
-/* ---------- Адмінка: логін + показ замовлень ---------- */
-const ADMIN_PASS = '1235467TTT'; // клієнтська авторизація (видна у коді) — для справжньої безпеки потрібен бекенд
-const loginBox   = document.getElementById('admin-login');
-const loginBtn   = document.getElementById('admin-login-btn');
-const passInput  = document.getElementById('admin-pass');
-const loginErr   = document.getElementById('admin-login-err');
-const panelBox   = document.getElementById('admin-panel');
-const logoutBtn  = document.getElementById('admin-logout');
-const ordersList = document.getElementById('orders-list');
-const ordersCount = document.getElementById('admin-orders-count');
-
-function showAdmin(show){
-  loginBox.style.display = show ? 'none' : 'block';
-  panelBox.style.display = show ? 'block' : 'none';
+function setActiveCase(caseId){
+  const c = DEMO.cases.find(x=>x.id===caseId); if(!c) return;
+  ACTIVE_CASE = c;
+  caseNameEl.textContent = c.name;
+  caseDescEl.textContent = c.desc;
+  casePriceEl.textContent = toMoney(c.price);
+  caseIconEl.textContent = c.name.split(' ')[0].slice(0,2).toUpperCase();
+  // show small probabilities summary
+  // build rarity table
 }
-
-function updateOrdersView(){
-  const arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
-  ordersList.innerHTML = '';
-  ordersCount.textContent = arr.length;
-  if (arr.length === 0){
-    ordersList.innerHTML = '<p style="color:var(--clr-text-sub)">Замовлень немає</p>';
-    return;
-  }
-  arr.forEach(o=>{
-    const div = document.createElement('div');
-    div.className = 'order-item';
-    div.innerHTML = `
-      <strong>${o.package}</strong> — <span style="color:var(--clr-text-sub)">${o.created}</span>
-      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick || '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
-      <div style="margin-top:6px">Оплата: ${escapeHtml(o.payment)}</div>
-      <div style="margin-top:8px"><button data-id="${o.id}" style="padding:6px 8px;border-radius:6px;background:#00bfa6;border:none;cursor:pointer;color:#000;font-weight:700">Позначити як виконане</button></div>
-    `;
-    // кнопка видалення / помітки виконаного
-    div.querySelector('button').addEventListener('click', (e)=>{
-      markOrderDone(o.id);
-    });
-    ordersList.appendChild(div);
+function renderInventory(){
+  inventoryEl.innerHTML = '';
+  if(STATE.inventory.length===0){ inventoryEl.innerHTML = '<div class="small">Інвентар порожній</div>'; return; }
+  STATE.inventory.slice().reverse().forEach(it=>{
+    const node = document.createElement('div'); node.className='inv-item';
+    node.innerHTML = `<div style="width:64px;height:64px">${it.iconSVG}</div>
+      <div style="flex:1">
+        <div style="font-weight:700">${it.name} <span class="meta">${rarityText(it.rarity)}</span></div>
+        <div class="meta">${toMoney(it.value)}</div>
+      </div>
+      <div style="text-align:right"><button class="small-btn" data-id="${it.id}">Sell</button></div>`;
+    inventoryEl.appendChild(node);
+    node.querySelector('button').onclick = ()=>{ sellItem(it.id); };
   });
 }
+function rarityText(r){ if(r==='common') return '<span class="r-common">common</span>'; if(r==='rare') return '<span class="r-rare">rare</span>'; if(r==='epic') return '<span class="r-epic">epic</span>'; return '<span class="r-legend">legend</span>'; }
+function renderRecent(){ recentEl.innerHTML = STATE.recent.slice().reverse().slice(0,6).map(r=>`<div style="margin:6px 0">${r}</div>`).join(''); }
 
-function markOrderDone(id){
-  let arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
-  arr = arr.filter(o=>o.id !== id);
-  localStorage.setItem('sw_orders', JSON.stringify(arr));
-  updateOrdersView();
+// ---------- selling ----------
+function sellItem(id){
+  const idx = STATE.inventory.findIndex(x=>x.id===id); if(idx===-1) return;
+  const it = STATE.inventory.splice(idx,1)[0];
+  STATE.balance += it.value;
+  saveState(); renderInventory(); renderBalance();
+  alert('Продано: ' + it.name);
 }
 
-function escapeHtml(text){
-  return String(text).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]; });
+// ---------- RNG helpers (webcrypto + HMAC) ----------
+async function hmacSha256Hex(keyHex, message){
+  // keyHex: hex string
+  const keyBytes = hexToBytes(keyHex);
+  const enc = new TextEncoder().encode(message);
+  const cryptoKey = await crypto.subtle.importKey('raw', keyBytes, {name:'HMAC', hash:'SHA-256'}, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', cryptoKey, enc);
+  return bytesToHex(new Uint8Array(sig));
+}
+function hexToBytes(hex){ const a = []; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
+function bytesToHex(bytes){ return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function rollFromSeeds(serverSeed, clientSeed, nonce=0){
+  const message = `${clientSeed}:${nonce}`;
+  const h = await hmacSha256Hex(serverSeed, message);
+  const slice = h.slice(0,15);
+  const num = parseInt(slice,16);
+  const max = Math.pow(16, slice.length);
+  return num / max;
 }
 
-loginBtn.addEventListener('click', ()=>{
-  const v = passInput.value;
-  if (v === ADMIN_PASS){
-    sessionStorage.setItem('sw_admin','true');
-    passInput.value = '';
-    loginErr.style.display = 'none';
-    showAdmin(true);
-    updateOrdersView();
-  } else {
-    loginErr.style.display = 'block';
+// ---------- case open core ----------
+openBtn.onclick = ()=> openCaseSingle();
+auto5Btn.onclick = async ()=>{ for(let i=0;i<5;i++){ if(STATE.balance < ACTIVE_CASE.price) break; await openCaseSingle(true); await sleep(700); } };
+
+async function openCaseSingle(isAuto=false){
+  if(isSpinning) return;
+  if(STATE.balance < ACTIVE_CASE.price){ alert('Немає балансу. Поповни.'); return; }
+  isSpinning = true;
+  // deduct
+  STATE.balance -= ACTIVE_CASE.price;
+  STATE.nonce += 1;
+  saveState(); renderBalance(); nonceDisplay.textContent = STATE.nonce;
+
+  // prepare seeds
+  const serverSeed = cryptoRandomHex(32); // hidden until reveal
+  const clientSeed = STATE.clientSeed || ('cs_' + Date.now().toString(36));
+  if(!STATE.clientSeed) { STATE.clientSeed = clientSeed; clientSeedInput.value = clientSeed; saveState(); }
+  const nonce = STATE.nonce;
+
+  // compute roll
+  const roll = await rollFromSeeds(serverSeed, clientSeed, nonce);
+  // choose item by weights
+  const chosenItem = chooseByWeight(ACTIVE_CASE.items, roll);
+  const itemDef = DEMO.items.find(it=>it.id===chosenItem.itemId);
+
+  // build reel array large enough for nice animation
+  const reelArray = buildReelArray(itemDef, ACTIVE_CASE.items, DEMO.items, 40);
+  renderReelSlots(reelArray);
+
+  // animate: move reel such that target appears in center after duration
+  const duration = ACTIVE_CASE.animationConfig.spinDurationMs || 4200;
+  await animateReelToIndex(reelArray, reelArray.findIndex(x=>x.isTarget), duration);
+
+  // create item copy and add to inventory
+  const newItem = Object.assign({}, itemDef, { id: uid(), acquiredAt: Date.now() });
+  STATE.inventory.push(newItem);
+  STATE.recent.push(`${new Date().toLocaleTimeString()} — Відкрито: ${newItem.name} (${newItem.rarity})`);
+  if(STATE.recent.length>40) STATE.recent.shift();
+  saveState();
+  renderInventory(); renderRecent();
+
+  // reveal serverSeed & provably data
+  showResult(newItem, { serverSeed, clientSeed, nonce, roll });
+
+  isSpinning = false;
+}
+function chooseByWeight(weightArr, roll){
+  const total = weightArr.reduce((s,e)=>s+e.weight,0);
+  let threshold = roll * total;
+  for(const ent of weightArr){
+    threshold -= ent.weight;
+    if(threshold <= 0) return ent;
   }
-});
-logoutBtn.addEventListener('click', ()=>{
-  sessionStorage.removeItem('sw_admin');
-  showAdmin(false);
-});
-
-/* ---------- Refresh some admin stats (demo) ---------- */
-const ipField = document.getElementById('admin-ip');
-const playersField = document.getElementById('admin-players');
-function refreshAdminStats(){
-  const online = Math.random() > 0.3;
-  ipField.textContent = online ? 'simpleworldl.aternos.me' : '—';
-  playersField.textContent = online ? (Math.floor(Math.random()*100) + ' гравців') : '0';
+  return weightArr[weightArr.length-1];
 }
 
-/* ---------- Init: показати/приховати адмінку в залежності від сесії ---------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  const logged = sessionStorage.getItem('sw_admin') === 'true';
-  showAdmin(logged);
-  if (logged) {
-    updateOrdersView();
-    refreshAdminStats();
+// ---------- reel helpers ----------
+function buildReelArray(targetItem, caseItems, allItems, length){
+  // Fill with random items according to weights, then insert target near center
+  const arr = [];
+  for(let i=0;i<length;i++){
+    const pick = weightedPick(caseItems, allItems);
+    arr.push(pick);
   }
-});
-
-/* ---------- Кнопка в шапці: burger ---------- */
-const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
-if (burger) burger.onclick=()=>nav.classList.toggle('open');
-
-/* ---------- SPA навігація ---------- */
-const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
-function show(id){sections.forEach(s=>s.classList.toggle('active',s.id===id));links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));nav.classList.remove('open');}
-links.forEach(l=>l.addEventListener('click', e=>{ e.preventDefault(); show(l.getAttribute('href').slice(1)); history.replaceState(null,'',l.hash); }));
-window.addEventListener('load', ()=> show(location.hash.slice(1)||'home'));
-
-/* ---------- FAQ акордеон ---------- */
-document.querySelectorAll('.faq-item').forEach(i=>i.addEventListener('click', ()=> i.classList.toggle('active')));
-
-/* ---------- Статус (імітація) ---------- */
-function updateStatus(){
-  const online = Math.random()>0.3;
-  document.getElementById('server-status').textContent = online?'Сервер онлайн':'Сервер офлайн';
-  document.getElementById('server-status').style.color = online?'var(--clr-accent)':'#ff4444';
-  document.getElementById('players-count').textContent = online?Math.floor(Math.random()*100)+' гравців':'0';
+  const center = Math.floor(length/2);
+  arr[center] = Object.assign({}, targetItem, { isTarget:true });
+  return arr;
 }
-updateStatus(); setInterval(updateStatus,15000);
+function weightedPick(caseItems, allItems){
+  const total = caseItems.reduce((s,e)=>s+e.weight,0);
+  let t = Math.random() * total;
+  for(const ent of caseItems){
+    t -= ent.weight;
+    if(t <= 0){
+      const def = allItems.find(a=>a.id===ent.itemId);
+      return def;
+    }
+  }
+  return allItems[0];
+}
+function renderReelSlots(arr){
+  reel.innerHTML = '';
+  arr.forEach(it=>{
+    const d = document.createElement('div'); d.className='slot';
+    d.innerHTML = `<div style="width:84px;height:84px;display:flex;align-items:center;justify-content:center">${it.iconSVG}</div>
+      <div style="flex:1">
+        <div class="name">${it.name}</div>
+        <div class="rarity ${rarityClass(it.rarity)}">${it.rarity}</div>
+      </div>`;
+    reel.appendChild(d);
+  });
+  // position top at 0
+  reel.style.transform = 'translateY(0px)';
+}
+function rarityClass(r){ if(r==='common') return 'r-common'; if(r==='rare') return 'r-rare'; if(r==='epic') return 'r-epic'; return 'r-legend'; }
 
-/* ---------- Копіювання IP ---------- */
-function copyIP(){
-  const i=document.getElementById('ipInput');
-  i.select();i.setSelectionRange(0,99999);
-  navigator.clipboard.writeText(i.value).then(()=>alert('IP скопійовано!'));
+async function animateReelToIndex(arr, targetIndex, duration){
+  const slotH = reelWindow.clientHeight; // each slot height equals window height
+  // ensure each slot element height matches
+  const slots = reel.children;
+  // compute required translateY: so that targetIndex slot sits centered (top: -(targetIndex*slotH) + centerOffset)
+  const centerOffset = Math.floor((reelWindow.clientHeight - slots[0].clientHeight)/2);
+  const targetY = -(targetIndex * slots[0].clientHeight) + centerOffset;
+  // animate with easing
+  const start = performance.now();
+  const from = 0;
+  const to = targetY - (Math.random()*slotH*3 + slotH*6); // add extra spins (negative)
+  return new Promise(resolve=>{
+    function frame(now){
+      const t = Math.min(1, (now-start)/duration);
+      const eased = easeOutCubic(t);
+      const current = from + (to - from) * eased;
+      reel.style.transform = `translateY(${current}px)`;
+      if(t < 1) requestAnimationFrame(frame); else {
+        // final settle (snap to exact targetY)
+        reel.style.transition = 'transform 280ms ease-out';
+        reel.style.transform = `translateY(${targetY}px)`;
+        setTimeout(()=>{ reel.style.transition = ''; resolve(); },300);
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
+
+// ---------- result display ----------
+function showResult(item, provably){
+  resultArea.innerHTML = `<div style="width:100%" class="result">
+    <div style="width:80px;height:80px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#062e3a,#073656)">${item.iconSVG}</div>
+    <div style="flex:1">
+      <div style="font-weight:900">${item.name} <span style="font-size:13px;color:var(--muted)">(${item.rarity})</span></div>
+      <div style="margin-top:6px" class="small">Вартість предмета: ${toMoney(item.value)}</div>
+      <div class="provably" style="margin-top:8px">
+        <div style="font-weight:700">Provably fair:</div>
+        <div>serverSeed: <span style="font-family:monospace">${provably.serverSeed.slice(0,24)}…</span></div>
+        <div>clientSeed: <span style="font-family:monospace">${provably.clientSeed}</span></div>
+        <div>nonce: ${provably.nonce}</div>
+        <div>roll: ${provably.roll.toFixed(6)}</div>
+      </div>
+    </div>
+  </div>`;
+  provablyBox.textContent = JSON.stringify(provably, null, 2);
 }
 
-/* ---------- Helper: close modal on backdrop click or ESC ---------- */
-modalBackdrop.addEventListener('click', (e)=>{
-  if (e.target === modalBackdrop) modalBackdrop.style.display = 'none';
-});
-document.addEventListener('keydown', (e)=>{
-  if (e.key === 'Escape') modalBackdrop.style.display = 'none';
-});
+// ---------- utilities ----------
+function cryptoRandomHex(bytes=32){
+  const arr = new Uint8Array(bytes);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ---------- small SVG icons used inline ----------
+function svgSticker(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect rx="10" width="64" height="64" fill="#ffcc9a"/>
+  <circle cx="32" cy="26" r="8" fill="#fff3e8"/>
+  <rect x="18" y="40" width="28" height="8" rx="4" fill="#fff3e8"/>
+</svg>`;}
+function svgKnife(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect rx="8" width="64" height="64" fill="#0b2540"/>
+  <path d="M10 40 L36 14 L54 20 L22 46 Z" fill="#d7b39d"/>
+  <rect x="6" y="44" width="30" height="8" rx="4" fill="#4b5563"/>
+</svg>`;}
+function svgRifle(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect rx="8" width="64" height="64" fill="#04121a"/>
+  <rect x="8" y="28" width="40" height="8" rx="4" fill="#7c3aed"/>
+  <rect x="46" y="34" width="10" height="6" rx="3" fill="#111827"/>
+</svg>`;}
+function svgAK(){ return `<svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect rx="8" width="64" height="64" fill="#021122"/>
+  <path d="M8 36 L28 22 L56 28 L48 36 L20 48 Z" fill="#0ea5a4"/>
+  <circle cx="48" cy="30" r="3" fill="#fff"/>
+</svg>`;}
+
+// ---------- misc helpers ----------
+function bytesToHex(arr){ return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+function hexToBytes(hex){ const a=[]; for(let i=0;i<hex.length;i+=2) a.push(parseInt(hex.slice(i,i+2),16)); return new Uint8Array(a); }
+
+// ---------- init styles for reel (create fixed slot height matching reel-window) ----------
+function prepareReelSlotHeight(){
+  // create a temporary slot to measure height
+  const tmp = document.createElement('div'); tmp.className='slot'; tmp.style.visibility='hidden';
+  tmp.innerHTML = `<div style="width:84px;height:84px"></div><div style="flex:1"><div>Sample</div><div class="rarity">rar</div></div>`;
+  reel.appendChild(tmp);
+  // set all slot heights to be equal to reel-window height to make animation easier
+  const h = reelWindow.clientHeight;
+  Array.from(document.getElementsByClassName('slot')).forEach(s=>s.style.height = h + 'px');
+  // cleanup tmp
+  if(reel.contains(tmp)) reel.removeChild(tmp);
+}
+window.addEventListener('resize', ()=>prepareReelSlotHeight());
+prepareReelSlotHeight();
+
+function initFromLocal(){
+  // if no client seed, set one
+  if(!STATE.clientSeed){ STATE.clientSeed = 'cs_' + Math.random().toString(36).slice(2); clientSeedInput.value = STATE.clientSeed; saveState(); }
+  renderInventory();
+  renderBalance();
+}
+initFromLocal();
+
+// ---------- recent initial demo ----------
+if(STATE.recent.length===0) STATE.recent.push(new Date().toLocaleTimeString() + ' — Демо: Відкрито Sticker: Fox Smile');
+renderRecent();
+
+// ---------- end of script ----------
 </script>
 </body>
 </html>
