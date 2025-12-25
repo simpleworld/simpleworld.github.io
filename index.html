@@ -3,597 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Browser FPS (Three.js)</title>
+    <title>ULTRABOLT FPS: TOTAL WAR</title>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; user-select: none; }
-        
-        /* UI: Екран блокування */
-        #blocker { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99; color: white; text-align: center; }
-        #start-btn { font-size: 2rem; padding: 10px 30px; border: 2px solid #0f0; color: #0f0; background: transparent; cursor: pointer; margin-top: 20px; transition: 0.3s; }
-        #start-btn:hover { background: #0f0; color: #000; }
+        :root {
+            --primary: #00ffcc;
+            --accent: #ff0055;
+            --bg: #0a0a0c;
+            --panel: rgba(20, 20, 25, 0.95);
+        }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            overflow: hidden; background: var(--bg);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+        }
+        canvas { display: block; }
 
-        /* UI: HUD */
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; transform: translate(-50%, -50%); pointer-events: none; }
-        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.8); }
-        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; }
-        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; }
+        /* UI LAYERS */
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+        .interactive { pointer-events: all; }
 
-        #hud { position: absolute; bottom: 20px; left: 20px; color: white; display: flex; gap: 20px; pointer-events: none; }
-        .hud-box { background: rgba(0,0,0,0.5); padding: 15px; border-left: 4px solid #0f0; }
-        #weapon-list { display: flex; gap: 10px; margin-bottom: 5px; }
-        .w-icon { padding: 5px 10px; border: 1px solid #555; font-size: 12px; color: #888; }
-        .w-icon.active { border-color: #0f0; color: #0f0; background: rgba(0, 255, 0, 0.1); font-weight: bold; }
-        #ammo-text { font-size: 24px; font-weight: bold; }
-        #enemy-count { font-size: 24px; font-weight: bold; color: #ff4444; }
+        /* CROSSHAIR */
+        #crosshair {
+            position: absolute; top: 50%; left: 50%;
+            width: 30px; height: 30px;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: ''; position: absolute; background: var(--primary);
+        }
+        #crosshair::before { top: 14px; left: 0; width: 30px; height: 2px; }
+        #crosshair::after { left: 14px; top: 0; width: 2px; height: 30px; }
 
-        #fps { position: absolute; top: 10px; left: 10px; color: #0f0; font-family: monospace; }
+        /* HUD */
+        #hud {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 20px; box-sizing: border-box;
+            display: none; justify-content: space-between; align-items: flex-end;
+        }
+        .stats-left, .stats-right {
+            background: var(--panel); padding: 15px 25px;
+            border-top: 3px solid var(--primary);
+            clip-path: polygon(0 0, 90% 0, 100% 100%, 0% 100%);
+        }
+        .stats-right {
+            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+            text-align: right;
+        }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
+        .stat-value { font-size: 32px; font-weight: 800; letter-spacing: 2px; }
+
+        /* MENU SYSTEM */
+        #menu-container {
+            display: flex; flex-direction: column; justify-content: center;
+            align-items: center; background: radial-gradient(circle, #1a1a2e 0%, #0a0a0c 100%);
+            pointer-events: all;
+        }
+        .main-title {
+            font-size: 80px; font-weight: 900; color: var(--primary);
+            text-shadow: 0 0 20px rgba(0,255,204,0.5); margin-bottom: 50px;
+        }
+        .menu-nav { display: flex; gap: 20px; margin-bottom: 30px; }
+        .btn {
+            background: transparent; border: 2px solid var(--primary);
+            color: var(--primary); padding: 15px 40px; font-size: 18px;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase;
+        }
+        .btn:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
+        .btn.active { background: var(--primary); color: #000; }
+
+        /* WINDOWS */
+        .window {
+            width: 80%; height: 60%; background: var(--panel);
+            border: 1px solid var(--primary); display: none;
+            padding: 30px; box-sizing: border-box; overflow-y: auto;
+        }
+        .market-grid, .inv-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .item-card {
+            background: rgba(255,255,255,0.05); padding: 20px;
+            border: 1px solid #333; transition: 0.2s;
+        }
+        .item-card:hover { border-color: var(--primary); }
+        .item-card h3 { margin: 0 0 10px 0; color: var(--primary); }
+        .price { font-size: 20px; color: #fbff00; margin-bottom: 15px; }
+
+        /* NOTIFICATIONS */
+        #notif {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .notif-msg {
+            background: var(--panel); border-right: 5px solid var(--accent);
+            padding: 10px 20px; animation: slideIn 0.3s forwards;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        #death-screen {
+            display: none; background: rgba(100,0,0,0.8);
+            justify-content: center; align-items: center; flex-direction: column;
+        }
     </style>
 </head>
 <body>
 
-    <div id="blocker">
-        <h1>BROWSER FPS 3D</h1>
-        <p>WASD = Рух | SPACE = Стрибок | 1, 2, 3 = Зброя | ЛКМ = Вогонь</p>
-        <button id="start-btn">ГРАТИ</button>
+<div id="crosshair" class="overlay"></div>
+
+<div id="hud" class="overlay">
+    <div class="stats-left">
+        <div class="stat-label">Health</div>
+        <div id="hp-val" class="stat-value">100</div>
+        <div class="stat-label" style="margin-top:5px">Currency</div>
+        <div id="money-val" class="stat-value" style="color:#fbff00; font-size:20px">$5000</div>
+    </div>
+    <div class="stats-right">
+        <div class="stat-label">Weapon</div>
+        <div id="weapon-name" class="stat-value" style="font-size:24px">AK-47</div>
+        <div class="stat-label">Ammo</div>
+        <div id="ammo-val" class="stat-value">30 / ∞</div>
+    </div>
+</div>
+
+<div id="menu-container" class="overlay interactive">
+    <div class="main-title">ULTRABOLT</div>
+    <div class="menu-nav">
+        <button class="btn active" onclick="showTab('main')">Home</button>
+        <button class="btn" onclick="showTab('market')">Market</button>
+        <button class="btn" onclick="showTab('inv')">Inventory</button>
+        <button class="btn" onclick="showTab('settings')">Settings</button>
     </div>
 
-    <div id="crosshair"></div>
-    <div id="fps">FPS: 60</div>
-    <div id="hud">
-        <div class="hud-box">
-            <div id="weapon-list">
-                <div class="w-icon active" id="w1">1. AK-47</div>
-                <div class="w-icon" id="w2">2. GLOCK</div>
-                <div class="w-icon" id="w3">3. KNIFE</div>
-            </div>
-            <div id="ammo-text">AK-47</div>
-        </div>
-        <div class="hud-box" style="border-color: #ff4444;">
-            <div style="font-size: 12px; color: #aaa;">ВОРОГИ</div>
-            <div id="enemy-count">0</div>
-        </div>
+    <div id="tab-main" style="display: block; text-align: center;">
+        <button class="btn" style="font-size: 30px; padding: 20px 80px;" onclick="startGame()">DEPLOY TO ZONE</button>
+        <p style="color:#888; margin-top:20px;">Eliminate hostile bots. Survive waves. Earn credits.</p>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    <div id="tab-market" class="window">
+        <h2>BLACK MARKET</h2>
+        <div class="market-grid" id="market-list"></div>
+    </div>
+
+    <div id="tab-inv" class="window">
+        <h2>YOUR ARMORY</h2>
+        <div class="inv-grid" id="inv-list"></div>
+    </div>
+
+    <div id="tab-settings" class="window">
+        <h2>SYSTEM SETTINGS</h2>
+        <div style="margin-top:20px">
+            <label>Sensitivity</label><br>
+            <input type="range" id="sens" min="1" max="100" value="50">
+        </div>
+    </div>
+</div>
+
+<div id="death-screen" class="overlay interactive">
+    <h1 style="font-size:100px; color:white; margin:0">KIA</h1>
+    <p style="font-size:24px">You have been neutralized.</p>
+    <button class="btn" onclick="location.reload()">Return to HQ</button>
+</div>
+
+<div id="notif" class="overlay"></div>
+
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+        }
+    }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+/**
+ * ============================================================================
+ * GLOBAL CONFIGURATION & STATE
+ * ============================================================================
+ */
+const CONFIG = {
+    GRAVITY: 30,
+    PLAYER_SPEED: 12,
+    PLAYER_RUN_SPEED: 20,
+    JUMP_FORCE: 12,
+    BOT_SPAWN_RATE: 5000,
+    MAP_SIZE: 500,
+    WAVE_INCREASE: 1.2
+};
+
+let gameActive = false;
+let money = 2500;
+let health = 100;
+let kills = 0;
+let wave = 1;
+
+let inventory = ["weapon_ak47", "weapon_glock", "weapon_knife"];
+let activeWeaponSlot = "weapon_ak47";
+
+const WEAPONS_DATA = {
+    "weapon_ak47": {
+        name: "AK-47",
+        type: "auto",
+        damage: 34,
+        fireRate: 100,
+        recoil: 0.04,
+        spread: 0.02,
+        price: 2700,
+        ammo: 30,
+        color: 0x4a3728
+    },
+    "weapon_glock": {
+        name: "Glock-18",
+        type: "semi",
+        damage: 18,
+        fireRate: 200,
+        recoil: 0.02,
+        spread: 0.01,
+        price: 500,
+        ammo: 17,
+        color: 0x222222
+    },
+    "weapon_knife": {
+        name: "Tactical Knife",
+        type: "melee",
+        damage: 100,
+        fireRate: 500,
+        recoil: 0,
+        spread: 0,
+        price: 0,
+        ammo: 0,
+        color: 0x888888
+    }
+};
+
+/**
+ * ============================================================================
+ * ENGINE CORE
+ * ============================================================================
+ */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x020205);
+scene.fog = new THREE.FogExp2(0x020205, 0.015);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const clock = new THREE.Clock();
+const raycaster = new THREE.Raycaster();
+
+// Lights
+const ambientLight = new THREE.AmbientLight(0x404050, 0.5);
+scene.add(ambientLight);
+
+const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+sun.position.set(100, 200, 100);
+sun.castShadow = true;
+sun.shadow.camera.left = -300;
+sun.shadow.camera.right = 300;
+sun.shadow.camera.top = 300;
+sun.shadow.camera.bottom = -300;
+sun.shadow.mapSize.width = 2048;
+sun.shadow.mapSize.height = 2048;
+scene.add(sun);
+
+/**
+ * ============================================================================
+ * PHYSICS & COLLISION
+ * ============================================================================
+ */
+const physicsObjects = [];
+const worldBounds = new THREE.Box3(
+    new THREE.Vector3(-CONFIG.MAP_SIZE/2, -10, -CONFIG.MAP_SIZE/2),
+    new THREE.Vector3(CONFIG.MAP_SIZE/2, 500, CONFIG.MAP_SIZE/2)
+);
+
+function checkCollision(position, radius) {
+    for (let obj of physicsObjects) {
+        if (obj.isBox) {
+            const box = new THREE.Box3().setFromObject(obj);
+            const closestPoint = new THREE.Vector3();
+            box.clampPoint(position, closestPoint);
+            const distance = position.distanceTo(closestPoint);
+            if (distance < radius) {
+                const diff = new THREE.Vector3().subVectors(position, closestPoint).normalize();
+                position.add(diff.multiplyScalar(radius - distance));
+                return true;
             }
         }
-    </script>
+    }
+    return false;
+}
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+/**
+ * ============================================================================
+ * MAP GENERATOR
+ * ============================================================================
+ */
+function createProceduralMap() {
+    // Ground
+    const groundGeo = new THREE.PlaneGeometry(CONFIG.MAP_SIZE * 2, CONFIG.MAP_SIZE * 2);
+    const groundMat = new THREE.MeshStandardMaterial({ 
+        color: 0x15151b,
+        roughness: 0.9,
+        metalness: 0.1
+    });
+    const ground = new THREE.Mesh(groundGeo, groundMat);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
 
-        // --- Глобальні змінні ---
-        let camera, scene, renderer, controls;
-        let raycaster;
-        const objects = []; // Для стрільби
-        const walls = [];   // Для колізії руху
-        const bots = [];    // Масив ботів
-        const tracers = []; // Масив куль
+    // Grid
+    const grid = new THREE.GridHelper(CONFIG.MAP_SIZE * 2, 100, 0x00ffcc, 0x111111);
+    grid.position.y = 0.05;
+    scene.add(grid);
 
-        // Фізика гравця
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let canJump = false;
-        let prevTime = performance.now();
-        const velocity = new THREE.Vector3();
-        const direction = new THREE.Vector3();
-        const PLAYER_HEIGHT = 1.6;
-        const PLAYER_RADIUS = 0.5;
+    // Buildings
+    for (let i = 0; i < 150; i++) {
+        const h = 10 + Math.random() * 50;
+        const w = 10 + Math.random() * 20;
+        const d = 10 + Math.random() * 20;
 
-        // Зброя та руки
-        let weaponRig; // Група, прив'язана до камери
-        let activeWeaponIdx = 0;
-        let isFiring = false;
-        let lastFireTime = 0;
-        let recoilOffset = 0;
-        let recoilRotation = 0;
+        const geo = new THREE.BoxGeometry(w, h, d);
+        const mat = new THREE.MeshStandardMaterial({ 
+            color: 0x111111 + (Math.random() * 0x222222),
+            roughness: 0.7
+        });
+        const b = new THREE.Mesh(geo, mat);
         
-        // Налаштування зброї
-        const weapons = [
-            { name: "AK-47", type: "auto", rate: 100, damage: 25, recoil: 0.05, range: 200, color: 0xffff00 },
-            { name: "GLOCK", type: "semi", rate: 250, damage: 15, recoil: 0.03, range: 100, color: 0xffaa00 },
-            { name: "KNIFE", type: "melee", rate: 500, damage: 50, recoil: 0.1, range: 2.5, color: 0xffffff }
-        ];
+        let px, pz;
+        do {
+            px = (Math.random() - 0.5) * CONFIG.MAP_SIZE;
+            pz = (Math.random() - 0.5) * CONFIG.MAP_SIZE;
+        } while(Math.abs(px) < 20 && Math.abs(pz) < 20); // Keep spawn clear
 
-        // Аудіо контекст
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        b.position.set(px, h/2, pz);
+        b.castShadow = true;
+        b.receiveShadow = true;
+        b.isBox = true;
+        scene.add(b);
+        physicsObjects.push(b);
 
-        // Ініціалізація
-        init();
-        animate();
+        // Windows / Decals
+        if(Math.random() > 0.5) {
+            const winGeo = new THREE.PlaneGeometry(w * 0.8, h * 0.8);
+            const winMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, transparent: true, opacity: 0.05, side: THREE.DoubleSide });
+            const win = new THREE.Mesh(winGeo, winMat);
+            win.position.set(0, 0, d/2 + 0.1);
+            b.add(win);
+        }
+    }
 
-        function init() {
-            // 1. Сцена
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1a1a1a);
-            scene.fog = new THREE.Fog(0x1a1a1a, 0, 80);
+    // Outer Walls
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0x050505 });
+    const wallH = 100;
+    const perimeter = [
+        { size: [CONFIG.MAP_SIZE, wallH, 10], pos: [0, wallH/2, CONFIG.MAP_SIZE/2] },
+        { size: [CONFIG.MAP_SIZE, wallH, 10], pos: [0, wallH/2, -CONFIG.MAP_SIZE/2] },
+        { size: [10, wallH, CONFIG.MAP_SIZE], pos: [CONFIG.MAP_SIZE/2, wallH/2, 0] },
+        { size: [10, wallH, CONFIG.MAP_SIZE], pos: [-CONFIG.MAP_SIZE/2, wallH/2, 0] }
+    ];
 
-            // 2. Камера
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.y = PLAYER_HEIGHT;
+    perimeter.forEach(p => {
+        const g = new THREE.BoxGeometry(...p.size);
+        const m = new THREE.Mesh(g, wallMat);
+        m.position.set(...p.pos);
+        m.isBox = true;
+        scene.add(m);
+        physicsObjects.push(m);
+    });
+}
+createProceduralMap();
 
-            // 3. Світло
-            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambient);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            dirLight.position.set(50, 100, 50);
-            dirLight.castShadow = true;
-            scene.add(dirLight);
+/**
+ * ============================================================================
+ * PLAYER SYSTEM
+ * ============================================================================
+ */
+const player = {
+    velocity: new THREE.Vector3(),
+    onGround: false,
+    height: 1.8,
+    radius: 0.6,
+    input: { w:false, a:false, s:false, d:false, shift:false, space:false, mousedown:false },
+    recoilY: 0,
+    swayTime: 0
+};
 
-            // 4. Управління
-            controls = new PointerLockControls(camera, document.body);
-            const blocker = document.getElementById('blocker');
-            const startBtn = document.getElementById('start-btn');
+const weaponGroup = new THREE.Group();
+camera.add(weaponGroup);
+scene.add(camera);
 
-            startBtn.addEventListener('click', () => {
-                controls.lock();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-            });
+function setupPlayerInput() {
+    window.addEventListener('keydown', (e) => {
+        const k = e.code;
+        if(k === 'KeyW') player.input.w = true;
+        if(k === 'KeyA') player.input.a = true;
+        if(k === 'KeyS') player.input.s = true;
+        if(k === 'KeyD') player.input.d = true;
+        if(k === 'ShiftLeft') player.input.shift = true;
+        if(k === 'Space') player.input.space = true;
+        if(k === 'Digit1') equipWeapon("weapon_ak47");
+        if(k === 'Digit2') equipWeapon("weapon_glock");
+        if(k === 'Digit3') equipWeapon("weapon_knife");
+    });
+    window.addEventListener('keyup', (e) => {
+        const k = e.code;
+        if(k === 'KeyW') player.input.w = false;
+        if(k === 'KeyA') player.input.a = false;
+        if(k === 'KeyS') player.input.s = false;
+        if(k === 'KeyD') player.input.d = false;
+        if(k === 'ShiftLeft') player.input.shift = false;
+        if(k === 'Space') player.input.space = false;
+    });
+    window.addEventListener('mousedown', () => { if(gameActive) player.input.mousedown = true; if(!gameActive && !document.pointerLockElement && health > 0) {} });
+    window.addEventListener('mouseup', () => player.input.mousedown = false);
+    window.addEventListener('mousemove', (e) => {
+        if (document.pointerLockElement) {
+            const sens = document.getElementById('sens').value / 25000;
+            camera.rotation.y -= e.movementX * sens * 10;
+            camera.rotation.x -= e.movementY * sens * 10;
+            camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+        }
+    });
+}
+setupPlayerInput();
 
-            controls.addEventListener('lock', () => { blocker.style.display = 'none'; });
-            controls.addEventListener('unlock', () => { blocker.style.display = 'flex'; });
+/**
+ * ============================================================================
+ * WEAPON ENGINE
+ * ============================================================================
+ */
+let currentWeaponModel = null;
+let lastFireTime = 0;
 
-            scene.add(controls.getObject());
+function buildWeaponModel(weaponId) {
+    if(currentWeaponModel) weaponGroup.remove(currentWeaponModel);
+    const wData = WEAPONS_DATA[weaponId];
+    const group = new THREE.Group();
 
-            // 5. Клавіші
-            document.addEventListener('keydown', onKeyDown);
-            document.addEventListener('keyup', onKeyUp);
-            document.addEventListener('mousedown', () => {
-                if(controls.isLocked) {
-                    isFiring = true;
-                    if(activeWeaponIdx !== 0) fire(); // Для напівавтомата стріляємо одразу
-                }
-            });
-            document.addEventListener('mouseup', () => isFiring = false);
+    // Procedural modeling based on weapon type
+    if(weaponId === "weapon_ak47") {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 0.6), new THREE.MeshStandardMaterial({color:0x222222}));
+        const stock = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.3), new THREE.MeshStandardMaterial({color:0x4a3728}));
+        stock.position.z = 0.4;
+        const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.5), new THREE.MeshStandardMaterial({color:0x111111}));
+        barrel.rotation.x = Math.PI/2; barrel.position.z = -0.5;
+        const mag = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.2, 0.1), new THREE.MeshStandardMaterial({color:0x111111}));
+        mag.position.set(0, -0.15, -0.1); mag.rotation.x = 0.3;
+        group.add(body, stock, barrel, mag);
+    } else if(weaponId === "weapon_glock") {
+        const slide = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.3), new THREE.MeshStandardMaterial({color:0x111111}));
+        const grip = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.15, 0.08), new THREE.MeshStandardMaterial({color:0x222222}));
+        grip.position.set(0, -0.1, 0.08); grip.rotation.x = 0.2;
+        group.add(slide, grip);
+    } else {
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.06, 0.3), new THREE.MeshStandardMaterial({color:0x888888, metalness:1, roughness:0.1}));
+        const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.05, 0.15), new THREE.MeshStandardMaterial({color:0x111111}));
+        handle.position.z = 0.2;
+        group.add(blade, handle);
+    }
 
-            // 6. Світ
-            buildMap();
-            buildBots(10); // 10 ботів
+    // Hands
+    const armMat = new THREE.MeshStandardMaterial({ color: 0xd2b48c });
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.6), armMat);
+    armL.position.set(-0.3, -0.2, 0.2);
+    const armR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.6), armMat);
+    armR.position.set(0.3, -0.2, 0.2);
+    group.add(armL, armR);
 
-            // 7. Зброя та руки (Важливо!)
-            buildWeaponRig();
+    group.position.set(0.3, -0.4, -0.5);
+    weaponGroup.add(group);
+    currentWeaponModel = group;
+}
 
-            // 8. Рендерер
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            document.body.appendChild(renderer.domElement);
+function equipWeapon(id) {
+    if(!inventory.includes(id)) return;
+    activeWeaponSlot = id;
+    buildWeaponModel(id);
+    document.getElementById("weapon-name").innerText = WEAPONS_DATA[id].name;
+    document.getElementById("ammo-val").innerText = WEAPONS_DATA[id].ammo > 0 ? WEAPONS_DATA[id].ammo + " / ∞" : "--";
+}
 
-            raycaster = new THREE.Raycaster();
-            window.addEventListener('resize', onWindowResize);
+function shoot() {
+    const w = WEAPONS_DATA[activeWeaponSlot];
+    const now = Date.now();
+    if(now - lastFireTime < w.fireRate) return;
+    lastFireTime = now;
+
+    // Recoil
+    player.recoilY += w.recoil;
+    camera.rotation.x += w.recoil;
+    currentWeaponModel.position.z += 0.1;
+
+    // Raycast for Hit
+    raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
+    const intersects = raycaster.intersectObjects(bots.map(b => b.mesh), true);
+    
+    if(intersects.length > 0) {
+        const hit = intersects[0];
+        const bot = bots.find(b => b.mesh === hit.object || b.mesh.children.includes(hit.object));
+        if(bot) {
+            bot.takeDamage(w.damage);
+            createImpact(hit.point, 0xff0000);
+        } else {
+            createImpact(hit.point, 0xcccccc);
+        }
+    }
+
+    // Muzzle Flash
+    const flash = new THREE.PointLight(0xffaa00, 2, 5);
+    flash.position.set(0.3, -0.3, -1);
+    camera.add(flash);
+    setTimeout(() => camera.remove(flash), 50);
+
+    // Tracer
+    createTracer();
+}
+
+function createImpact(pos, color) {
+    const geo = new THREE.SphereGeometry(0.1);
+    const mat = new THREE.MeshBasicMaterial({color: color});
+    const p = new THREE.Mesh(geo, mat);
+    p.position.copy(pos);
+    scene.add(p);
+    setTimeout(() => scene.add(p), 100); // reuse/removal logic simplified for speed
+    setTimeout(() => scene.remove(p), 2000);
+}
+
+function createTracer() {
+    const points = [];
+    points.push(new THREE.Vector3(0.3, -0.4, -0.8).applyMatrix4(camera.matrixWorld));
+    
+    const end = new THREE.Vector3(0,0,-100).applyMatrix4(camera.matrixWorld);
+    points.push(end);
+
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    const mat = new THREE.LineBasicMaterial({color: 0xffff00, transparent:true, opacity:0.5});
+    const line = new THREE.Line(geo, mat);
+    scene.add(line);
+    setTimeout(() => scene.remove(line), 30);
+}
+
+/**
+ * ============================================================================
+ * BOT AI SYSTEM
+ * ============================================================================
+ */
+const bots = [];
+class Bot {
+    constructor() {
+        this.hp = 100;
+        this.speed = 4 + Math.random() * 4;
+        this.state = 'chase';
+        
+        const group = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 1, 4, 8), new THREE.MeshStandardMaterial({color:0xff3333}));
+        body.position.y = 1;
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.3), new THREE.MeshStandardMaterial({color:0xffaaaa}));
+        head.position.y = 2;
+        group.add(body, head);
+        
+        let px, pz;
+        do {
+            px = (Math.random() - 0.5) * CONFIG.MAP_SIZE;
+            pz = (Math.random() - 0.5) * CONFIG.MAP_SIZE;
+        } while(new THREE.Vector3(px, 1, pz).distanceTo(camera.position) < 30);
+
+        group.position.set(px, 0, pz);
+        scene.add(group);
+        this.mesh = group;
+        this.mesh.castShadow = true;
+    }
+
+    update(dt) {
+        if(this.hp <= 0) return;
+
+        const dist = this.mesh.position.distanceTo(camera.position);
+        if(dist < 2.0) {
+            // Attack player
+            health -= 0.5;
+            document.getElementById("hp-val").innerText = Math.ceil(health);
+            if(health <= 0) gameOver();
         }
 
-        // --- ГЕНЕРАЦІЯ РУК ТА ЗБРОЇ ---
-        function buildWeaponRig() {
-            weaponRig = new THREE.Group();
-            camera.add(weaponRig);
-            // Початкова позиція рук
-            weaponRig.position.set(0.2, -0.25, -0.4);
+        // Move towards player
+        const dir = new THREE.Vector3().subVectors(camera.position, this.mesh.position);
+        dir.y = 0;
+        dir.normalize();
+        this.mesh.position.add(dir.multiplyScalar(this.speed * dt));
+        this.mesh.lookAt(camera.position.x, 0, camera.position.z);
+    }
 
-            // Матеріали
-            const matSkin = new THREE.MeshLambertMaterial({ color: 0xdcb898 }); // Тілесний
-            const matMetal = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.3, metalness: 0.8 });
-            const matWood = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
-            const matBlade = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.2, metalness: 1.0 });
-
-            // 1. AK-47 GROUP
-            const akGroup = new THREE.Group();
-            akGroup.userData = { id: 0 };
-            
-            // Модель AK
-            const akBody = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.4), matMetal);
-            const akBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.4), matMetal);
-            akBarrel.rotation.x = Math.PI/2; akBarrel.position.z = -0.4;
-            const akMag = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 0.08), matMetal);
-            akMag.position.set(0, -0.1, -0.1); akMag.rotation.x = 0.3;
-            const akStock = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.1, 0.25), matWood);
-            akStock.position.z = 0.32;
-            
-            // Руки для AK (тримають з двох сторін)
-            const akLeftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.045, 0.6), matSkin);
-            akLeftArm.position.set(-0.2, -0.1, 0.2);
-            akLeftArm.rotation.z = -0.3; akLeftArm.rotation.x = 0.8;
-            
-            const akRightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.045, 0.6), matSkin);
-            akRightArm.position.set(0.2, -0.1, 0.3);
-            akRightArm.rotation.z = 0.2; akRightArm.rotation.x = 0.8;
-
-            akGroup.add(akBody, akBarrel, akMag, akStock, akLeftArm, akRightArm);
-            weaponRig.add(akGroup);
-
-            // 2. GLOCK GROUP
-            const glockGroup = new THREE.Group();
-            glockGroup.userData = { id: 1 };
-            glockGroup.visible = false;
-
-            const gSlide = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.2), matMetal);
-            const gHandle = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.1, 0.05), matMetal);
-            gHandle.position.set(0, -0.05, 0.05); gHandle.rotation.x = 0.2;
-            
-            // Одна рука
-            const gRightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.045, 0.6), matSkin);
-            gRightArm.position.set(0.1, -0.15, 0.3);
-            gRightArm.rotation.z = 0.1; gRightArm.rotation.x = 0.9;
-            gRightArm.rotation.y = -0.2;
-
-            glockGroup.add(gSlide, gHandle, gRightArm);
-            // Трохи змістити пістолет щоб був по центру
-            glockGroup.position.set(0, 0.05, 0.1);
-            weaponRig.add(glockGroup);
-
-            // 3. KNIFE GROUP
-            const knifeGroup = new THREE.Group();
-            knifeGroup.userData = { id: 2 };
-            knifeGroup.visible = false;
-
-            const kHandle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.12), matWood);
-            const kBlade = new THREE.Mesh(new THREE.BoxGeometry(0.005, 0.025, 0.2), matBlade);
-            kBlade.position.z = -0.16;
-            
-            // Рука для ножа
-            const kArm = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.045, 0.7), matSkin);
-            kArm.position.set(0.15, -0.1, 0.4);
-            kArm.rotation.x = 1.0; kArm.rotation.z = 0.2;
-
-            knifeGroup.add(kHandle, kBlade, kArm);
-            // Поворот ножа "в атаку"
-            knifeGroup.rotation.y = -0.5;
-            knifeGroup.position.set(0.1, 0, 0);
-            weaponRig.add(knifeGroup);
+    takeDamage(amt) {
+        this.hp -= amt;
+        this.mesh.children[0].material.color.set(0xffffff);
+        setTimeout(() => this.mesh.children[0].material.color.set(0xff3333), 100);
+        if(this.hp <= 0) {
+            scene.remove(this.mesh);
+            kills++;
+            money += 300;
+            updateUI();
+            addNotif("Hostile Neutralized +$300");
         }
+    }
+}
 
-        // --- ГЕНЕРАЦІЯ КАРТИ ---
-        function buildMap() {
-            // Підлога
-            const floorGeo = new THREE.PlaneGeometry(200, 200);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            scene.add(floor);
-            objects.push(floor);
+function spawnWave() {
+    const count = Math.floor(5 * wave);
+    for(let i=0; i<count; i++) {
+        bots.push(new Bot());
+    }
+    addNotif("WAVE " + wave + " INBOUND");
+    wave++;
+}
 
-            // Будівлі
-            const boxGeo = new THREE.BoxGeometry(1, 1, 1);
-            const colors = [0x555555, 0x666666, 0x777777, 0x4a4a4a];
-            
-            for (let i = 0; i < 60; i++) {
-                const h = 5 + Math.random() * 15;
-                const w = 5 + Math.random() * 10;
-                const d = 5 + Math.random() * 10;
-                const mat = new THREE.MeshLambertMaterial({ color: colors[Math.floor(Math.random()*colors.length)] });
-                const mesh = new THREE.Mesh(boxGeo, mat);
-                
-                mesh.position.x = (Math.random() - 0.5) * 150;
-                mesh.position.z = (Math.random() - 0.5) * 150;
-                mesh.position.y = h / 2;
-                
-                // Звільнити спавн
-                if(Math.abs(mesh.position.x) < 15 && Math.abs(mesh.position.z) < 15) continue;
+/**
+ * ============================================================================
+ * UI & ECONOMY
+ * ============================================================================
+ */
+function showTab(tab) {
+    document.querySelectorAll('.window').forEach(w => w.style.display = 'none');
+    document.getElementById('tab-main').style.display = 'none';
+    document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+    
+    if(tab === 'main') {
+        document.getElementById('tab-main').style.display = 'block';
+    } else {
+        document.getElementById('tab-' + tab).style.display = 'block';
+    }
+}
 
-                mesh.scale.set(w, h, d);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                
-                scene.add(mesh);
-                objects.push(mesh); // Для куль
-                
-                // Створюємо AABB для фізики
-                const box = new THREE.Box3().setFromObject(mesh);
-                walls.push(box);
-            }
+function updateUI() {
+    document.getElementById("money-val").innerText = "$" + money;
+    renderMarket();
+    renderInventory();
+}
+
+function renderMarket() {
+    const container = document.getElementById("market-list");
+    container.innerHTML = "";
+    for(let id in WEAPONS_DATA) {
+        if(inventory.includes(id)) continue;
+        const w = WEAPONS_DATA[id];
+        const card = document.createElement('div');
+        card.className = "item-card";
+        card.innerHTML = `
+            <h3>${w.name}</h3>
+            <div class="price">$${w.price}</div>
+            <button class="btn" onclick="buyItem('${id}')">Purchase</button>
+        `;
+        container.appendChild(card);
+    }
+}
+
+window.buyItem = function(id) {
+    const w = WEAPONS_DATA[id];
+    if(money >= w.price) {
+        money -= w.price;
+        inventory.push(id);
+        addNotif("Obtained " + w.name);
+        updateUI();
+    } else {
+        addNotif("Insufficient Credits");
+    }
+};
+
+function renderInventory() {
+    const container = document.getElementById("inv-list");
+    container.innerHTML = "";
+    inventory.forEach(id => {
+        const w = WEAPONS_DATA[id];
+        const card = document.createElement('div');
+        card.className = "item-card";
+        card.innerHTML = `
+            <h3>${w.name}</h3>
+            <button class="btn ${activeWeaponSlot === id ? 'active' : ''}" onclick="equipWeapon('${id}')">Equip</button>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function addNotif(msg) {
+    const n = document.createElement('div');
+    n.className = "notif-msg";
+    n.innerText = msg;
+    document.getElementById("notif").appendChild(n);
+    setTimeout(() => n.remove(), 3000);
+}
+
+/**
+ * ============================================================================
+ * GAME LOOP
+ * ============================================================================
+ */
+function startGame() {
+    document.getElementById("menu-container").style.display = "none";
+    document.getElementById("hud").style.display = "flex";
+    document.getElementById("crosshair").style.display = "block";
+    document.body.requestPointerLock();
+    gameActive = true;
+    equipWeapon(activeWeaponSlot);
+    setInterval(spawnWave, CONFIG.BOT_SPAWN_RATE);
+}
+
+function gameOver() {
+    gameActive = false;
+    document.exitPointerLock();
+    document.getElementById("death-screen").style.display = "flex";
+}
+
+function update(dt) {
+    if(!gameActive) return;
+
+    // Movement
+    const speed = player.input.shift ? CONFIG.PLAYER_RUN_SPEED : CONFIG.PLAYER_SPEED;
+    direction.z = Number(player.input.s) - Number(player.input.w);
+    direction.x = Number(player.input.d) - Number(player.input.a);
+    direction.normalize();
+
+    if (player.input.w || player.input.s) player.velocity.z -= direction.z * speed * dt;
+    if (player.input.a || player.input.d) player.velocity.x -= direction.x * speed * dt;
+
+    // Gravity & Jump
+    player.velocity.y -= CONFIG.GRAVITY * dt;
+    if(player.onGround && player.input.space) {
+        player.velocity.y = CONFIG.JUMP_FORCE;
+        player.onGround = false;
+    }
+
+    // Apply Velocity
+    const nextPos = camera.position.clone();
+    nextPos.x += player.velocity.x * dt;
+    nextPos.z += player.velocity.z * dt;
+    
+    // Friction
+    player.velocity.x *= 0.85;
+    player.velocity.z *= 0.85;
+
+    // Collision Detection
+    camera.position.y += player.velocity.y * dt;
+    if(camera.position.y < PLAYER_HEIGHT) {
+        camera.position.y = PLAYER_HEIGHT;
+        player.velocity.y = 0;
+        player.onGround = true;
+    }
+    
+    checkCollision(camera.position, player.radius);
+
+    // Shooting
+    if(player.input.mousedown) {
+        shoot();
+    }
+
+    // Weapon Animation (Sway/Reset)
+    player.recoilY *= 0.9;
+    currentWeaponModel.position.z = THREE.MathUtils.lerp(currentWeaponModel.position.z, -0.5, 0.1);
+    
+    player.swayTime += dt * (player.input.w || player.input.s ? 10 : 2);
+    currentWeaponModel.position.y = -0.4 + Math.sin(player.swayTime) * 0.01;
+    currentWeaponModel.position.x = 0.3 + Math.cos(player.swayTime * 0.5) * 0.01;
+
+    // Update Bots
+    for(let i = bots.length - 1; i >= 0; i--) {
+        if(bots[i].hp <= 0) {
+            bots.splice(i, 1);
+            continue;
         }
+        bots[i].update(dt);
+    }
+}
 
-        // --- ЛОГІКА БОТІВ ---
-        function buildBots(count) {
-            const botGeo = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
-            const botMat = new THREE.MeshLambertMaterial({ color: 0xff0000 }); // Червоні вороги
+function animate() {
+    requestAnimationFrame(animate);
+    const dt = clock.getDelta();
+    update(dt);
+    renderer.render(scene, camera);
+}
 
-            for(let i=0; i<count; i++) {
-                const bot = new THREE.Mesh(botGeo, botMat.clone());
-                // Рандомна позиція
-                let tx, tz;
-                do {
-                    tx = (Math.random() - 0.5) * 100;
-                    tz = (Math.random() - 0.5) * 100;
-                } while (Math.abs(tx) < 20 && Math.abs(tz) < 20); // Далеко від гравця
+// Final setup
+updateUI();
+const PLAYER_HEIGHT = 1.8;
+camera.position.set(0, PLAYER_HEIGHT, 0);
 
-                bot.position.set(tx, 1, tz);
-                bot.userData = { 
-                    health: 100, 
-                    speed: 2 + Math.random() * 2,
-                    state: 'idle',
-                    nextMove: 0
-                };
-                scene.add(bot);
-                bots.push(bot);
-                objects.push(bot); // Можна влучити
-            }
-            updateEnemyCounter();
-        }
-
-        function updateBots(delta) {
-            const playerPos = camera.position;
-
-            bots.forEach((bot, index) => {
-                if(bot.userData.health <= 0) return;
-
-                const dist = bot.position.distanceTo(playerPos);
-                
-                // Простий ШІ: якщо близько - йти до гравця
-                if(dist < 40) {
-                    bot.lookAt(playerPos.x, 1, playerPos.z);
-                    // Рух вперед
-                    const dir = new THREE.Vector3(0, 0, 1).applyQuaternion(bot.quaternion);
-                    bot.position.add(dir.multiplyScalar(bot.userData.speed * delta));
-                }
-            });
-        }
-
-        // --- УПРАВЛІННЯ ГРАВЦЕМ ---
-        function onKeyDown(event) {
-            switch (event.code) {
-                case 'KeyW': moveForward = true; break;
-                case 'KeyA': moveLeft = true; break;
-                case 'KeyS': moveBackward = true; break;
-                case 'KeyD': moveRight = true; break;
-                case 'Space': if(canJump) { velocity.y += 10; canJump = false; } break;
-                case 'Digit1': switchWeapon(0); break;
-                case 'Digit2': switchWeapon(1); break;
-                case 'Digit3': switchWeapon(2); break;
-            }
-        }
-        function onKeyUp(event) {
-            switch (event.code) {
-                case 'KeyW': moveForward = false; break;
-                case 'KeyA': moveLeft = false; break;
-                case 'KeyS': moveBackward = false; break;
-                case 'KeyD': moveRight = false; break;
-            }
-        }
-
-        function switchWeapon(idx) {
-            activeWeaponIdx = idx;
-            // Оновити UI
-            document.querySelectorAll('.w-icon').forEach((el, i) => {
-                el.classList.toggle('active', i === idx);
-            });
-            document.getElementById('ammo-text').innerText = weapons[idx].name;
-            
-            // Оновити модель
-            weaponRig.children.forEach(grp => {
-                grp.visible = (grp.userData.id === idx);
-            });
-            // Скидання анімації
-            weaponRig.position.set(0.2, -0.25, -0.4);
-            weaponRig.rotation.set(0, 0, 0);
-        }
-
-        // --- СТРІЛЬБА ТА ВІДДАЧА ---
-        function fire() {
-            const now = performance.now();
-            const w = weapons[activeWeaponIdx];
-            if(now - lastFireTime < w.rate) return;
-            lastFireTime = now;
-
-            // Звук
-            playSound(w.type);
-
-            // Віддача (візуальна + камера)
-            recoilOffset += 0.1; // Зброя назад
-            recoilRotation += w.recoil; // Камера вгору
-            
-            // Анімація ножа (удар)
-            if(w.type === 'melee') {
-                const knife = weaponRig.children.find(c => c.userData.id === 2);
-                knife.rotation.x -= 1;
-                setTimeout(() => knife.rotation.x += 1, 150);
-            }
-
-            // Raycasting (логіка попадання)
-            raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-            const intersects = raycaster.intersectObjects(objects);
-
-            // Трасер (лінія кулі)
-            if(w.type !== 'melee') {
-                createTracer(w);
-            }
-
-            // Обробка попадання
-            if(intersects.length > 0) {
-                const hit = intersects[0];
-                if(hit.distance > w.range) return; // Занадто далеко
-
-                // Ефект попадання
-                if(w.type !== 'melee') createHitEffect(hit.point);
-
-                // Якщо це бот
-                if(bots.includes(hit.object)) {
-                    hitBot(hit.object, w.damage);
-                }
-            }
-        }
-
-        function createTracer(weapon) {
-            // Початок трасера - приблизно з дула (справа знизу від центру)
-            // Для точності краще брати світову позицію дула, але спростимо:
-            // Вектор з камери трохи правіше і нижче
-            const start = new THREE.Vector3(0.15, -0.15, -0.5).applyMatrix4(camera.matrixWorld);
-            
-            // Кінець - куди дивиться камера (на велику відстань)
-            const end = new THREE.Vector3(0, 0, -100).applyMatrix4(camera.matrixWorld);
-            
-            // Якщо є перешкода - малюємо до неї
-            raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-            const intersects = raycaster.intersectObjects(objects);
-            if(intersects.length > 0) {
-                end.copy(intersects[0].point);
-            }
-
-            // Малюємо лінію
-            const mat = new THREE.LineBasicMaterial({ color: 0xffff00 });
-            const geo = new THREE.BufferGeometry().setFromPoints([start, end]);
-            const line = new THREE.Line(geo, mat);
-            scene.add(line);
-            
-            // Видаляємо через 50мс
-            setTimeout(() => { scene.remove(line); geo.dispose(); mat.dispose(); }, 50);
-        }
-
-        function createHitEffect(pos) {
-            const mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(0.1, 0.1, 0.1),
-                new THREE.MeshBasicMaterial({ color: 0x000000 })
-            );
-            mesh.position.copy(pos);
-            scene.add(mesh);
-            setTimeout(() => scene.remove(mesh), 2000);
-        }
-
-        function hitBot(bot, dmg) {
-            bot.userData.health -= dmg;
-            // Спалах червоного кольору
-            bot.material.emissive.setHex(0xff0000);
-            setTimeout(() => bot.material.emissive.setHex(0x000000), 100);
-
-            if(bot.userData.health <= 0) {
-                scene.remove(bot);
-                // Видалити з масивів
-                const idx = bots.indexOf(bot);
-                if(idx > -1) bots.splice(idx, 1);
-                const objIdx = objects.indexOf(bot);
-                if(objIdx > -1) objects.splice(objIdx, 1);
-                
-                updateEnemyCounter();
-            }
-        }
-
-        function updateEnemyCounter() {
-            document.getElementById('enemy-count').innerText = bots.length;
-        }
-
-        // --- АУДІО ---
-        function playSound(type) {
-            if(audioCtx.state === 'suspended') return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            const t = audioCtx.currentTime;
-            
-            if(type === 'auto' || type === 'semi') {
-                // Шум пострілу
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(type==='auto'? 100:150, t);
-                osc.frequency.exponentialRampToValueAtTime(0.01, t + 0.1);
-                gain.gain.setValueAtTime(0.5, t);
-                gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-                osc.start(t);
-                osc.stop(t + 0.1);
-            } else {
-                // Свист ножа
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(600, t);
-                osc.frequency.linearRampToValueAtTime(100, t + 0.15);
-                gain.gain.setValueAtTime(0.3, t);
-                gain.gain.linearRampToValueAtTime(0, t + 0.15);
-                osc.start(t);
-                osc.stop(t + 0.15);
-            }
-        }
-
-        // --- ГОЛОВНИЙ ЦИКЛ ---
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = performance.now();
-            const delta = (time - prevTime) / 1000;
-            prevTime = time;
-
-            if (controls.isLocked) {
-                // 1. Рух гравця
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= 9.8 * 30.0 * delta; // Гравітація
-
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize();
-
-                const speed = 80.0;
-                if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
-                if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
-
-                // Передбачення колізій (Спрощено: перевірка наступного кроку)
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-                
-                // Перевірка колізій зі стінами
-                const playerPos = controls.getObject().position;
-                let collided = false;
-                for(let wall of walls) {
-                    if(wall.containsPoint(playerPos)) {
-                        collided = true; 
-                        break;
-                    }
-                }
-                if(collided) {
-                    // Відкат назад
-                    controls.moveForward(velocity.z * delta);
-                    controls.moveRight(velocity.x * delta);
-                }
-
-                controls.getObject().position.y += (velocity.y * delta);
-
-                if (controls.getObject().position.y < PLAYER_HEIGHT) {
-                    velocity.y = 0;
-                    controls.getObject().position.y = PLAYER_HEIGHT;
-                    canJump = true;
-                }
-
-                // 2. Логіка автоматичної стрільби
-                if(isFiring && activeWeaponIdx === 0) fire();
-
-                // 3. Анімація зброї (Хитання - Sway)
-                const isMoving = (Math.abs(velocity.x) > 1 || Math.abs(velocity.z) > 1);
-                let swayX = 0, swayY = 0;
-                if(isMoving) {
-                    swayX = Math.sin(time * 0.01) * 0.05;
-                    swayY = Math.cos(time * 0.02) * 0.05;
-                }
-                
-                // Відновлення віддачі
-                recoilOffset = Math.max(0, recoilOffset - delta * 2);
-                recoilRotation = Math.max(0, recoilRotation - delta * 2);
-
-                // Застосування трансформацій до рук
-                weaponRig.position.x = 0.2 + swayX;
-                weaponRig.position.y = -0.25 + swayY;
-                weaponRig.position.z = -0.4 + recoilOffset * 0.5; // Відштовхування
-                
-                // Підкидання камери від пострілів (Pitch)
-                camera.rotation.x += recoilRotation * 0.01;
-                
-                // 4. Оновлення ботів
-                updateBots(delta);
-
-                // FPS
-                if(Math.random() > 0.9) document.getElementById('fps').innerText = `FPS: ${Math.round(1/delta)}`;
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-    </script>
+</script>
 </body>
 </html>
