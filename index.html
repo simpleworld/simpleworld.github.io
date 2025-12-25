@@ -2,104 +2,230 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<title>Simple FPS</title>
+<title>Browser FPS Shooter</title>
 <style>
-    body { margin:0; overflow:hidden; background:black; }
-    canvas { display:block; }
-    #ui {
-        position:fixed;
-        top:10px;
-        left:10px;
-        color:white;
-        font-family:Arial;
-        font-size:16px;
-    }
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, sans-serif;
+}
+#hud {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: #0f0;
+    font-size: 16px;
+}
+#crosshair {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-left: -10px;
+    margin-top: -10px;
+}
+#crosshair::before,
+#crosshair::after {
+    content: "";
+    position: absolute;
+    background: #0f0;
+}
+#crosshair::before {
+    width: 20px;
+    height: 2px;
+    top: 9px;
+    left: 0;
+}
+#crosshair::after {
+    width: 2px;
+    height: 20px;
+    left: 9px;
+    top: 0;
+}
+#start {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgba(0,0,0,0.9);
+    cursor: pointer;
+    font-size: 24px;
+}
 </style>
 </head>
 <body>
+<div id="hud">
+    Weapon: <span id="weapon">AK-47</span><br>
+    Shots: <span id="shots">0</span>
+</div>
+<div id="crosshair"></div>
+<div id="start">CLICK TO START</div>
 
-<div id="ui">Зброя: <span id="weapon">AK-47</span></div>
-<canvas id="game"></canvas>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
 
-// ГРАВЕЦЬ
-let player = { x:0, y:0, speed:3 };
+let camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
+renderer.setSize(innerWidth, innerHeight);
+document.body.appendChild(renderer.domElement);
+
+let yaw = 0, pitch = 0;
+let velocity = new THREE.Vector3();
 let keys = {};
-let weapon = "AK-47";
+let shots = 0;
 
-// БУДІВЛІ
-let buildings = [
-    {x:-200,y:-200,w:150,h:150},
-    {x:200,y:-100,w:200,h:200},
-    {x:-300,y:200,w:200,h:150}
-];
+let weapon = 1;
+const weaponNames = {1:"AK-47",2:"Glock",3:"Knife"};
 
-// КЕРУВАННЯ
-addEventListener("keydown", e => {
-    keys[e.key.toLowerCase()] = true;
+const listener = new THREE.AudioListener();
+camera.add(listener);
+const audio = new THREE.Audio(listener);
+const audioCtx = listener.context;
 
-    if(e.key === "1") weapon="AK-47";
-    if(e.key === "2") weapon="Glock";
-    if(e.key === "3") weapon="Knife";
-    document.getElementById("weapon").innerText = weapon;
+function shootSound(){
+    let o = audioCtx.createOscillator();
+    let g = audioCtx.createGain();
+    o.frequency.value = weapon === 1 ? 120 : 300;
+    g.gain.value = 0.1;
+    o.connect(g).connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.05);
+}
+
+camera.position.set(0, 1.7, 5);
+
+let light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 5);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+let floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(200,200),
+    new THREE.MeshStandardMaterial({color:0x444444})
+);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+
+let buildings = [];
+for(let i=0;i<20;i++){
+    let b = new THREE.Mesh(
+        new THREE.BoxGeometry(3, Math.random()*5+2, 3),
+        new THREE.MeshStandardMaterial({color:0x888888})
+    );
+    b.position.set(
+        (Math.random()-0.5)*50,
+        b.geometry.parameters.height/2,
+        (Math.random()-0.5)*50
+    );
+    buildings.push(b);
+    scene.add(b);
+}
+
+function collide(pos){
+    for(let b of buildings){
+        let box = new THREE.Box3().setFromObject(b);
+        if(box.containsPoint(pos)) return true;
+    }
+    return false;
+}
+
+document.addEventListener("keydown",e=>{
+    keys[e.code]=true;
+    if(e.code==="Digit1") weapon=1;
+    if(e.code==="Digit2") weapon=2;
+    if(e.code==="Digit3") weapon=3;
 });
-addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+document.addEventListener("keyup",e=>keys[e.code]=false);
 
-// СТРІЛЬБА
-addEventListener("mousedown", ()=>{
-    console.log("Fire:", weapon);
+document.addEventListener("mousemove",e=>{
+    if(document.pointerLockElement){
+        yaw -= e.movementX*0.002;
+        pitch -= e.movementY*0.002;
+        pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
+    }
 });
 
-// РУХ
-function move(){
-    if(keys["w"]) player.y -= player.speed;
-    if(keys["s"]) player.y += player.speed;
-    if(keys["a"]) player.x -= player.speed;
-    if(keys["d"]) player.x += player.speed;
+let shooting = false;
+document.addEventListener("mousedown",()=>{
+    shooting = true;
+});
+document.addEventListener("mouseup",()=>{
+    shooting = false;
+});
+
+function shoot(){
+    shots++;
+    document.getElementById("shots").textContent = shots;
+    shootSound();
+    if(weapon===1){
+        pitch += 0.02;
+    }
 }
 
-// МАЛЮВАННЯ
-function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+let lastShot = 0;
 
-    // ЗЕМЛЯ
-    ctx.fillStyle = "#2a2a2a";
-    ctx.fillRect(0, canvas.height/2, canvas.width, canvas.height/2);
+function update(delta){
+    let speed = 6;
+    let dir = new THREE.Vector3();
+    if(keys["KeyW"]) dir.z -= 1;
+    if(keys["KeyS"]) dir.z += 1;
+    if(keys["KeyA"]) dir.x -= 1;
+    if(keys["KeyD"]) dir.x += 1;
+    dir.normalize().applyAxisAngle(new THREE.Vector3(0,1,0), yaw);
 
-    // НЕБО
-    ctx.fillStyle = "#87ceeb";
-    ctx.fillRect(0,0,canvas.width,canvas.height/2);
+    let nextPos = camera.position.clone().add(dir.multiplyScalar(delta*speed));
+    if(!collide(nextPos)) camera.position.copy(nextPos);
 
-    // БУДІВЛІ
-    ctx.fillStyle = "#555";
-    buildings.forEach(b=>{
-        let bx = canvas.width/2 + (b.x - player.x);
-        let by = canvas.height/2 + (b.y - player.y);
-        ctx.fillRect(bx, by, b.w, b.h);
-    });
+    camera.rotation.order = "YXZ";
+    camera.rotation.y = yaw;
+    camera.rotation.x = pitch;
 
-    // ПРИЦІЛ
-    ctx.strokeStyle="white";
-    ctx.beginPath();
-    ctx.moveTo(canvas.width/2 -10, canvas.height/2);
-    ctx.lineTo(canvas.width/2 +10, canvas.height/2);
-    ctx.moveTo(canvas.width/2, canvas.height/2 -10);
-    ctx.lineTo(canvas.width/2, canvas.height/2 +10);
-    ctx.stroke();
+    document.getElementById("weapon").textContent = weaponNames[weapon];
+
+    if(shooting){
+        if(weapon===1 && performance.now()-lastShot>100){
+            shoot();
+            lastShot = performance.now();
+        }
+        if(weapon===2 && performance.now()-lastShot>300){
+            shoot();
+            lastShot = performance.now();
+        }
+        if(weapon===3 && performance.now()-lastShot>500){
+            shoot();
+            lastShot = performance.now();
+        }
+    }
 }
 
-// ЦИКЛ
-function loop(){
-    move();
-    draw();
-    requestAnimationFrame(loop);
+let prev = performance.now();
+function animate(){
+    requestAnimationFrame(animate);
+    let now = performance.now();
+    let delta = (now-prev)/1000;
+    prev = now;
+    update(delta);
+    renderer.render(scene,camera);
 }
-loop();
+animate();
+
+window.addEventListener("resize",()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth,innerHeight);
+});
+
+document.getElementById("start").onclick=()=>{
+    document.body.requestPointerLock();
+    document.getElementById("start").style.display="none";
+};
 </script>
 </body>
 </html>
