@@ -1,238 +1,599 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<title>FPS Full Game</title>
-<style>
-html,body{margin:0;padding:0;overflow:hidden;background:#1e1e1e;font-family:Arial}
-#crosshair{position:fixed;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;pointer-events:none}
-#crosshair:before,#crosshair:after{content:"";position:absolute;background:#0f0}
-#crosshair:before{width:20px;height:2px;top:9px;left:0}
-#crosshair:after{width:2px;height:20px;left:9px;top:0}
-#hud{position:fixed;bottom:10px;left:10px;color:#fff;font-size:14px}
-#weapons{position:fixed;bottom:10px;right:10px;display:flex;gap:10px}
-.weapon{padding:8px 12px;border:2px solid #555;color:#aaa;transition:0.2s}
-.weapon.active{border-color:#0f0;color:#0f0;transform:scale(1.2)}
-#start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);color:#fff;font-size:24px;cursor:pointer}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Browser Shooter (Three.js)</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111;
+            user-select: none;
+        }
+
+        /* Екран блокування / Меню */
+        #blocker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 10;
+        }
+
+        #instructions {
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Приціл */
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: '';
+            position: absolute;
+            background: #0f0;
+        }
+        #crosshair::before { top: 9px; left: 0; width: 20px; height: 2px; } /* Горизонтальна */
+        #crosshair::after { top: 0; left: 9px; width: 2px; height: 20px; } /* Вертикальна */
+
+        /* Інтерфейс (HUD) */
+        #hud {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #0f0;
+            font-size: 20px;
+            text-shadow: 1px 1px 2px black;
+            pointer-events: none;
+        }
+
+        .weapon-info {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        #ammo {
+            margin-top: 5px;
+            color: #fff;
+        }
+
+        /* Допоміжні написи */
+        #controls-hint {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-<div id="crosshair"></div>
-<div id="hud">
-Weapon: <span id="weaponName">AK-47</span><br>
-Enemies: <span id="enemyCount">0</span>
-</div>
-<div id="weapons">
-<div class="weapon active" id="w1">AK</div>
-<div class="weapon" id="w2">GLOCK</div>
-<div class="weapon" id="w3">KNIFE</div>
-</div>
-<div id="start">CLICK TO START</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<script>
-/* ================= BASIC ================= */
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87ceeb);
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-camera.position.set(0,1.7,5);
-const renderer = new THREE.WebGLRenderer({antialias:true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+    <div id="blocker">
+        <div id="instructions">
+            <span style="font-size:40px">КЛІКНИ ЩОБ ГРАТИ</span>
+            <br /><br />
+            (W, A, S, D = Рух, SPACE = Стрибок, MOUSE = Огляд)<br/>
+            (1 = AK-47, 2 = Glock, 3 = Ніж)<br/>
+            (ЛКМ = Стріляти)
+        </div>
+    </div>
 
-/* ================= LIGHT ================= */
-scene.add(new THREE.AmbientLight(0xffffff,0.5));
-const sun = new THREE.DirectionalLight(0xffffff,1);
-sun.position.set(10,20,10);
-scene.add(sun);
+    <div id="crosshair"></div>
+    <div id="hud">
+        <div class="weapon-info" id="weapon-name">AK-47</div>
+        <div id="ammo">Патрони: ∞</div>
+    </div>
+    
+    <div id="controls-hint">
+        WASD - Рух<br>1, 2, 3 - Зміна зброї
+    </div>
 
-/* ================= MAP ================= */
-const floor = new THREE.Mesh(
- new THREE.PlaneGeometry(400,400),
- new THREE.MeshStandardMaterial({color:0x444444})
-);
-floor.rotation.x = -Math.PI/2;
-scene.add(floor);
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
 
-const buildings = [];
-for(let i=0;i<100;i++){
- const h = Math.random()*15+5;
- const b = new THREE.Mesh(
-  new THREE.BoxGeometry(6,h,6),
-  new THREE.MeshStandardMaterial({color:0x777777})
- );
- b.position.set((Math.random()-0.5)*180, h/2, (Math.random()-0.5)*180);
- buildings.push(b);
- scene.add(b);
-}
-function collide(pos){
- for(const b of buildings){
-  const box = new THREE.Box3().setFromObject(b);
-  if(box.containsPoint(pos)) return true;
- }
- return false;
-}
+    <script type="module">
+        import * as THREE from 'three';
+        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
-/* ================= INPUT ================= */
-let keys = {}, yaw=0, pitch=0;
-document.addEventListener("keydown", e => keys[e.code]=true);
-document.addEventListener("keyup", e => keys[e.code]=false);
-document.addEventListener("mousemove", e => {
- if(document.pointerLockElement){
-  yaw -= e.movementX*0.002;
-  pitch -= e.movementY*0.002;
-  pitch = Math.max(-1.4, Math.min(1.4, pitch));
- }
-});
+        // --- Глобальні змінні ---
+        let camera, scene, renderer, controls;
+        let raycaster;
+        
+        // Фізика руху
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
+        let canJump = false;
 
-/* ================= HANDS ================= */
-const hands = new THREE.Group();
-camera.add(hands);
-scene.add(camera);
-const skinMat = new THREE.MeshStandardMaterial({color:0xffc9a5});
-function createHands(){
- const left = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,0.6,16), skinMat);
- const right = new THREE.Mesh(new THREE.CylinderGeometry(0.08,0.1,0.6,16), skinMat);
- left.rotation.z = 0.5;
- right.rotation.z = -0.5;
- left.position.set(-0.25,-0.5,-0.6);
- right.position.set(0.25,-0.5,-0.6);
- hands.add(left,right);
-}
-createHands();
+        let prevTime = performance.now();
+        const velocity = new THREE.Vector3();
+        const direction = new THREE.Vector3();
 
-/* ================= WEAPONS ================= */
-let weapon = 1;
-const names = {1:"AK-47",2:"Glock",3:"Knife"};
-const weaponGroup = new THREE.Group();
-camera.add(weaponGroup);
-function clearWeapon(){while(weaponGroup.children.length) weaponGroup.remove(weaponGroup.children[0]);}
-function AK(){
- const g = new THREE.Group();
- const metal = new THREE.MeshStandardMaterial({color:0x333333});
- const wood = new THREE.MeshStandardMaterial({color:0x8b4513});
- const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2), metal);
- barrel.rotation.x=Math.PI/2;
- const body = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.3,0.6), metal);
- const mag = new THREE.Mesh(new THREE.BoxGeometry(0.25,0.5,0.3), metal);
- const stock = new THREE.Mesh(new THREE.BoxGeometry(0.3,0.25,0.8), wood);
- body.position.z=-0.3; mag.position.set(0,-0.4,0); stock.position.z=0.8;
- g.add(barrel,body,mag,stock); g.position.set(0.45,-0.45,-1);
- return g;
-}
-function Glock(){
- const g = new THREE.Group();
- const mat = new THREE.MeshStandardMaterial({color:0x222222});
- const slide = new THREE.Mesh(new THREE.BoxGeometry(0.4,0.2,1),mat);
- const grip = new THREE.Mesh(new THREE.BoxGeometry(0.25,0.45,0.25),mat);
- grip.position.set(0,-0.35,0.25); g.add(slide,grip); g.position.set(0.4,-0.45,-0.9);
- return g;
-}
-function Knife(){
- const g = new THREE.Group();
- const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,1), new THREE.MeshStandardMaterial({color:0xdddddd}));
- const handle = new THREE.Mesh(new THREE.BoxGeometry(0.15,0.1,0.35), new THREE.MeshStandardMaterial({color:0x222222}));
- handle.position.z=0.65; g.add(blade,handle); g.position.set(0.35,-0.45,-0.7);
- return g;
-}
-function equip(){
- clearWeapon();
- if(weapon===1) weaponGroup.add(AK());
- if(weapon===2) weaponGroup.add(Glock());
- if(weapon===3) weaponGroup.add(Knife());
- document.getElementById("weaponName").textContent=names[weapon];
- document.querySelectorAll(".weapon").forEach(w=>w.classList.remove("active"));
- document.getElementById("w"+weapon).classList.add("active");
-}
-equip();
-document.addEventListener("keydown", e=>{
- if(e.code==="Digit1") weapon=1;
- if(e.code==="Digit2") weapon=2;
- if(e.code==="Digit3") weapon=3;
- equip();
-});
+        // Світ та колізії
+        const objects = []; // Об'єкти, з якими можна зіткнутися (підлога, стіни)
+        const walls = [];   // Тільки стіни для перевірки колізії руху
 
-/* ================= BOTS ================= */
-const bots = [];
-function createBot(x,z){
- const g = new THREE.Group();
- const bodyMat = new THREE.MeshStandardMaterial({color:0x5555ff});
- const head = new THREE.Mesh(new THREE.SphereGeometry(0.25,16,16), bodyMat);
- head.position.y = 1.9;
- const torso = new THREE.Mesh(new THREE.BoxGeometry(0.6,0.8,0.4), bodyMat);
- torso.position.y = 1.3;
- const leg1 = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.7,12), bodyMat);
- const leg2 = leg1.clone();
- leg1.position.set(-0.15,0.35,0); leg2.position.set(0.15,0.35,0);
- g.add(head,torso,leg1,leg2);
- g.position.set(x,0,z);
- g.hp = 100;
- scene.add(g); bots.push(g);
-}
-for(let i=0;i<15;i++) createBot((Math.random()-0.5)*150,(Math.random()-0.5)*150);
+        // Зброя
+        let weaponMeshGroup;
+        let activeWeaponIndex = 0; // 0: AK, 1: Glock, 2: Knife
+        let isFiring = false;
+        let lastFireTime = 0;
+        
+        // Налаштування зброї
+        const weapons = [
+            { 
+                name: "AK-47", 
+                type: "auto", 
+                rate: 100, // мс між пострілами
+                damage: 30, 
+                recoil: 0.05,
+                color: 0x444444 
+            },
+            { 
+                name: "Glock", 
+                type: "semi", 
+                rate: 250, 
+                damage: 15, 
+                recoil: 0.02,
+                color: 0x222222 
+            },
+            { 
+                name: "Ніж", 
+                type: "melee", 
+                rate: 500, 
+                damage: 50, 
+                recoil: 0.1,
+                color: 0x888888 
+            }
+        ];
 
-/* ================= COMBAT ================= */
-const raycaster = new THREE.Raycaster();
-let shooting=false, lastShot=0;
-document.addEventListener("mousedown",()=>shooting=true);
-document.addEventListener("mouseup",()=>shooting=false);
-function shootAK(){
- pitch+=0.03;
- raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
- const hit = raycaster.intersectObjects(bots,true)[0];
- if(hit){const bot=hit.object.parent; bot.hp-=25; if(bot.hp<=0){scene.remove(bot); bots.splice(bots.indexOf(bot),1);}}
-}
-function shootGlock(){
- raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
- const hit = raycaster.intersectObjects(bots,true)[0];
- if(hit){const bot=hit.object.parent; bot.hp-=15; if(bot.hp<=0){scene.remove(bot); bots.splice(bots.indexOf(bot),1);}}
-}
-function knifeAttack(){
- raycaster.setFromCamera(new THREE.Vector2(0,0),camera);
- raycaster.far=2;
- const hit = raycaster.intersectObjects(bots,true)[0];
- if(hit){const bot=hit.object.parent; bot.hp-=50; if(bot.hp<=0){scene.remove(bot); bots.splice(bots.indexOf(bot),1);}}
-}
+        // Аудіо контекст (для синтезу звуків)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-/* ================= LOOP ================= */
-let last = performance.now();
-function animate(){
- requestAnimationFrame(animate);
- const now = performance.now();
- const dt = (now-last)/1000; last=now;
- let dir = new THREE.Vector3();
- if(keys["KeyW"]) dir.z-=1; if(keys["KeyS"]) dir.z+=1;
- if(keys["KeyA"]) dir.x-=1; if(keys["KeyD"]) dir.x+=1;
- dir.normalize().applyAxisAngle(new THREE.Vector3(0,1,0),yaw);
- const next = camera.position.clone().add(dir.multiplyScalar(dt*6));
- if(!collide(next)) camera.position.copy(next);
- camera.rotation.order="YXZ"; camera.rotation.y=yaw; camera.rotation.x=pitch;
- weaponGroup.rotation.z=Math.sin(now*0.005)*0.03;
- hands.position.y=Math.sin(now*0.01)*0.03;
- if(shooting){
-  if(weapon===1 && now-lastShot>100){shootAK(); lastShot=now;}
-  if(weapon===2 && now-lastShot>400){shootGlock(); lastShot=now;}
-  if(weapon===3 && now-lastShot>400){knifeAttack(); lastShot=now;}
- }
- bots.forEach(b=>{
-  const d = camera.position.clone().sub(b.position);
-  if(d.length()<40){ d.normalize(); b.position.add(d.multiplyScalar(dt*1.2));}
- });
- document.getElementById("enemyCount").textContent=bots.length;
- renderer.render(scene,camera);
-}
-animate();
+        // --- Ініціалізація ---
+        init();
+        animate();
 
-/* ================= START ================= */
-document.getElementById("start").onclick=()=>{
- document.body.requestPointerLock();
- document.getElementById("start").style.display="none";
-};
-window.onresize=()=>{
- camera.aspect = innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
-};
-</script>
+        function init() {
+            // 1. Сцена та Камера
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB); // Блакитне небо
+            scene.fog = new THREE.Fog(0x87CEEB, 0, 750);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+            camera.position.y = 10; // Висота очей
+
+            // 2. Світло
+            const light = new THREE.HemisphereLight(0xeeeeff, 0x777788, 0.75);
+            light.position.set(0.5, 1, 0.75);
+            scene.add(light);
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(50, 200, 100);
+            scene.add(dirLight);
+
+            // 3. Управління (Pointer Lock)
+            controls = new PointerLockControls(camera, document.body);
+
+            const blocker = document.getElementById('blocker');
+            const instructions = document.getElementById('instructions');
+
+            instructions.addEventListener('click', function () {
+                controls.lock();
+                // Активуємо аудіо при першому кліку
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            });
+
+            controls.addEventListener('lock', function () {
+                instructions.style.display = 'none';
+                blocker.style.display = 'none';
+            });
+
+            controls.addEventListener('unlock', function () {
+                blocker.style.display = 'flex';
+                instructions.style.display = '';
+            });
+
+            scene.add(controls.getObject());
+
+            // 4. Обробка клавіш
+            const onKeyDown = function (event) {
+                switch (event.code) {
+                    case 'ArrowUp':
+                    case 'KeyW': moveForward = true; break;
+                    case 'ArrowLeft':
+                    case 'KeyA': moveLeft = true; break;
+                    case 'ArrowDown':
+                    case 'KeyS': moveBackward = true; break;
+                    case 'ArrowRight':
+                    case 'KeyD': moveRight = true; break;
+                    case 'Space': 
+                        if (canJump === true) velocity.y += 350; 
+                        canJump = false; 
+                        break;
+                    case 'Digit1': switchWeapon(0); break;
+                    case 'Digit2': switchWeapon(1); break;
+                    case 'Digit3': switchWeapon(2); break;
+                }
+            };
+
+            const onKeyUp = function (event) {
+                switch (event.code) {
+                    case 'ArrowUp':
+                    case 'KeyW': moveForward = false; break;
+                    case 'ArrowLeft':
+                    case 'KeyA': moveLeft = false; break;
+                    case 'ArrowDown':
+                    case 'KeyS': moveBackward = false; break;
+                    case 'ArrowRight':
+                    case 'KeyD': moveRight = false; break;
+                }
+            };
+
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            
+            // Стрільба мишею
+            document.addEventListener('mousedown', function(e) {
+                if (controls.isLocked) {
+                    isFiring = true;
+                    // Для напівавтоматики (Glock/Ніж) стріляємо одразу при натисканні
+                    if (weapons[activeWeaponIndex].type !== 'auto') {
+                        attemptFire();
+                    }
+                }
+            });
+            document.addEventListener('mouseup', function() {
+                isFiring = false;
+            });
+
+            // 5. Створення світу
+            buildWorld();
+
+            // 6. Створення зброї (візуалізація)
+            createWeaponModels();
+
+            // 7. Рендерер
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            window.addEventListener('resize', onWindowResize);
+
+            // Raycaster для стрільби
+            raycaster = new THREE.Raycaster();
+        }
+
+        function buildWorld() {
+            // Підлога
+            const floorGeometry = new THREE.PlaneGeometry(2000, 2000, 100, 100);
+            floorGeometry.rotateX(-Math.PI / 2);
+            
+            // Проста текстура "сітка" кольорами вершин
+            const position = floorGeometry.attributes.position;
+            const colorsFloor = [];
+            const color = new THREE.Color();
+
+            for (let i = 0, l = position.count; i < l; i++) {
+                color.setHSL(Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75);
+                colorsFloor.push(color.r, color.g, color.b);
+            }
+            floorGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colorsFloor, 3));
+
+            const floorMaterial = new THREE.MeshBasicMaterial({ vertexColors: true });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            scene.add(floor);
+            objects.push(floor);
+
+            // Будівлі / Стіни
+            const boxGeometry = new THREE.BoxGeometry(20, 20, 20);
+            // Розміщуємо 50 випадкових будівель
+            for (let i = 0; i < 50; i++) {
+                const boxMaterial = new THREE.MeshPhongMaterial({ color: Math.random() * 0xffffff, flatShading: true });
+                const box = new THREE.Mesh(boxGeometry, boxMaterial);
+                
+                // Випадкова позиція
+                box.position.x = Math.floor(Math.random() * 20 - 10) * 20;
+                box.position.y = 10; // Половина висоти, щоб стояв на землі
+                box.position.z = Math.floor(Math.random() * 20 - 10) * 20;
+
+                // Не ставити на старті (0,0,0)
+                if (Math.abs(box.position.x) < 20 && Math.abs(box.position.z) < 20) continue;
+
+                scene.add(box);
+                objects.push(box);
+                walls.push(box); // Додаємо в список для фізичної колізії
+            }
+        }
+
+        function createWeaponModels() {
+            weaponMeshGroup = new THREE.Group();
+            camera.add(weaponMeshGroup); // Прив'язуємо зброю до камери
+
+            // Позиція зброї на екрані
+            weaponMeshGroup.position.set(0.5, -0.5, -1);
+
+            // Моделі для кожної зброї (прості форми)
+            
+            // 1. AK-47 (Довгий прямокутник + магазин)
+            const akGroup = new THREE.Group();
+            const akBody = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 1), new THREE.MeshLambertMaterial({ color: 0x5D4037 }));
+            const akBarrel = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.4), new THREE.MeshLambertMaterial({ color: 0x111111 }));
+            akBarrel.position.z = -0.6;
+            const akMag = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.1), new THREE.MeshLambertMaterial({ color: 0x222222 }));
+            akMag.position.set(0, -0.1, -0.2);
+            akMag.rotation.x = 0.3;
+            
+            akGroup.add(akBody, akBarrel, akMag);
+            akGroup.userData = { id: 0 };
+            weaponMeshGroup.add(akGroup);
+
+            // 2. Glock (Короткий чорний блок)
+            const glockGroup = new THREE.Group();
+            const glockBody = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.4), new THREE.MeshLambertMaterial({ color: 0x111111 }));
+            glockGroup.add(glockBody);
+            glockGroup.visible = false;
+            glockGroup.userData = { id: 1 };
+            weaponMeshGroup.add(glockGroup);
+
+            // 3. Ніж (Плоский срібний блок)
+            const knifeGroup = new THREE.Group();
+            const knifeBlade = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.1, 0.5), new THREE.MeshStandardMaterial({ color: 0xCCCCCC, metalness: 0.8, roughness: 0.2 }));
+            knifeBlade.position.z = -0.2;
+            const knifeHandle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 0.3), new THREE.MeshLambertMaterial({ color: 0x330000 }));
+            knifeHandle.position.z = 0.2;
+            
+            knifeGroup.add(knifeBlade, knifeHandle);
+            knifeGroup.rotation.x = 1.5; // Тримаємо як ніж
+            knifeGroup.rotation.y = -0.5;
+            knifeGroup.position.set(0.2, -0.2, 0); // Трохи ближче
+            knifeGroup.visible = false;
+            knifeGroup.userData = { id: 2 };
+            weaponMeshGroup.add(knifeGroup);
+        }
+
+        function switchWeapon(index) {
+            if (index < 0 || index >= weapons.length) return;
+            activeWeaponIndex = index;
+
+            // Оновлюємо UI
+            document.getElementById('weapon-name').innerText = weapons[index].name;
+
+            // Оновлюємо модель
+            weaponMeshGroup.children.forEach(child => {
+                child.visible = (child.userData.id === index);
+            });
+        }
+
+        // --- Логіка стрільби ---
+        function attemptFire() {
+            const now = performance.now();
+            const weapon = weapons[activeWeaponIndex];
+
+            if (now - lastFireTime > weapon.rate) {
+                fireWeapon(weapon);
+                lastFireTime = now;
+            }
+        }
+
+        function fireWeapon(weapon) {
+            // 1. Анімація віддачі
+            const currentWeaponMesh = weaponMeshGroup.children.find(c => c.userData.id === activeWeaponIndex);
+            if(currentWeaponMesh) {
+                currentWeaponMesh.position.z += weapon.recoil; // Відштовхнути назад
+                
+                // Ніж має анімацію удару
+                if (weapon.type === 'melee') {
+                     currentWeaponMesh.rotation.x -= 0.5;
+                     setTimeout(() => currentWeaponMesh.rotation.x += 0.5, 100);
+                }
+            }
+
+            // 2. Звук
+            playShootSound(weapon.type);
+
+            // 3. Raycast (логіка влучання)
+            if (weapon.type !== 'melee') {
+                raycaster.setFromCamera( new THREE.Vector2(0,0), camera ); // Центр екрану
+                const intersects = raycaster.intersectObjects(objects);
+
+                if (intersects.length > 0) {
+                    const hit = intersects[0];
+                    // Ефект влучання (маленька сфера)
+                    createHitEffect(hit.point);
+                    
+                    // Тут можна додати логіку пошкодження ворогів у майбутньому
+                    if (hit.object.geometry.type === 'BoxGeometry') {
+                        // Зміна кольору блоку при влучанні
+                        hit.object.material.color.setHex(Math.random() * 0xffffff);
+                    }
+                }
+            }
+        }
+
+        function createHitEffect(position) {
+            const geom = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+            const mat = new THREE.MeshBasicMaterial({ color: 0xFF0000 });
+            const mesh = new THREE.Mesh(geom, mat);
+            mesh.position.copy(position);
+            scene.add(mesh);
+
+            // Видалити через 500мс
+            setTimeout(() => {
+                scene.remove(mesh);
+                geom.dispose();
+                mat.dispose();
+            }, 500);
+        }
+
+        // --- Синтезатор звуків (Web Audio API) ---
+        function playShootSound(type) {
+            if (audioCtx.state === 'suspended') return;
+
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'melee') {
+                // Звук "свист"
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else {
+                // Звук пострілу (шум)
+                const bufferSize = audioCtx.sampleRate * 0.1; // 0.1 секунди
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                
+                // Фільтр частот
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 1000;
+
+                noise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (type === 'auto' ? 0.1 : 0.2));
+                
+                noise.start();
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- Перевірка колізій гравця ---
+        function checkCollision(position) {
+            const playerRadius = 2; // Радіус гравця (приблизний)
+            
+            for (let i = 0; i < walls.length; i++) {
+                const wall = walls[i];
+                // Отримуємо межі стіни (AABB)
+                const bbox = new THREE.Box3().setFromObject(wall);
+                
+                // Перевірка, чи точка всередині box (з урахуванням розміру гравця)
+                if (position.x > bbox.min.x - playerRadius && position.x < bbox.max.x + playerRadius &&
+                    position.z > bbox.min.z - playerRadius && position.z < bbox.max.z + playerRadius) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // --- Головний цикл гри ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = performance.now();
+
+            if (controls.isLocked === true) {
+                const delta = (time - prevTime) / 1000;
+
+                // 1. Оновлення швидкості (інерція)
+                velocity.x -= velocity.x * 10.0 * delta;
+                velocity.z -= velocity.z * 10.0 * delta;
+                velocity.y -= 9.8 * 100.0 * delta; // Гравітація
+
+                // 2. Обчислення напрямку
+                direction.z = Number(moveForward) - Number(moveBackward);
+                direction.x = Number(moveRight) - Number(moveLeft);
+                direction.normalize(); // Нормалізація для діагонального руху
+
+                // 3. Застосування швидкості
+                if (moveForward || moveBackward) velocity.z -= direction.z * 400.0 * delta;
+                if (moveLeft || moveRight) velocity.x -= direction.x * 400.0 * delta;
+
+                // 4. Обробка колізій (передбачення руху)
+                controls.moveRight(-velocity.x * delta);
+                if (checkCollision(controls.getObject().position)) {
+                    controls.moveRight(velocity.x * delta); // Відкат
+                    velocity.x = 0;
+                }
+
+                controls.moveForward(-velocity.z * delta);
+                if (checkCollision(controls.getObject().position)) {
+                    controls.moveForward(velocity.z * delta); // Відкат
+                    velocity.z = 0;
+                }
+
+                // 5. Рух по Y (стрибки)
+                controls.getObject().position.y += (velocity.y * delta);
+
+                if (controls.getObject().position.y < 10) {
+                    velocity.y = 0;
+                    controls.getObject().position.y = 10;
+                    canJump = true;
+                }
+
+                // 6. Логіка автоматичної зброї
+                if (isFiring && weapons[activeWeaponIndex].type === 'auto') {
+                    attemptFire();
+                }
+
+                // 7. Повернення зброї після віддачі (Smooth Lerp)
+                const currentWeaponMesh = weaponMeshGroup.children.find(c => c.userData.id === activeWeaponIndex);
+                if (currentWeaponMesh) {
+                    // Повертаємо Z до початкового стану (-1 для всієї групи, але локально деталі можуть бути зміщені)
+                    // Тут ми змінюємо локальну позицію mesh всередині weaponMeshGroup, але простіше контролювати позицію групи
+                    // Але в цій реалізації ми рухали 'currentWeaponMesh'. Початкова Z різна для зброї.
+                    
+                    // Спрощена логіка: якщо це ніж, інша база, якщо пістолет - інша.
+                    // Для простоти, ми просто плавно зменшуємо зміщення, яке додали.
+                    if (weapons[activeWeaponIndex].type !== 'melee') {
+                        if (currentWeaponMesh.position.z > 0) {
+                             currentWeaponMesh.position.z -= delta * 1; 
+                             if (currentWeaponMesh.position.z < 0) currentWeaponMesh.position.z = 0;
+                        }
+                    }
+                }
+            }
+
+            prevTime = time;
+
+            renderer.render(scene, camera);
+        }
+    </script>
 </body>
 </html>
