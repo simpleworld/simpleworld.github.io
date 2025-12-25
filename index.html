@@ -1,4 +1,3 @@
-vortex, [07.11.2025 22:06]
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -159,7 +158,6 @@ button.send{
 }
 button.send:hover{background:var(--clr-accent-hover)}
 
-vortex, [07.11.2025 22:06]
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:2000}
 .modal{
@@ -254,8 +252,7 @@ vortex, [07.11.2025 22:06]
       <li><b>1.15</b> Тролінг модерації — <i>мут 2 год</i></li>
     </ul>
 
-vortex, [07.11.2025 22:06]
-<h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
+    <h3 style="color:var(--clr-accent);margin-top:30px">🔹 2. ІГРОВИЙ ПРОЦЕС</h3>
     <ul>
       <li><b>2.1</b> Чити / взломки — <i>бан 30-50 днів</i></li>
       <li><b>2.2</b> Автоклікери / макроси — <i>бан 7 днів</i></li>
@@ -328,8 +325,7 @@ vortex, [07.11.2025 22:06]
     </div>
   </div>
 
-vortex, [07.11.2025 22:06]
-<div style="background:#222;padding:12px;border-radius:8px;">
+  <div style="background:#222;padding:12px;border-radius:8px;">
     <h4 style="color:var(--clr-accent);margin-bottom:8px">Швидкі дії</h4>
     <button onclick="alert('Рестарт сервера (демо)')" style="padding:8px 14px;background:#ff4444;border:none;border-radius:8px;color:#fff;cursor:pointer">Рестарт (демо)</button>
   </div>
@@ -402,7 +398,6 @@ DONATES.forEach(d => {
   donateGrid.appendChild(card);
 });
 
-vortex, [07.11.2025 22:06]
 /* ---------- Модальне замовлення ---------- */
 const modalBackdrop = document.getElementById('modal-backdrop');
 const orderForm = document.getElementById('order-form');
@@ -441,7 +436,7 @@ orderForm.addEventListener('submit', function(e){
   const orderObj = {
     id: data.get('_form_id'),
     package: data.get('package'),
-    nick: data.get('nick')  '',
+    nick: data.get('nick') || '',
     name: data.get('name'),
     contact: data.get('contact'),
     payment: data.get('payment'),
@@ -457,7 +452,7 @@ orderForm.addEventListener('submit', function(e){
   })
   .then(res => res.json())
   .then(json => {
-    if (json.success === 'true'  json.success === true) {
+    if (json.success === 'true' || json.success === true) {
       alert('Замовлення успішно надіслано! Ми скоро звʼяжемося.');
       modalBackdrop.style.display = 'none';
       orderForm.reset();
@@ -480,10 +475,9 @@ orderForm.addEventListener('submit', function(e){
   });
 });
 
-vortex, [07.11.2025 22:06]
 /* ---------- LocalStorage: зберігання замовлень ---------- */
 function saveOrderLocal(order){
-  const list = JSON.parse(localStorage.getItem('sw_orders')  '[]');
+  const list = JSON.parse(localStorage.getItem('sw_orders') || '[]');
   list.unshift(order); // нові в початок
   localStorage.setItem('sw_orders', JSON.stringify(list.slice(0,200))); // зберігаємо максимум 200
 }
@@ -505,7 +499,7 @@ function showAdmin(show){
 }
 
 function updateOrdersView(){
-  const arr = JSON.parse(localStorage.getItem('sw_orders')  '[]');
+  const arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
   ordersList.innerHTML = '';
   ordersCount.textContent = arr.length;
   if (arr.length === 0){
@@ -517,7 +511,7 @@ function updateOrdersView(){
     div.className = 'order-item';
     div.innerHTML = `
       <strong>${o.package}</strong> — <span style="color:var(--clr-text-sub)">${o.created}</span>
-      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick  '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
+      <div style="margin-top:6px">Нік: ${escapeHtml(o.nick || '—')} | Імʼя: ${escapeHtml(o.name)} | Контакт: ${escapeHtml(o.contact)}</div>
       <div style="margin-top:6px">Оплата: ${escapeHtml(o.payment)}</div>
       <div style="margin-top:8px"><button data-id="${o.id}" style="padding:6px 8px;border-radius:6px;background:#00bfa6;border:none;cursor:pointer;color:#000;font-weight:700">Позначити як виконане</button></div>
     `;
@@ -530,7 +524,7 @@ function updateOrdersView(){
 }
 
 function markOrderDone(id){
-  let arr = JSON.parse(localStorage.getItem('sw_orders')  '[]');
+  let arr = JSON.parse(localStorage.getItem('sw_orders') || '[]');
   arr = arr.filter(o=>o.id !== id);
   localStorage.setItem('sw_orders', JSON.stringify(arr));
   updateOrdersView();
@@ -580,7 +574,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 const burger=document.getElementById('burger'), nav=document.querySelector('header nav');
 if (burger) burger.onclick=()=>nav.classList.toggle('open');
 
-vortex, [07.11.2025 22:06]
 /* ---------- SPA навігація ---------- */
 const links=document.querySelectorAll('.nav-link'), sections=document.querySelectorAll('main section');
 function show(id){sections.forEach(s=>s.classList.toggle('active',s.id===id));links.forEach(l=>l.classList.toggle('active',l.hash==='#'+id));nav.classList.remove('open');}
