@@ -1,547 +1,221 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PHANTOM OPS: FIXED ENGINE</title>
-    <style>
-        :root { --main: #ffae00; --bg: #050505; }
-        body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', monospace; user-select: none; }
-        
-        /* UI */
-        #ui-layer { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
-        .interactive { pointer-events: auto; }
-        
-        #crosshair {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 4px; height: 4px; background: #0f0; border-radius: 50%;
-            box-shadow: 0 0 4px #0f0; transition: width 0.1s;
-        }
-        
-        #hud { position: absolute; bottom: 20px; left: 20px; right: 20px; display: flex; justify-content: space-between; color: white; text-shadow: 1px 1px 0 #000; }
-        .hud-box { background: rgba(0,0,0,0.6); padding: 15px; border-left: 3px solid var(--main); }
-        .big-text { font-size: 32px; font-weight: 900; }
-        .label { font-size: 12px; color: #aaa; letter-spacing: 1px; }
+<meta charset="UTF-8">
+<title>Web FPS Shooter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+html,body{margin:0;padding:0;overflow:hidden;background:#000;font-family:Arial}
+#ui{position:fixed;inset:0;pointer-events:none}
+#crosshair{
+position:absolute;left:50%;top:50%;
+width:20px;height:20px;
+margin-left:-10px;margin-top:-10px;
+}
+#crosshair:before,#crosshair:after{
+content:"";position:absolute;background:#fff
+}
+#crosshair:before{left:9px;top:0;width:2px;height:20px}
+#crosshair:after{top:9px;left:0;width:20px;height:2px}
 
-        /* MENU */
-        #menu { 
-            position: absolute; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20;
-        }
-        h1 { color: var(--main); font-size: 48px; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 5px; }
-        button {
-            background: transparent; color: white; border: 1px solid #444; padding: 15px 40px;
-            font-size: 18px; cursor: pointer; transition: 0.2s; margin: 5px; text-transform: uppercase;
-        }
-        button:hover { background: var(--main); color: black; border-color: var(--main); }
-        .hidden { display: none !important; }
-
-        /* SKINS PANEL */
-        #skins-panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
-        .skin-btn { border: 1px solid #333; padding: 10px; font-size: 12px; width: 100px; text-align: center; }
-        .skin-btn.active { border-color: #0f0; color: #0f0; }
-    </style>
+#mobile{
+position:absolute;inset:0;display:none;pointer-events:auto
+}
+.joy{
+position:absolute;width:120px;height:120px;
+border-radius:50%;background:rgba(255,255,255,.1);
+border:2px solid rgba(255,255,255,.3)
+}
+.knob{
+width:40px;height:40px;border-radius:50%;
+background:rgba(255,255,255,.6);
+position:absolute;left:40px;top:40px
+}
+#moveJoy{left:20px;bottom:20px}
+#lookJoy{right:20px;bottom:20px}
+#fireBtn{
+position:absolute;right:30px;bottom:180px;
+width:80px;height:80px;border-radius:50%;
+background:rgba(255,0,0,.4);
+border:2px solid #fff;color:#fff;font-size:14px
+}
+</style>
 </head>
 <body>
 
-    <div id="ui-layer">
-        <div id="crosshair"></div>
-        <div id="hud" class="hidden">
-            <div class="hud-box">
-                <div class="big-text">100</div>
-                <div class="label">HEALTH</div>
-            </div>
-            <div class="hud-box" style="text-align: right;">
-                <div class="big-text" id="ammo-disp">30 / 90</div>
-                <div class="label" id="weapon-disp">RIFLE</div>
-            </div>
-        </div>
-    </div>
+<div id="ui">
+  <div id="crosshair"></div>
+  <div id="mobile">
+    <div id="moveJoy" class="joy"><div class="knob"></div></div>
+    <div id="lookJoy" class="joy"><div class="knob"></div></div>
+    <button id="fireBtn">FIRE</button>
+  </div>
+</div>
 
-    <div id="menu" class="interactive">
-        <h1>Phantom Ops</h1>
-        <div style="color: #666; margin-bottom: 20px;">ENGINE v2.0 // STABLE CAM</div>
-        <button onclick="Game.start()">DEPLOY</button>
-        <div id="skins-panel">
-            </div>
-        <p style="color:#444; font-size: 12px; margin-top: 20px;">WASD - Move | R - Reload | 1/2/3 - Weapon</p>
-    </div>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+<script>
+/* =========================
+   BASIC SETUP
+========================= */
+const canvas = document.createElement("canvas");
+canvas.style.width="100%";canvas.style.height="100%";
+document.body.appendChild(canvas);
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+const engine = new BABYLON.Engine(canvas,true);
+const scene = new BABYLON.Scene(engine);
+scene.clearColor = new BABYLON.Color3(0.5,0.7,1);
 
-        // --- CONFIG ---
-        const CFG = {
-            fov: 75,
-            sens: 0.002,
-            camHeight: 1.7,
-            recoilRecovery: 0.1, // Speed of return
-            swayAmount: 0.02,
-            swaySpeed: 4
-        };
+/* =========================
+   LIGHT + GROUND
+========================= */
+const light = new BABYLON.HemisphericLight("l",new BABYLON.Vector3(0,1,0),scene);
+light.intensity = 0.9;
 
-        // --- STATE ---
-        const State = {
-            isLocked: false,
-            skin: { awp: 'def', glock: 'def', knife: 'def' },
-            activeWeapon: 'glock', // 'awp', 'glock', 'knife'
-            lastShot: 0
-        };
+const ground = BABYLON.MeshBuilder.CreateGround("g",{width:200,height:200},scene);
+const gmat = new BABYLON.StandardMaterial("gm",scene);
+gmat.diffuseColor = new BABYLON.Color3(0.2,0.6,0.2);
+ground.material = gmat;
 
-        const WEAPONS = {
-            glock: { name: 'G-18', rpm: 150, dmg: 25, recoil: 0.04, range: 40, type: 'pistol' },
-            awp:   { name: 'AWP', rpm: 1200, dmg: 100, recoil: 0.2, range: 200, type: 'rifle' },
-            knife: { name: 'KNIFE', rpm: 500, dmg: 50, recoil: 0.0, range: 2, type: 'melee' }
-        };
+/* =========================
+   PLAYER + CAMERA
+========================= */
+const camera = new BABYLON.UniversalCamera("cam",new BABYLON.Vector3(0,2,0),scene);
+camera.attachControl(canvas,true);
+camera.speed = 0.4;
+camera.angularSensibility = 4000;
+camera.minZ = 0.1;
+scene.activeCamera = camera;
 
-        // --- THREE JS VARS ---
-        let scene, renderer, controls;
-        let cameraContainer, camera; // Container = Aiming, Camera = Recoil/Shake
-        let weaponRig, currentMesh;
-        let raycaster = new THREE.Raycaster();
-        
-        // Physics
-        let moveState = { f:0, b:0, l:0, r:0, j:0 };
-        let velocity = new THREE.Vector3();
-        let onGround = false;
-        let prevTime = performance.now();
+/* =========================
+   SIMPLE MAP
+========================= */
+for(let i=0;i<20;i++){
+ let box = BABYLON.MeshBuilder.CreateBox("b",{size:3},scene);
+ box.position.set(
+  Math.random()*100-50,
+  1.5,
+  Math.random()*100-50
+ );
+}
 
-        // Recoil System
-        let recoilParams = {
-            currentPitch: 0,
-            targetPitch: 0
-        };
+/* =========================
+   INPUT
+========================= */
+const keys = {};
+window.addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);
+window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
 
-        // World
-        const objects = [];
-        const particles = [];
+/* =========================
+   MOBILE DETECT
+========================= */
+const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+if(isMobile){
+ document.getElementById("mobile").style.display="block";
+}
 
-        init();
-        animate();
+/* =========================
+   JOYSTICKS
+========================= */
+let moveVec={x:0,y:0},lookVec={x:0,y:0};
 
-        function init() {
-            // 1. SCENE
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x050505);
-            scene.fog = new THREE.FogExp2(0x050505, 0.02);
+function setupJoy(id,vec){
+ const joy=document.getElementById(id);
+ const knob=joy.querySelector(".knob");
+ let active=false,start={x:0,y:0};
+ joy.addEventListener("touchstart",e=>{
+  active=true;
+  start.x=e.touches[0].clientX;
+  start.y=e.touches[0].clientY;
+ });
+ joy.addEventListener("touchmove",e=>{
+  if(!active)return;
+  let dx=e.touches[0].clientX-start.x;
+  let dy=e.touches[0].clientY-start.y;
+  dx=Math.max(-40,Math.min(40,dx));
+  dy=Math.max(-40,Math.min(40,dy));
+  knob.style.left=40+dx+"px";
+  knob.style.top=40+dy+"px";
+  vec.x=dx/40;vec.y=dy/40;
+ });
+ joy.addEventListener("touchend",()=>{
+  active=false;
+  knob.style.left="40px";knob.style.top="40px";
+  vec.x=0;vec.y=0;
+ });
+}
 
-            // 2. CAMERA HIERARCHY (CRITICAL FIX)
-            // Container handles Yaw/Navigation (PointerLock)
-            cameraContainer = new THREE.Object3D();
-            cameraContainer.position.y = CFG.camHeight;
-            scene.add(cameraContainer);
+if(isMobile){
+ setupJoy("moveJoy",moveVec);
+ setupJoy("lookJoy",lookVec);
+}
 
-            // Actual Camera handles Pitch Recoil & Sway
-            camera = new THREE.PerspectiveCamera(CFG.fov, window.innerWidth/window.innerHeight, 0.05, 1000);
-            cameraContainer.add(camera);
+/* =========================
+   SHOOTING
+========================= */
+let canShoot=true;
 
-            // 3. RENDERER
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            document.body.prepend(renderer.domElement);
+function shoot(){
+ if(!canShoot)return;
+ canShoot=false;
+ setTimeout(()=>canShoot=true,120);
 
-            // 4. CONTROLS
-            // We lock the container, not the camera directly, to separate recoil rotation
-            controls = new PointerLockControls(cameraContainer, document.body);
-            
-            // Fix PointerLockControls creating its own object. We want it to control our container.
-            // Standard ThreeJS PointerLockControls adds the camera to the scene. 
-            // We need to override or use it carefully. 
-            // Better method: Let PointerLock control an empty object, and we copy rotation?
-            // No, easiest way: PointerLockControls controls 'cameraContainer'.
-            
-            controls.addEventListener('lock', () => { 
-                State.isLocked = true; 
-                document.getElementById('menu').classList.add('hidden');
-                document.getElementById('hud').classList.remove('hidden');
-            });
-            controls.addEventListener('unlock', () => { 
-                State.isLocked = false; 
-                document.getElementById('menu').classList.remove('hidden');
-                document.getElementById('hud').classList.add('hidden');
-            });
+ const ray = camera.getForwardRay(100);
+ const hit = scene.pickWithRay(ray,m=>m.name==="bot");
+ if(hit.hit){
+  hit.pickedMesh.health-=50;
+  if(hit.pickedMesh.health<=0){
+   hit.pickedMesh.dispose();
+  }
+ }
+}
 
-            // 5. LIGHTS
-            const amb = new THREE.AmbientLight(0xffffff, 0.4);
-            scene.add(amb);
-            const dir = new THREE.DirectionalLight(0xffddaa, 1);
-            dir.position.set(10, 20, 10);
-            dir.castShadow = true;
-            scene.add(dir);
+window.addEventListener("mousedown",()=>!isMobile && shoot());
+if(isMobile){
+ document.getElementById("fireBtn").onclick=shoot;
+}
 
-            // 6. WORLD GENERATION
-            createMap();
+/* =========================
+   BOTS
+========================= */
+function spawnBot(){
+ const bot = BABYLON.MeshBuilder.CreateBox("bot",{size:2},scene);
+ bot.position.set(Math.random()*80-40,1,Math.random()*80-40);
+ bot.health=100;
+ setInterval(()=>{
+  if(!bot.isDisposed()){
+   const dir=camera.position.subtract(bot.position).normalize();
+   bot.position.addInPlace(dir.scale(0.03));
+  }
+ },50);
+}
+setInterval(spawnBot,3000);
 
-            // 7. WEAPON RIG SETUP (CRITICAL FIX)
-            createWeaponRig();
+/* =========================
+   GAME LOOP
+========================= */
+scene.onBeforeRenderObservable.add(()=>{
+ if(!isMobile){
+  let forward=(keys["w"]?1:0)-(keys["s"]?1:0);
+  let side=(keys["d"]?1:0)-(keys["a"]?1:0);
+  camera.moveWithCollisions(
+   camera.getDirection(new BABYLON.Vector3(side,0,forward)).scale(0.2)
+  );
+ }else{
+  camera.rotation.y+=lookVec.x*0.05;
+  camera.rotation.x+=lookVec.y*0.05;
+  camera.moveWithCollisions(
+   camera.getDirection(new BABYLON.Vector3(moveVec.x,0,moveVec.y)).scale(0.15)
+  );
+ }
+});
 
-            // 8. EVENTS
-            window.addEventListener('resize', onResize);
-            document.addEventListener('keydown', onKey(true));
-            document.addEventListener('keyup', onKey(false));
-            document.addEventListener('mousedown', () => {
-                if(State.isLocked) fireWeapon();
-            });
+/* =========================
+   RUN
+========================= */
+engine.runRenderLoop(()=>scene.render());
+window.addEventListener("resize",()=>engine.resize());
+</script>
 
-            // Init Menu
-            initSkinMenu();
-        }
-
-        // --- ARCHITECTURE: WEAPON RIG ---
-        function createWeaponRig() {
-            weaponRig = new THREE.Group();
-            
-            // IMPORTANT: Add to CAMERA, not scene
-            camera.add(weaponRig);
-
-            // SCALE HACK: Make it tiny so it doesn't clip walls
-            weaponRig.scale.set(0.05, 0.05, 0.05);
-            
-            // Position relative to camera (down and right)
-            weaponRig.position.set(0.02, -0.02, -0.05); 
-            
-            // Create Weapons
-            createGlock();
-            createAWP();
-            createKnife();
-            
-            // Default
-            switchWeapon('glock');
-        }
-
-        // --- HELPER: Create material that renders on top ---
-        function getWeaponMat(color, rough = 0.5) {
-            return new THREE.MeshStandardMaterial({
-                color: color,
-                roughness: rough,
-                metalness: 0.2,
-                depthTest: false, // MAGIC: Renders on top of everything
-                depthWrite: false // Don't write to depth buffer
-            });
-        }
-
-        function createGlock() {
-            const g = new THREE.Group();
-            g.userData.id = 'glock';
-
-            // Arm
-            const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 1), getWeaponMat(0xccaa88));
-            arm.rotation.x = Math.PI/2.5; arm.position.set(0.2, -0.4, 0.5);
-            
-            // Gun
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.4), getWeaponMat(0x111111));
-            const slide = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.08, 0.4), getWeaponMat(0x333333, 0.2));
-            slide.position.y = 0.06;
-            slide.userData.part = 'skin'; // Mark for skinning
-
-            g.add(arm, body, slide);
-            g.visible = false;
-            weaponRig.add(g);
-        }
-
-        function createAWP() {
-            const g = new THREE.Group();
-            g.userData.id = 'awp';
-
-            // Hands (Two hands for rifle)
-            const rArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 1), getWeaponMat(0xccaa88));
-            rArm.rotation.x = Math.PI/2.2; rArm.position.set(0.2, -0.4, 0.6);
-            
-            const lArm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 1), getWeaponMat(0xccaa88));
-            lArm.rotation.set(Math.PI/2, 0, 0.5); lArm.position.set(-0.3, -0.4, 0.2);
-
-            // Gun Body
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 1.2), getWeaponMat(0x224422));
-            body.userData.part = 'skin';
-            const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 1), getWeaponMat(0x000000));
-            barrel.rotation.x = Math.PI/2; barrel.position.set(0, 0.05, -0.6);
-            const scope = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 0.4), getWeaponMat(0x000000));
-            scope.rotation.x = Math.PI/2; scope.position.set(0, 0.18, 0.1);
-
-            g.add(rArm, lArm, body, barrel, scope);
-            g.visible = false;
-            weaponRig.add(g);
-        }
-
-        function createKnife() {
-            const g = new THREE.Group();
-            g.userData.id = 'knife';
-
-            const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 1), getWeaponMat(0xccaa88));
-            arm.rotation.x = Math.PI/2; arm.position.set(0.2, -0.4, 0.5);
-
-            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.4, 0.02), getWeaponMat(0xcccccc, 0.1));
-            blade.position.set(0, 0.3, 0);
-            blade.userData.part = 'skin';
-            
-            const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.15, 0.06), getWeaponMat(0x222222));
-
-            // Rotate knife to holding position
-            const holder = new THREE.Group();
-            holder.add(blade, handle);
-            holder.rotation.x = -1.5;
-            holder.position.set(0.2, -0.1, -0.3);
-
-            g.add(arm, holder);
-            g.visible = false;
-            weaponRig.add(g);
-        }
-
-        // --- GAME LOGIC ---
-
-        function switchWeapon(id) {
-            State.activeWeapon = id;
-            weaponRig.children.forEach(c => {
-                c.visible = (c.userData.id === id);
-                if(c.visible) currentMesh = c;
-            });
-            
-            // Apply Skin
-            const skinName = State.skin[id];
-            let color = 0x333333;
-            if(id === 'awp') color = skinName === 'red' ? 0xff0000 : 0x224422;
-            if(id === 'glock') color = skinName === 'gold' ? 0xffaa00 : 0x333333;
-            if(id === 'knife') color = skinName === 'blue' ? 0x0000ff : 0xcccccc;
-
-            currentMesh.traverse(child => {
-                if(child.userData.part === 'skin') {
-                    child.material.color.setHex(color);
-                }
-            });
-
-            // HUD
-            document.getElementById('weapon-disp').innerText = WEAPONS[id].name;
-            document.getElementById('ammo-disp').innerText = id === 'knife' ? '--' : '30/90';
-        }
-
-        function fireWeapon() {
-            const now = performance.now();
-            const wData = WEAPONS[State.activeWeapon];
-            
-            if(now - State.lastShot < 60000/wData.rpm) return;
-            State.lastShot = now;
-
-            // 1. RECOIL APPLICATION (Target Pitch)
-            // We add to target, logic loop handles smoothing
-            recoilParams.targetPitch += wData.recoil; 
-            
-            // 2. ANIMATION
-            // Kick weapon back (Z axis)
-            currentMesh.position.z += 0.2; // Visual only
-
-            // 3. SHOOTING
-            if(State.activeWeapon === 'knife') {
-                // Swing anim
-                currentMesh.rotation.x -= 0.5;
-                setTimeout(() => currentMesh.rotation.x += 0.5, 100);
-            } else {
-                // Raycast
-                shootRay(wData.range);
-                
-                // Muzzle Flash
-                const flash = new THREE.PointLight(0xffaa00, 1, 2);
-                flash.position.set(0, 0, -0.5);
-                currentMesh.add(flash);
-                setTimeout(() => currentMesh.remove(flash), 50);
-            }
-        }
-
-        function shootRay(range) {
-            // Shoots from center of camera
-            raycaster.setFromCamera(new THREE.Vector2(0,0), camera);
-            
-            // Get precise Muzzle Position for Tracer (Converting from Local weapon space to World)
-            const muzzlePos = new THREE.Vector3(0, 0.1, -1.0);
-            if(currentMesh) {
-                // Approximate muzzle location relative to current weapon
-                muzzlePos.applyMatrix4(currentMesh.matrixWorld);
-            } else {
-                muzzlePos.copy(camera.position); // Fallback
-            }
-
-            const intersects = raycaster.intersectObjects(objects);
-            
-            let targetPoint = new THREE.Vector3();
-            // Default target (max range)
-            targetPoint.copy(raycaster.ray.direction).multiplyScalar(range).add(raycaster.ray.origin);
-
-            if(intersects.length > 0 && intersects[0].distance < range) {
-                targetPoint.copy(intersects[0].point);
-                createImpact(targetPoint, intersects[0].face.normal);
-            }
-
-            createTracer(muzzlePos, targetPoint);
-        }
-
-        function createTracer(start, end) {
-            const geo = new THREE.BufferGeometry().setFromPoints([start, end]);
-            const mat = new THREE.LineBasicMaterial({ color: 0xffffaa, linewidth: 2 });
-            const line = new THREE.Line(geo, mat);
-            scene.add(line);
-            
-            // Animate fade
-            let frames = 0;
-            const anim = () => {
-                frames++;
-                mat.opacity = 1 - (frames/10);
-                mat.transparent = true;
-                if(frames < 10) requestAnimationFrame(anim);
-                else scene.remove(line);
-            };
-            anim();
-        }
-
-        function createImpact(pos, normal) {
-            const p = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), new THREE.MeshBasicMaterial({color:0xff0000}));
-            p.position.copy(pos);
-            scene.add(p);
-            setTimeout(()=>scene.remove(p), 1000);
-        }
-
-        // --- PHYSICS & LOOP ---
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const time = performance.now();
-            const delta = (time - prevTime) / 1000;
-            prevTime = time;
-
-            if(State.isLocked) {
-                // 1. MOVEMENT (Standard WASD)
-                velocity.x -= velocity.x * 10.0 * delta;
-                velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= 9.8 * 2.0 * delta; // Gravity
-
-                const speed = 15.0;
-                const dir = new THREE.Vector3();
-                dir.z = Number(moveState.f) - Number(moveState.b);
-                dir.x = Number(moveState.r) - Number(moveState.l);
-                dir.normalize();
-
-                if (moveState.f || moveState.b) velocity.z -= dir.z * speed * delta;
-                if (moveState.l || moveState.r) velocity.x -= dir.x * speed * delta;
-
-                controls.moveRight(-velocity.x * delta);
-                controls.moveForward(-velocity.z * delta);
-                cameraContainer.position.y += (velocity.y * delta);
-
-                if (cameraContainer.position.y < CFG.camHeight) {
-                    velocity.y = 0;
-                    cameraContainer.position.y = CFG.camHeight;
-                    onGround = true;
-                }
-                
-                // 2. RECOIL & SWAY LOGIC (The Core Fix)
-                
-                // A. Smoothly interpolate current pitch towards target pitch
-                // But target pitch decays to 0
-                recoilParams.targetPitch *= (1 - CFG.recoilRecovery); // Decay impulse
-                recoilParams.currentPitch = THREE.MathUtils.lerp(recoilParams.currentPitch, recoilParams.targetPitch, 0.2);
-                
-                // B. Weapon Sway (Movement based)
-                const isMoving = velocity.length() > 1;
-                const swayX = isMoving ? Math.sin(time * 0.01) * 0.002 : 0;
-                const swayY = isMoving ? Math.cos(time * 0.02) * 0.002 : 0;
-
-                // C. Apply to CAMERA (Local Rotation)
-                // Note: We only rotate X (Pitch) for recoil, and slight Z/Y for sway
-                camera.rotation.x = recoilParams.currentPitch + swayY;
-                camera.rotation.y = swayX;
-                camera.rotation.z = swayX * 0.5;
-
-                // D. Weapon visual recovery (Kickback)
-                if(currentMesh) {
-                    currentMesh.position.z = THREE.MathUtils.lerp(currentMesh.position.z, 0, 0.1);
-                }
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        function createMap() {
-            // Floor
-            const floor = new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshStandardMaterial({color:0x222222}));
-            floor.rotation.x = -Math.PI/2;
-            scene.add(floor);
-            
-            // Walls
-            const boxGeo = new THREE.BoxGeometry(1,1,1);
-            const boxMat = new THREE.MeshStandardMaterial({color:0x555555});
-            
-            for(let i=0; i<50; i++) {
-                const h = 2 + Math.random()*4;
-                const mesh = new THREE.Mesh(boxGeo, boxMat);
-                mesh.position.set((Math.random()-0.5)*80, h/2, (Math.random()-0.5)*80);
-                mesh.scale.set(3, h, 3);
-                
-                // Spawn clear
-                if(mesh.position.distanceTo(new THREE.Vector3(0,0,0)) > 5) {
-                    scene.add(mesh);
-                    objects.push(mesh);
-                }
-            }
-        }
-
-        // --- INPUTS ---
-        function onKey(down) {
-            return (e) => {
-                switch(e.code) {
-                    case 'KeyW': moveState.f = down; break;
-                    case 'KeyS': moveState.b = down; break;
-                    case 'KeyA': moveState.l = down; break;
-                    case 'KeyD': moveState.r = down; break;
-                    case 'Space': if(down && onGround) { velocity.y = 10; onGround = false; } break;
-                    case 'Digit1': if(down) switchWeapon('awp'); break;
-                    case 'Digit2': if(down) switchWeapon('glock'); break;
-                    case 'Digit3': if(down) switchWeapon('knife'); break;
-                    case 'KeyR': if(down) { 
-                        // Visual reload anim
-                        if(currentMesh) {
-                            currentMesh.rotation.x = -1;
-                            setTimeout(()=>currentMesh.rotation.x=0, 500);
-                        }
-                    } break;
-                }
-            };
-        }
-
-        function onResize() {
-            camera.aspect = window.innerWidth/window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function initSkinMenu() {
-            const p = document.getElementById('skins-panel');
-            const opts = [
-                { id: 'awp', val: 'def', name: 'AWP Default' },
-                { id: 'awp', val: 'red', name: 'AWP RedLine' },
-                { id: 'glock', val: 'def', name: 'Glock Def' },
-                { id: 'glock', val: 'gold', name: 'Glock Gold' },
-            ];
-            opts.forEach(o => {
-                const b = document.createElement('button');
-                b.className = 'skin-btn';
-                b.innerText = o.name;
-                b.onclick = () => {
-                    State.skin[o.id] = o.val;
-                    if(State.activeWeapon === o.id) switchWeapon(o.id);
-                };
-                p.appendChild(b);
-            });
-        }
-
-        window.Game = { start: () => controls.lock() };
-    </script>
 </body>
 </html>
