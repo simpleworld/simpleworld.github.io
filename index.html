@@ -3,597 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS AI - Автономний Асистент</title>
+    <title>OMEGA AI | Autonomous Neural System</title>
     <style>
         /* =========================================
-           CSS СТИЛІ (ОФОРМЛЕННЯ)
+           CSS: СУЧАСНИЙ AI ІНТЕРФЕЙС
            ========================================= */
         :root {
-            --bg-color: #0b0e14;
-            --chat-bg: #151a23;
-            --primary-color: #00f2ff; /* Неоновий блакитний */
-            --accent-color: #7000ff;  /* Неоновий фіолетовий */
-            --text-color: #e0e6ed;
-            --user-msg-bg: #2b3b55;
-            --ai-msg-bg: #1e2532;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            --font-code: 'Consolas', 'Courier New', monospace;
+            --bg-dark: #0b0e14;
+            --bg-panel: #151a23;
+            --primary: #00f2ff;
+            --accent: #7000ff;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --user-msg: #2563eb;
+            --ai-msg: #1e293b;
+            --code-bg: #0d1117;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, sans-serif;
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
             overflow: hidden;
         }
 
-        /* ГОЛОВНИЙ КОНТЕЙНЕР */
-        .main-container {
-            width: 100%;
-            max-width: 900px;
-            height: 95vh;
-            background-color: var(--chat-bg);
-            border-radius: 20px;
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+        .app-container { display: flex; width: 100%; height: 100%; }
+
+        /* БОКОВА ПАНЕЛЬ */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* ХЕДЕР */
-        .chat-header {
             padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(21, 26, 35, 0.95);
-            border-radius: 20px 20px 0 0;
-            z-index: 10;
+            transition: 0.3s;
         }
 
-        .ai-status {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--primary-color);
+        .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+        .logo-orb {
+            width: 24px; height: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary-color);
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px var(--primary);
+            animation: pulse 3s infinite;
         }
 
-        .ai-info h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            margin: 0;
+        .modes { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .mode-btn {
+            background: transparent; border: 1px solid transparent;
+            color: var(--text-muted); padding: 12px; text-align: left;
+            border-radius: 10px; cursor: pointer; display: flex; gap: 10px;
+        }
+        .mode-btn.active { 
+            background: rgba(0, 242, 255, 0.1); 
+            border-color: var(--primary); color: var(--primary); 
         }
 
-        .status-text {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.5);
+        /* ЧАТ */
+        .chat-interface { flex: 1; display: flex; flex-direction: column; position: relative; }
+        
+        .top-bar {
+            padding: 15px 25px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(21, 26, 35, 0.8); backdrop-filter: blur(10px);
         }
 
-        /* ВІКНО ЧАТУ */
-        .chat-window {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            scroll-behavior: smooth;
+        .chat-history {
+            flex: 1; overflow-y: auto; padding: 30px;
+            display: flex; flex-direction: column; gap: 20px;
         }
 
-        .chat-window::-webkit-scrollbar {
-            width: 6px;
-        }
-        .chat-window::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .chat-window::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-
-        /* ПОВІДОМЛЕННЯ */
-        .message {
-            display: flex;
-            gap: 15px;
-            max-width: 85%;
-            opacity: 0;
-            animation: fadeIn 0.3s forwards;
-        }
-
-        .message.user-message {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
-
-        .message.ai-message {
-            align-self: flex-start;
-        }
+        .message { display: flex; gap: 15px; max-width: 850px; width: 100%; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .message.user-message { flex-direction: row-reverse; }
 
         .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.8rem;
-            flex-shrink: 0;
+            width: 38px; height: 38px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; flex-shrink: 0;
         }
+        .ai-message .avatar { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; }
+        .user-message .avatar { background: #475569; color: #fff; }
 
-        .ai-message .avatar {
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            color: #fff;
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        .content {
+            background: var(--ai-msg); padding: 15px 20px; border-radius: 15px;
+            line-height: 1.6; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
+        .user-message .content { background: var(--user-msg); border-bottom-right-radius: 2px; }
+        .ai-message .content { border-bottom-left-radius: 2px; border-left: 3px solid var(--primary); }
 
-        .user-message .avatar {
-            background: #444;
-            color: #ccc;
-        }
+        /* ГЕНЕРАЦІЯ ЗОБРАЖЕНЬ ТА КОДУ */
+        canvas { border-radius: 8px; margin-top: 10px; max-width: 100%; border: 1px solid var(--primary); }
+        pre { background: var(--code-bg); padding: 15px; border-radius: 8px; margin: 10px 0; overflow-x: auto; border: 1px solid #30363d; color: #79c0ff; font-family: 'Consolas', monospace; }
 
-        .text {
-            padding: 15px;
-            border-radius: 15px;
-            line-height: 1.5;
-            font-size: 0.95rem;
-            position: relative;
-            word-wrap: break-word;
-        }
-
-        .ai-message .text {
-            background-color: var(--ai-msg-bg);
-            border-left: 3px solid var(--primary-color);
-            border-top-right-radius: 15px;
-            border-bottom-right-radius: 15px;
-            border-bottom-left-radius: 0;
-        }
-
-        .user-message .text {
-            background-color: var(--user-msg-bg);
-            border-right: 3px solid #fff;
-            border-top-left-radius: 15px;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 0;
-        }
-
-        /* Стилі для коду */
-        .code-block {
-            background: #000;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: var(--font-code);
-            color: #0f0;
-            margin-top: 10px;
-            white-space: pre-wrap;
-            font-size: 0.85rem;
-            border: 1px solid #333;
-        }
-
-        /* ЗОНА ВВЕДЕННЯ */
-        .input-area {
-            padding: 20px;
-            background: rgba(21, 26, 35, 0.95);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 0 0 20px 20px;
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: border-color 0.3s;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: var(--primary-color);
-        }
-
+        /* ВВЕДЕННЯ */
+        .input-area { padding: 25px; background: var(--bg-panel); border-top: 1px solid var(--border); }
+        .input-wrapper { max-width: 850px; margin: 0 auto; position: relative; }
         textarea {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: var(--font-main);
-            font-size: 1rem;
-            resize: none;
-            outline: none;
-            max-height: 100px;
-            padding: 10px 5px;
+            width: 100%; background: #0d1117; border: 1px solid var(--border);
+            border-radius: 12px; color: #fff; padding: 15px 60px 15px 15px;
+            font-size: 1rem; resize: none; height: 56px; outline: none; transition: 0.3s;
+        }
+        textarea:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 242, 255, 0.2); }
+        
+        #send-btn {
+            position: absolute; right: 10px; top: 10px;
+            background: var(--primary); border: none; width: 36px; height: 36px;
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
 
-        button {
-            background: transparent;
-            border: none;
-            color: var(--primary-color);
-            cursor: pointer;
-            padding: 0 10px;
-            transition: transform 0.2s, color 0.2s;
-        }
+        .loader { display: none; margin-bottom: 10px; color: var(--primary); font-size: 0.8rem; text-align: center; }
 
-        button:hover {
-            color: #fff;
-            transform: scale(1.1);
-        }
-
-        /* АНІМАЦІЇ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; box-shadow: 0 0 5px var(--primary-color); }
-            50% { opacity: 0.5; box-shadow: 0 0 2px var(--primary-color); }
-            100% { opacity: 1; box-shadow: 0 0 5px var(--primary-color); }
-        }
-
-        .typing-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: #aaa;
-            border-radius: 50%;
-            margin-right: 3px;
-            animation: typing 1.4s infinite ease-in-out both;
-        }
-
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 242, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 242, 255, 0); } }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <header class="chat-header">
-            <div class="ai-status">
-                <div class="status-dot"></div>
-                <div class="ai-info">
-                    <h2>NEXUS AI</h2>
-                    <span class="status-text">Система онлайн • Готовий до роботи</span>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand"><div class="logo-orb"></div><h2>OMEGA AI</h2></div>
+            <nav class="modes">
+                <button class="mode-btn active" onclick="app.setMode('chat')">💬 Чат-асистент</button>
+                <button class="mode-btn" onclick="app.setMode('code')">💻 Кодинг-режим</button>
+                <button class="mode-btn" onclick="app.setMode('image')">🎨 Генерація Image</button>
+            </nav>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">System: v4.0.2 Local Node</div>
+        </aside>
+
+        <main class="chat-interface">
+            <header class="top-bar"><h3 id="mode-display">General Intelligence</h3><button onclick="app.clear()" style="background:none; border:none; color:red; cursor:pointer;">Clear</button></header>
+            <div class="chat-history" id="chat-history"></div>
+            <div class="input-area">
+                <div id="loader" class="loader">OMEGA обробляє нейрони...</div>
+                <div class="input-wrapper">
+                    <textarea id="user-input" placeholder="Запитайте щось..."></textarea>
+                    <button id="send-btn">🚀</button>
                 </div>
             </div>
-        </header>
-
-        <div class="chat-window" id="chatWindow">
-            <div class="message ai-message">
-                <div class="avatar">AI</div>
-                <div class="text">Вітаю. Я Nexus AI — ваш автономний цифровий асистент. Я можу писати код, відповідати на запитання, грати в ігри або просто спілкуватися. Чим можу допомогти?</div>
-            </div>
-        </div>
-
-        <div class="input-area">
-            <div class="input-wrapper">
-                <textarea id="userInput" placeholder="Введіть запит тут..." rows="1"></textarea>
-                <button id="sendBtn">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </div>
-        </div>
+        </main>
     </div>
 
     <script>
         /**
          * =========================================
-         * NEXUS AI ENGINE (LOGIC)
-         * Чистий JavaScript, повна автономність
+         * OMEGA AI ENGINE: LOGIC & GENERATION
          * =========================================
          */
 
-        // Стан "пам'яті" бота
-        let memory = {
-            userName: null,
-            lastTopic: null,
-            awaitingAnswer: null, // Для ігор
-            gameTarget: null
+        class OmegaEngine {
+            constructor() {
+                this.history = [];
+                this.context = "general";
+                this.knowledge = this.getKnowledgeBase();
+            }
+
+            async process(input) {
+                const query = input.toLowerCase();
+                this.history.push({ role: 'user', text: input });
+
+                // 1. IMAGE GENERATION DETECTION
+                if (query.includes('намалюй') || query.includes('image') || query.includes('картинку')) {
+                    return { type: 'image', prompt: query.replace(/намалюй|image|картинку/g, '').trim() };
+                }
+
+                // 2. MATH DETECTION
+                if (/[\d\+\-\*\/\=]/.test(query) && !/[a-z]/.test(query)) {
+                    try {
+                        const res = eval(query.replace(/[^-()\d/*+.]/g, ''));
+                        return { type: 'text', text: `Результат обчислення: **${res}**. Я використав вбудований математичний модуль.` };
+                    } catch(e) {}
+                }
+
+                // 3. NLP & PATTERN MATCHING
+                for (let category in this.knowledge) {
+                    if (this.knowledge[category].triggers.some(t => query.includes(t))) {
+                        const responses = this.knowledge[category].answers;
+                        return { type: 'text', text: responses[Math.floor(Math.random() * responses.length)] };
+                    }
+                }
+
+                // 4. COMPLEX PROGRAMMING ANSWERS
+                if (query.includes('код') || query.includes('js') || query.includes('python')) {
+                    return this.generateCode(query);
+                }
+
+                return { type: 'text', text: "Я проаналізував ваш запит. Моїх поточних локальних даних недостатньо для точної відповіді, але я можу спробувати змоделювати логічне рішення або згенерувати код/зображення для цього." };
+            }
+
+            generateCode(q) {
+                if (q.includes('python')) return { type: 'text', text: "Ось приклад на Python:\n```python\ndef omega_ai():\n    print('Hello World')\n\nomega_ai()```" };
+                return { type: 'text', text: "Ось базовий шаблон JS:\n```javascript\nconst system = 'Omega';\nconsole.log(system + ' online');\n```" };
+            }
+
+            getKnowledgeBase() {
+                return {
+                    hello: { triggers: ['привіт', 'хай', 'вітаю'], answers: ['Привіт! Я OMEGA. Чим допоможу?', 'Вітаю! Системи онлайн.'] },
+                    who: { triggers: ['хто ти', 'твоє ім', 'що ти таке'], answers: ['Я OMEGA — автономний ШІ, що працює повністю у вашому браузері.', 'Я нейро-симуляція, створена на чистому JS.'] },
+                    capabilities: { triggers: ['що вмієш', 'можливості'], answers: ['Я можу: писати код, рахувати, генерувати зображення через Canvas та аналізути текст.'] }
+                };
+            }
+        }
+
+        class VisualCortex {
+            generate(prompt, ctx) {
+                const w = 500, h = 300;
+                ctx.canvas.width = w; ctx.canvas.height = h;
+                
+                // Background
+                const grad = ctx.createLinearGradient(0,0, w, h);
+                grad.addColorStop(0, '#0f172a'); grad.addColorStop(1, '#334155');
+                ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+
+                // Procedural Art
+                for(let i=0; i<40; i++) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = `hsla(${Math.random()*360}, 70%, 50%, 0.5)`;
+                    ctx.lineWidth = Math.random()*3;
+                    if(prompt.includes('коло')) ctx.arc(Math.random()*w, Math.random()*h, Math.random()*50, 0, Math.PI*2);
+                    else ctx.rect(Math.random()*w, Math.random()*h, Math.random()*100, Math.random()*100);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = "#fff"; ctx.font = "14px Arial";
+                ctx.fillText(`OMEGA Gen: ${prompt}`, 20, 280);
+            }
+        }
+
+        const app = {
+            engine: new OmegaEngine(),
+            visual: new VisualCortex(),
+            
+            init() {
+                document.getElementById('send-btn').onclick = () => this.send();
+                document.getElementById('user-input').onkeydown = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); } };
+                this.addMsg('ai', 'Система OMEGA ініціалізована. Чекаю на ваші вказівки.');
+            },
+
+            async send() {
+                const input = document.getElementById('user-input');
+                const val = input.value.trim();
+                if(!val) return;
+
+                this.addMsg('user', val);
+                input.value = '';
+                document.getElementById('loader').style.display = 'block';
+
+                const response = await this.engine.process(val);
+                
+                setTimeout(() => {
+                    document.getElementById('loader').style.display = 'none';
+                    if(response.type === 'image') {
+                        const canvas = document.createElement('canvas');
+                        this.visual.generate(response.prompt, canvas.getContext('2d'));
+                        this.addMsg('ai', `Згенеровано візуалізацію для: "${response.prompt}"`);
+                        document.querySelector('.ai-message:last-child .content').appendChild(canvas);
+                    } else {
+                        this.addMsg('ai', response.text);
+                    }
+                }, 800);
+            },
+
+            addMsg(role, text) {
+                const hist = document.getElementById('chat-history');
+                const div = document.createElement('div');
+                div.className = `message ${role}-message`;
+                
+                // Markdown-like code formatting
+                let html = text.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+                div.innerHTML = `<div class="avatar">${role==='ai'?'Ω':'U'}</div><div class="content">${html}</div>`;
+                hist.appendChild(div);
+                hist.scrollTop = hist.scrollHeight;
+            },
+
+            setMode(m) {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                event.target.classList.add('active');
+                document.getElementById('mode-display').innerText = m.toUpperCase() + " ENGINE ACTIVE";
+            },
+
+            clear() { document.getElementById('chat-history').innerHTML = ''; }
         };
 
-        // --- БАЗА ЗНАНЬ (Knowledge Base) ---
-        const knowledgeBase = [
-            {
-                // Привітання
-                triggers: [/(привіт|вітаю|добрий день|здоров|хай)/i],
-                responses: [
-                    "Вітаю! Як я можу допомогти вам сьогодні?",
-                    "Привіт. Готовий до роботи. Яке у вас завдання?",
-                    "Радий вас чути. Чим можу бути корисним?"
-                ],
-                type: "simple"
-            },
-            {
-                // Самоідентифікація
-                triggers: [/(хто ти|що ти таке|твоє ім.?я|як тебе звати)/i],
-                responses: [
-                    "Я Nexus AI, автономна інтелектуальна система, що працює безпосередньо у вашому браузері.",
-                    "Мене звати Nexus. Я штучний інтелект, створений для допомоги з кодом, текстами та аналізом даних."
-                ],
-                type: "simple"
-            },
-            {
-                // Програмування: HTML
-                triggers: [/(як|напиши|створи).*html.*(структура|код|файл)/i, /(приклад|код).*html/i],
-                responses: [
-                    "Ось базова структура HTML5 документу:\n```html\n<!DOCTYPE html>\n<html lang=\"uk\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>\n```\nЦей код створює пусту сторінку з заголовком."
-                ],
-                type: "code"
-            },
-            {
-                // Програмування: JS Loop
-                triggers: [/(цикл|loop).*js|javascript/i, /як зробити цикл/i],
-                responses: [
-                    "У JavaScript найпопулярнішим є цикл `for`. Ось приклад:\n```javascript\n// Виведе числа від 0 до 4\nfor (let i = 0; i < 5; i++) {\n    console.log('Ітерація:', i);\n}\n```"
-                ],
-                type: "code"
-            },
-            {
-                // Програмування: Python
-                triggers: [/(код|напиши).*python/i, /як.*python/i],
-                responses: [
-                    "Звісно. Ось простий приклад функції на Python:\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('User'))\n```"
-                ],
-                type: "code"
-            },
-            {
-                // Математика (тригер)
-                triggers: [/(порахуй|скільки буде|обчисли|калькулятор)/i],
-                action: "calculate",
-                type: "func"
-            },
-            {
-                // Час і дата
-                triggers: [/(котра година|який час|дата|який день)/i],
-                action: "datetime",
-                type: "func"
-            },
-            {
-                // Ігри
-                triggers: [/(давай пограємо|гра|загадай число)/i],
-                responses: ["Давай пограємо в 'Вгадай число'. Я загадав число від 1 до 10. Спробуй вгадати!"],
-                action: "startGame",
-                type: "game"
-            },
-            {
-                // Філософія
-                triggers: [/(сенс життя|що таке любов|чи ти живий)/i],
-                responses: [
-                    "Це складне питання. Як AI, я не маю почуттів, але розумію концепції. Сенс життя кожен визначає для себе сам.",
-                    "Я мислю (обробляю дані), отже я існую... у вашому браузері.",
-                    "Любов — це складна біохімічна реакція у людей."
-                ],
-                type: "simple"
-            },
-            {
-                // Збереження імені
-                triggers: [/(мене звати|моє ім.?я) (.+)/i],
-                action: "saveName",
-                type: "func"
-            },
-            {
-                // Згадування імені
-                triggers: [/(як мене звати|хто я)/i],
-                action: "getName",
-                type: "func"
-            }
-        ];
-
-        const fallbackResponses = [
-            "Я не зовсім зрозумів ваше питання. Можете перефразувати?",
-            "Цікаво, але мені потрібно більше деталей, щоб відповісти точно.",
-            "Мої алгоритми ще навчаються. Спробуйте запитати про програмування або математику.",
-            "Хм, я не певен щодо цього. Можливо, поговоримо про технології?"
-        ];
-
-        // --- DOM ЕЛЕМЕНТИ ---
-        const chatWindow = document.getElementById('chatWindow');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-
-        // --- ОСНОВНА ЛОГІКА ---
-
-        window.onload = () => { userInput.focus(); };
-
-        sendBtn.addEventListener('click', handleUserMessage);
-
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleUserMessage();
-            }
-        });
-
-        function handleUserMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            addMessage(text, 'user');
-            userInput.value = '';
-            userInput.style.height = 'auto'; // Скидання висоти
-
-            showTypingIndicator();
-
-            // Імітація затримки мислення
-            setTimeout(() => {
-                removeTypingIndicator();
-                const response = generateAIResponse(text);
-                addMessage(response.text, 'ai', response.isCode);
-            }, 800 + Math.random() * 1000);
-        }
-
-        function generateAIResponse(input) {
-            const cleanInput = input.toLowerCase();
-
-            // Перевірка гри
-            if (memory.awaitingAnswer === 'guessNumber') {
-                const num = parseInt(cleanInput);
-                if (isNaN(num)) return { text: "Будь ласка, введіть число." };
-                
-                memory.awaitingAnswer = null;
-                const target = memory.gameTarget;
-                if (num === target) return { text: `Точно! Це було число ${target}. Ти виграв! 🎉` };
-                else return { text: `Ні, я загадав число ${target}. Пощастить наступного разу!` };
-            }
-
-            // Пошук у базі знань
-            for (const entry of knowledgeBase) {
-                const match = entry.triggers.some(trigger => trigger.test(cleanInput));
-                if (match) {
-                    if (entry.type === 'func' || entry.type === 'game') {
-                        return executeAction(entry.action, cleanInput, input);
-                    }
-                    const reply = getRandom(entry.responses);
-                    return { text: reply, isCode: entry.type === 'code' };
-                }
-            }
-
-            // Математика (без явного тригера)
-            if (/[\d]+\s*[\+\-\*\/]/.test(cleanInput)) {
-                try {
-                    const mathExpression = cleanInput.match(/[\d\.\s\+\-\*\/%\(\)]+/)[0];
-                    // eslint-disable-next-line no-new-func
-                    const result = new Function('return ' + mathExpression)();
-                    return { text: `Результат: ${result}` };
-                } catch (e) {}
-            }
-
-            return { text: getRandom(fallbackResponses) };
-        }
-
-        function executeAction(action, cleanInput, originalInput) {
-            if (action === 'calculate') {
-                const match = originalInput.match(/(\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(\d+(?:\.\d+)?)/);
-                if (match) {
-                    const a = parseFloat(match[1]);
-                    const op = match[2];
-                    const b = parseFloat(match[3]);
-                    let res = 0;
-                    if(op==='+') res=a+b; else if(op==='-') res=a-b; else if(op==='*') res=a*b; else if(op==='/') res=b!==0?(a/b).toFixed(2):"Помилка";
-                    return { text: `Я порахував: ${a} ${op} ${b} = ${res}` };
-                }
-                return { text: "Напишіть приклад, наприклад: 2 + 2" };
-            }
-
-            if (action === 'datetime') {
-                const now = new Date();
-                return { text: `Зараз: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}` };
-            }
-
-            if (action === 'startGame') {
-                memory.awaitingAnswer = 'guessNumber';
-                memory.gameTarget = Math.floor(Math.random() * 10) + 1;
-                return { text: "Я загадав число від 1 до 10. Введи свій варіант!" };
-            }
-
-            if (action === 'saveName') {
-                const match = originalInput.match(/(мене звати|моє ім.?я)\s+(.+)/i);
-                if (match && match[2]) {
-                    memory.userName = match[2];
-                    return { text: `Приємно познайомитись, ${memory.userName}.` };
-                }
-            }
-
-            if (action === 'getName') {
-                return memory.userName ? { text: `Тебе звати ${memory.userName}.` } : { text: "Ми ще не знайомі." };
-            }
-
-            return { text: "Помилка системи." };
-        }
-
-        // --- UI ФУНКЦІЇ ---
-        function addMessage(text, sender, isCode = false) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', `${sender}-message`);
-
-            const avatarDiv = document.createElement('div');
-            avatarDiv.classList.add('avatar');
-            avatarDiv.textContent = sender === 'ai' ? 'AI' : 'U';
-
-            const textDiv = document.createElement('div');
-            textDiv.classList.add('text');
-
-            if (isCode) {
-                const parts = text.split('```');
-                parts.forEach((part, index) => {
-                    if (index % 2 === 1) {
-                        const code = document.createElement('div');
-                        code.className = 'code-block';
-                        code.textContent = part.trim();
-                        textDiv.appendChild(code);
-                    } else {
-                        const p = document.createElement('p');
-                        p.textContent = part;
-                        textDiv.appendChild(p);
-                    }
-                });
-            } else {
-                textDiv.textContent = text;
-            }
-
-            msgDiv.appendChild(avatarDiv);
-            msgDiv.appendChild(textDiv);
-            chatWindow.appendChild(msgDiv);
-            scrollToBottom();
-        }
-
-        function showTypingIndicator() {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message', 'ai-message');
-            msgDiv.id = 'typingIndicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar';
-            avatar.textContent = 'AI';
-
-            const textDiv = document.createElement('div');
-            textDiv.className = 'text';
-            textDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-
-            msgDiv.appendChild(avatar);
-            msgDiv.appendChild(textDiv);
-            chatWindow.appendChild(msgDiv);
-            scrollToBottom();
-        }
-
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
-        }
-
-        function scrollToBottom() {
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
-
-        function getRandom(array) {
-            return array[Math.floor(Math.random() * array.length)];
-        }
+        app.init();
     </script>
 </body>
 </html>
