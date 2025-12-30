@@ -2,1021 +2,598 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JS FPS: Standoff Logic Core</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS AI - Автономний Асистент</title>
     <style>
-        /* --- CORE UI STYLES --- */
-        body { margin: 0; overflow: hidden; background: #111; font-family: 'Segoe UI', sans-serif; user-select: none; -webkit-user-select: none; }
-        #game-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        
-        /* LAYOUTS */
-        .screen { position: absolute; width: 100%; height: 100%; display: flex; flex-direction: column; pointer-events: none; }
-        .interactive { pointer-events: auto; }
-        .hidden { display: none !important; }
-        
-        /* MENU STYLES */
-        #menu-screen { background: rgba(15, 15, 20, 0.95); color: #fff; z-index: 10; align-items: center; justify-content: center; }
-        .panel { background: rgba(30, 30, 40, 0.9); border: 1px solid #445; padding: 20px; border-radius: 8px; width: 80%; max-width: 800px; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; max-height: 90%; overflow-y: auto; }
-        
-        h1, h2 { margin: 0 0 10px 0; color: #fb1; text-transform: uppercase; letter-spacing: 2px; }
-        .stats-bar { display: flex; justify-content: space-between; background: #000; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; }
-        .currency { color: #4f4; }
-        
-        .btn { background: #222; border: 1px solid #555; color: #eee; padding: 12px; cursor: pointer; text-transform: uppercase; font-weight: bold; transition: 0.2s; }
-        .btn:hover { background: #333; border-color: #fb1; }
-        .btn-primary { background: #b60; border-color: #e80; color: #fff; font-size: 1.2em; }
-        .btn-primary:hover { background: #d70; }
-        
-        /* GRID FOR ITEMS */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
-        .item-card { background: #1a1a1a; border: 1px solid #333; padding: 10px; text-align: center; cursor: pointer; position: relative; }
-        .item-card:hover { border-color: #888; }
-        .item-card.selected { border-color: #fb1; box-shadow: 0 0 10px rgba(255, 187, 17, 0.2); }
-        .rarity-common { border-bottom: 3px solid #ccc; }
-        .rarity-rare { border-bottom: 3px solid #48f; }
-        .rarity-legendary { border-bottom: 3px solid #fb1; }
-        
-        /* HUD */
-        #hud-screen { z-index: 5; justify-content: space-between; padding: 20px; box-sizing: border-box; }
-        .hud-top { display: flex; justify-content: space-between; width: 100%; }
-        .hud-bottom { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto; }
-        
-        .stat-box { background: rgba(0,0,0,0.5); padding: 10px 20px; color: #fff; font-size: 24px; font-weight: bold; border-left: 4px solid #fff; }
-        .hp-box { border-color: #f33; }
-        .armor-box { border-color: #33f; }
-        .ammo-box { border-color: #fb1; text-align: right; }
-        
-        #crosshair { position: absolute; top: 50%; left: 50%; width: 0; height: 0; transform: translate(-50%, -50%); }
-        .ch-part { position: absolute; background: #0f0; }
-        .ch-h { width: 10px; height: 2px; top: -1px; left: -5px; }
-        .ch-v { width: 2px; height: 10px; top: -5px; left: -1px; }
-        
-        #killfeed { position: absolute; top: 20px; right: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .feed-item { background: rgba(0,0,0,0.6); color: #fff; padding: 5px 10px; border-radius: 4px; font-size: 14px; animation: fadeOut 4s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; } }
+        /* =========================================
+           CSS СТИЛІ (ОФОРМЛЕННЯ)
+           ========================================= */
+        :root {
+            --bg-color: #0b0e14;
+            --chat-bg: #151a23;
+            --primary-color: #00f2ff; /* Неоновий блакитний */
+            --accent-color: #7000ff;  /* Неоновий фіолетовий */
+            --text-color: #e0e6ed;
+            --user-msg-bg: #2b3b55;
+            --ai-msg-bg: #1e2532;
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-code: 'Consolas', 'Courier New', monospace;
+        }
 
-        /* MOBILE CONTROLS */
-        #mobile-controls { display: none; position: absolute; width: 100%; height: 100%; z-index: 8; pointer-events: none; }
-        .joystick-zone { position: absolute; width: 40%; height: 50%; bottom: 0; pointer-events: auto; }
-        #stick-left-zone { left: 0; }
-        #stick-right-zone { right: 0; }
-        .action-btn { position: absolute; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; width: 60px; height: 60px; pointer-events: auto; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; }
-        .action-btn:active { background: rgba(255,187,17,0.5); }
-        #btn-shoot { bottom: 80px; right: 20px; width: 70px; height: 70px; border-color: #f55; background: rgba(255,0,0,0.1); }
-        #btn-reload { bottom: 30px; right: 100px; }
-        #btn-switch { bottom: 110px; right: 100px; }
-        #btn-jump { bottom: 160px; right: 20px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        /* SHOP IN GAME */
-        #ingame-shop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 15; background: rgba(20,20,20,0.95); padding: 20px; border: 2px solid #fb1; display: none; pointer-events: auto; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ГОЛОВНИЙ КОНТЕЙНЕР */
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            background-color: var(--chat-bg);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ХЕДЕР */
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(21, 26, 35, 0.95);
+            border-radius: 20px 20px 0 0;
+            z-index: 10;
+        }
+
+        .ai-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        .ai-info h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ВІКНО ЧАТУ */
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-window::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-window::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-window::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* ПОВІДОМЛЕННЯ */
+        .message {
+            display: flex;
+            gap: 15px;
+            max-width: 85%;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .message.user-message {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.ai-message {
+            align-self: flex-start;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .ai-message .avatar {
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+        }
+
+        .user-message .avatar {
+            background: #444;
+            color: #ccc;
+        }
+
+        .text {
+            padding: 15px;
+            border-radius: 15px;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .ai-message .text {
+            background-color: var(--ai-msg-bg);
+            border-left: 3px solid var(--primary-color);
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
+            border-bottom-left-radius: 0;
+        }
+
+        .user-message .text {
+            background-color: var(--user-msg-bg);
+            border-right: 3px solid #fff;
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 0;
+        }
+
+        /* Стилі для коду */
+        .code-block {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: var(--font-code);
+            color: #0f0;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            border: 1px solid #333;
+        }
+
+        /* ЗОНА ВВЕДЕННЯ */
+        .input-area {
+            padding: 20px;
+            background: rgba(21, 26, 35, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: border-color 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            max-height: 100px;
+            padding: 10px 5px;
+        }
+
+        button {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0 10px;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        button:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        /* АНІМАЦІЇ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; box-shadow: 0 0 5px var(--primary-color); }
+            50% { opacity: 0.5; box-shadow: 0 0 2px var(--primary-color); }
+            100% { opacity: 1; box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        .typing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #aaa;
+            border-radius: 50%;
+            margin-right: 3px;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div id="game-container"></div>
-
-    <div id="menu-screen" class="screen interactive">
-        <div class="panel">
-            <h1>FPS Project: Core</h1>
-            <div class="stats-bar">
-                <span>Гроші: <span id="menu-money" class="currency">$0</span></span>
-                <span>Рівень: 1</span>
+    <div class="main-container">
+        <header class="chat-header">
+            <div class="ai-status">
+                <div class="status-dot"></div>
+                <div class="ai-info">
+                    <h2>NEXUS AI</h2>
+                    <span class="status-text">Система онлайн • Готовий до роботи</span>
+                </div>
             </div>
-            
-            <button class="btn btn-primary" onclick="Game.startMatch()">ГРАТИ</button>
-            <div style="height: 20px;"></div>
-            
-            <div style="display: flex; gap: 5px;">
-                <button class="btn" onclick="Menu.showTab('inventory')">Інвентар</button>
-                <button class="btn" onclick="Menu.showTab('shop')">Магазин</button>
-                <button class="btn" onclick="Menu.showTab('market')">Ринок</button>
+        </header>
+
+        <div class="chat-window" id="chatWindow">
+            <div class="message ai-message">
+                <div class="avatar">AI</div>
+                <div class="text">Вітаю. Я Nexus AI — ваш автономний цифровий асистент. Я можу писати код, відповідати на запитання, грати в ігри або просто спілкуватися. Чим можу допомогти?</div>
             </div>
+        </div>
 
-            <hr style="width:100%; border: 0; border-top: 1px solid #444;">
-
-            <div id="tab-inventory" class="tab-content">
-                <h2>Ваш Арсенал</h2>
-                <div id="inventory-grid" class="grid"></div>
-            </div>
-
-            <div id="tab-shop" class="tab-content hidden">
-                <h2>Магазин зброї</h2>
-                <div id="shop-grid" class="grid"></div>
-            </div>
-
-            <div id="tab-market" class="tab-content hidden">
-                <h2>Ринок Скінів</h2>
-                <p style="font-size: 12px; color: #888;">Купуйте рідкісні скіни у інших гравців (симуляція)</p>
-                <div id="market-grid" class="grid"></div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="userInput" placeholder="Введіть запит тут..." rows="1"></textarea>
+                <button id="sendBtn">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="hud-screen" class="screen hidden">
-        <div id="killfeed"></div>
-        
-        <div id="crosshair">
-            <div class="ch-part ch-h"></div>
-            <div class="ch-part ch-v"></div>
-        </div>
+    <script>
+        /**
+         * =========================================
+         * NEXUS AI ENGINE (LOGIC)
+         * Чистий JavaScript, повна автономність
+         * =========================================
+         */
 
-        <div class="hud-top">
-            <div class="stat-box"><span id="hud-score-t">0</span> : <span id="hud-score-ct">0</span></div>
-            <div class="stat-box currency" id="hud-money">$800</div>
-        </div>
-
-        <div class="hud-bottom">
-            <div style="display:flex; gap: 10px;">
-                <div class="stat-box hp-box" id="hud-hp">100 HP</div>
-                <div class="stat-box armor-box" id="hud-armor">0 AP</div>
-            </div>
-            <div class="stat-box ammo-box" id="hud-ammo">30 / 90</div>
-        </div>
-        
-        <div style="position: absolute; left: 20px; top: 50%; opacity: 0.5; font-size: 12px;" id="pc-hints">
-            [B] Магазин | [R] Перезарядка | [1-3] Зброя
-        </div>
-    </div>
-
-    <div id="ingame-shop">
-        <h2>Закупівля</h2>
-        <div class="grid" id="ingame-shop-grid" style="width: 500px;"></div>
-        <button class="btn" onclick="Game.toggleShop()" style="margin-top: 10px; width: 100%;">Закрити</button>
-    </div>
-
-    <div id="mobile-controls">
-        <div id="stick-left-zone" class="joystick-zone"></div>
-        <div id="stick-right-zone" class="joystick-zone"></div>
-        
-        <div id="btn-shoot" class="action-btn">FIRE</div>
-        <div id="btn-reload" class="action-btn">R</div>
-        <div id="btn-switch" class="action-btn">SW</div>
-        <div id="btn-jump" class="action-btn">J</div>
-    </div>
-
-<script>
-/**
- * ------------------------------------------------------------------
- * CONFIGURATION & DATA
- * ------------------------------------------------------------------
- */
-const CONFIG = {
-    sensitivity: 0.002,
-    mobileSensitivity: 0.005,
-    gravity: 30,
-    speed: 15,
-    jumpForce: 12
-};
-
-// ЗБРОЯ ТА ХАРАКТЕРИСТИКИ
-const WEAPONS = {
-    KNIFE: { id: 'knife', name: 'N-Knife', type: 'melee', damage: 35, fireRate: 0.5, range: 3, recoil: 0, price: 0, clip: 0 },
-    PISTOL: { id: 'pistol', name: 'G-22', type: 'pistol', damage: 24, fireRate: 0.15, range: 50, recoil: 0.02, spread: 0.02, price: 300, clip: 20, reserve: 100, reloadTime: 1.5 },
-    RIFLE: { id: 'rifle', name: 'AK-47', type: 'rifle', damage: 32, fireRate: 0.1, range: 100, recoil: 0.04, spread: 0.01, price: 2700, clip: 30, reserve: 90, reloadTime: 2.2 },
-    SNIPER: { id: 'sniper', name: 'AWM', type: 'sniper', damage: 110, fireRate: 1.2, range: 200, recoil: 0.1, spread: 0.001, price: 4750, clip: 10, reserve: 30, reloadTime: 3.0 }
-};
-
-// БАЗА СКІНІВ (Кольори замість текстур для оптимізації без ассетів)
-const SKINS = {
-    'default': { name: 'Standard', color: 0x333333, rarity: 'common' },
-    'red_dragon': { name: 'Red Dragon', color: 0xaa0000, rarity: 'legendary', price: 1500 },
-    'blue_camo': { name: 'Blue Camo', color: 0x0044aa, rarity: 'rare', price: 400 },
-    'gold': { name: 'Gold Dust', color: 0xffd700, rarity: 'legendary', price: 5000 },
-    'forest': { name: 'Forest', color: 0x225522, rarity: 'common', price: 50 }
-};
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 1: PERSISTENCE & INVENTORY (LocalStorage)
- * ------------------------------------------------------------------
- */
-const UserData = {
-    money: 1000,
-    inventory: [
-        { uid: 1, weaponId: 'knife', skinId: 'default', equipped: true },
-        { uid: 2, weaponId: 'pistol', skinId: 'default', equipped: true },
-        { uid: 3, weaponId: 'rifle', skinId: 'default', equipped: true }
-    ],
-    
-    load() {
-        const data = localStorage.getItem('fps_save_v1');
-        if (data) {
-            const parsed = JSON.parse(data);
-            this.money = parsed.money;
-            this.inventory = parsed.inventory;
-        }
-        this.updateUI();
-    },
-
-    save() {
-        localStorage.setItem('fps_save_v1', JSON.stringify({
-            money: this.money,
-            inventory: this.inventory
-        }));
-        this.updateUI();
-    },
-
-    updateUI() {
-        document.getElementById('menu-money').innerText = `$${this.money}`;
-        document.getElementById('hud-money').innerText = `$${this.money}`;
-    },
-
-    getEquippedSkin(weaponId) {
-        const item = this.inventory.find(i => i.weaponId === weaponId && i.equipped);
-        return item ? item.skinId : 'default';
-    }
-};
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 2: ENGINE & RENDERER
- * ------------------------------------------------------------------
- */
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB); // Skybox
-scene.fog = new THREE.Fog(0x87CEEB, 20, 100);
-
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-document.getElementById('game-container').appendChild(renderer.domElement);
-
-// Світло
-const ambLight = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambLight);
-const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-dirLight.position.set(50, 100, 50);
-dirLight.castShadow = true;
-scene.add(dirLight);
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 3: INPUT MANAGER (PC + MOBILE)
- * ------------------------------------------------------------------
- */
-const Input = {
-    keys: {},
-    moveVector: { x: 0, z: 0 },
-    lookVector: { x: 0, y: 0 },
-    isMobile: /Android|iPhone|iPad/i.test(navigator.userAgent),
-    isFiring: false,
-    
-    init() {
-        // PC Controls
-        document.addEventListener('keydown', (e) => this.keys[e.code] = true);
-        document.addEventListener('keyup', (e) => this.keys[e.code] = false);
-        document.addEventListener('mousemove', (e) => {
-            if (document.pointerLockElement === document.body) {
-                Player.rotate(e.movementX, e.movementY);
-            }
-        });
-        document.addEventListener('mousedown', () => {
-            if (Game.state === 'PLAYING') {
-                if (document.pointerLockElement !== document.body && !this.isMobile) {
-                    document.body.requestPointerLock();
-                } else {
-                    this.isFiring = true;
-                }
-            }
-        });
-        document.addEventListener('mouseup', () => this.isFiring = false);
-        
-        // Key binds
-        document.addEventListener('keydown', (e) => {
-            if (Game.state !== 'PLAYING') return;
-            if (e.code === 'KeyR') Player.reload();
-            if (e.code === 'KeyB') Game.toggleShop();
-            if (e.code === 'Digit1') Player.switchWeapon('rifle');
-            if (e.code === 'Digit2') Player.switchWeapon('pistol');
-            if (e.code === 'Digit3') Player.switchWeapon('knife');
-            if (e.code === 'Space') Player.jump();
-        });
-
-        // Mobile Controls
-        if (this.isMobile) {
-            document.getElementById('mobile-controls').style.display = 'block';
-            document.getElementById('pc-hints').style.display = 'none';
-            this.setupTouch();
-        }
-    },
-
-    setupTouch() {
-        // Simple Virtual Joystick Implementation
-        const handleJoystick = (zone, callback) => {
-            let startX, startY;
-            zone.addEventListener('touchstart', (e) => {
-                startX = e.changedTouches[0].clientX;
-                startY = e.changedTouches[0].clientY;
-            });
-            zone.addEventListener('touchmove', (e) => {
-                const dx = e.changedTouches[0].clientX - startX;
-                const dy = e.changedTouches[0].clientY - startY;
-                callback(dx, dy);
-            });
-            zone.addEventListener('touchend', () => callback(0, 0));
+        // Стан "пам'яті" бота
+        let memory = {
+            userName: null,
+            lastTopic: null,
+            awaitingAnswer: null, // Для ігор
+            gameTarget: null
         };
 
-        handleJoystick(document.getElementById('stick-left-zone'), (x, y) => {
-            // Limit output to -1 to 1
-            this.moveVector.x = Math.max(-1, Math.min(1, x / 50));
-            this.moveVector.z = Math.max(-1, Math.min(1, y / 50));
-        });
-
-        handleJoystick(document.getElementById('stick-right-zone'), (x, y) => {
-            // Camera rotation logic for touch
-            Player.rotate(x * 5, y * 5); // Sensitivity multiplier
-        });
-
-        // Buttons
-        document.getElementById('btn-shoot').addEventListener('touchstart', (e) => { e.preventDefault(); this.isFiring = true; });
-        document.getElementById('btn-shoot').addEventListener('touchend', (e) => { e.preventDefault(); this.isFiring = false; });
-        document.getElementById('btn-reload').addEventListener('touchstart', (e) => { e.preventDefault(); Player.reload(); });
-        document.getElementById('btn-jump').addEventListener('touchstart', (e) => { e.preventDefault(); Player.jump(); });
-        document.getElementById('btn-switch').addEventListener('touchstart', (e) => { 
-            e.preventDefault(); 
-            // Simple cycle for mobile
-            const order = ['rifle', 'pistol', 'knife'];
-            const currentIdx = order.indexOf(Player.currentWeapon.data.id);
-            Player.switchWeapon(order[(currentIdx + 1) % 3]);
-        });
-    },
-
-    getMovement() {
-        if (this.isMobile) return this.moveVector;
-        
-        let x = 0, z = 0;
-        if (this.keys['KeyW']) z = -1;
-        if (this.keys['KeyS']) z = 1;
-        if (this.keys['KeyA']) x = -1;
-        if (this.keys['KeyD']) x = 1;
-        return { x, z };
-    }
-};
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 4: WEAPON & ANIMATION SYSTEM
- * ------------------------------------------------------------------
- */
-class WeaponModel {
-    constructor(type, skinColor) {
-        this.mesh = new THREE.Group();
-        const material = new THREE.MeshStandardMaterial({ color: skinColor });
-        const grey = new THREE.MeshStandardMaterial({ color: 0x222222 });
-
-        if (type === 'pistol') {
-            const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.3), material);
-            const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.15, 0.1), grey);
-            handle.position.set(0, -0.1, 0.1);
-            handle.rotation.x = 0.2;
-            this.mesh.add(barrel, handle);
-        } else if (type === 'rifle') {
-            const body = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.6), material);
-            const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.4), grey);
-            barrel.rotation.x = Math.PI / 2;
-            barrel.position.z = -0.4;
-            const mag = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.15), grey);
-            mag.position.set(0, -0.2, 0.1);
-            mag.rotation.x = 0.2;
-            this.mesh.add(body, barrel, mag);
-        } else if (type === 'knife') {
-            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.02, 0.4), material); // Лезо
-            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.15), grey);
-            handle.rotation.x = Math.PI / 2;
-            handle.position.z = 0.25;
-            this.mesh.add(blade, handle);
-        }
-
-        // Позиція зброї відносно камери (Hands)
-        this.mesh.position.set(0.3, -0.25, -0.5);
-        this.basePos = this.mesh.position.clone();
-    }
-}
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 5: PLAYER CONTROLLER
- * ------------------------------------------------------------------
- */
-const Player = {
-    mesh: new THREE.Object3D(), // Тіло гравця (невидиме, для фізики)
-    pitchObject: new THREE.Object3D(), // Для повороту голови (вверх/вниз)
-    velocity: new THREE.Vector3(),
-    onGround: false,
-    hp: 100,
-    armor: 0,
-    money: 800,
-    weapons: {},
-    currentWeapon: null,
-    
-    // Recoil vars
-    recoilPitch: 0,
-    recoilYaw: 0,
-    
-    init() {
-        scene.add(this.mesh);
-        this.mesh.add(this.pitchObject);
-        this.pitchObject.add(camera);
-        this.mesh.position.y = 2; // Висота очей
-
-        // Initialize weapons with inventory skins
-        this.loadLoadout();
-    },
-
-    loadLoadout() {
-        // Очистити стару зброю
-        if(this.currentWeapon) this.pitchObject.remove(this.currentWeapon.model.mesh);
-        
-        ['knife', 'pistol', 'rifle', 'sniper'].forEach(type => {
-            const skinId = UserData.getEquippedSkin(type);
-            const color = SKINS[skinId].color;
-            
-            // Logic Object
-            this.weapons[type] = {
-                data: WEAPONS[type.toUpperCase()],
-                model: new WeaponModel(type, color),
-                ammo: WEAPONS[type.toUpperCase()].clip,
-                reserve: WEAPONS[type.toUpperCase()].reserve,
-                lastShot: 0,
-                reloading: false
-            };
-        });
-
-        this.switchWeapon('pistol');
-    },
-
-    switchWeapon(type) {
-        if (!this.weapons[type]) return; // Якщо зброї нема
-        if (this.currentWeapon) {
-            this.pitchObject.remove(this.currentWeapon.model.mesh);
-            this.currentWeapon.reloading = false; // Cancel reload
-        }
-        this.currentWeapon = this.weapons[type];
-        this.pitchObject.add(this.currentWeapon.model.mesh);
-        this.updateHUD();
-        
-        // Анімація діставання
-        this.currentWeapon.model.mesh.rotation.x = Math.PI / 2;
-        new TWEEN(this.currentWeapon.model.mesh.rotation, { x: 0 }, 300);
-    },
-
-    update(dt) {
-        if (this.hp <= 0) return;
-
-        // 1. Movement Logic
-        const input = Input.getMovement();
-        const speed = CONFIG.speed;
-        
-        // Local movement to Global
-        const direction = new THREE.Vector3(input.x, 0, input.z);
-        direction.applyEuler(new THREE.Euler(0, this.mesh.rotation.y, 0));
-        
-        if (input.x !== 0 || input.z !== 0) {
-            this.velocity.x = direction.x * speed;
-            this.velocity.z = direction.z * speed;
-            // Bobbing animation
-            const time = Date.now() * 0.01;
-            this.currentWeapon.model.mesh.position.y = this.currentWeapon.model.basePos.y + Math.sin(time) * 0.005;
-            this.currentWeapon.model.mesh.position.x = this.currentWeapon.model.basePos.x + Math.cos(time * 0.5) * 0.005;
-        } else {
-            this.velocity.x *= 0.9; // Friction
-            this.velocity.z *= 0.9;
-            // Return to base pos
-            this.currentWeapon.model.mesh.position.lerp(this.currentWeapon.model.basePos, 0.1);
-        }
-
-        // Gravity
-        this.velocity.y -= CONFIG.gravity * dt;
-        
-        // Apply Move
-        this.mesh.position.add(this.velocity.clone().multiplyScalar(dt));
-
-        // Floor Collision (Primitive)
-        if (this.mesh.position.y < 2) {
-            this.mesh.position.y = 2;
-            this.velocity.y = 0;
-            this.onGround = true;
-        }
-
-        // 2. Shooting Logic
-        if (Input.isFiring && !this.currentWeapon.reloading) {
-            this.fire();
-        }
-
-        // 3. Recoil Recovery
-        this.recoilPitch = THREE.MathUtils.lerp(this.recoilPitch, 0, dt * 5);
-        this.recoilYaw = THREE.MathUtils.lerp(this.recoilYaw, 0, dt * 5);
-        this.pitchObject.rotation.x = Math.max(-1.5, Math.min(1.5, this.pitchObject.rotation.x - this.recoilPitch * 0.1));
-
-        // Weapon Kickback Animation return
-        this.currentWeapon.model.mesh.position.z = THREE.MathUtils.lerp(this.currentWeapon.model.mesh.position.z, this.currentWeapon.model.basePos.z, dt * 10);
-    },
-
-    rotate(dx, dy) {
-        if (this.hp <= 0) return;
-        const sens = Input.isMobile ? CONFIG.mobileSensitivity : CONFIG.sensitivity;
-        
-        this.mesh.rotation.y -= dx * sens;
-        this.pitchObject.rotation.x -= dy * sens;
-        
-        // Clamp look up/down
-        this.pitchObject.rotation.x = Math.max(-1.5, Math.min(1.5, this.pitchObject.rotation.x));
-    },
-
-    jump() {
-        if (this.onGround) {
-            this.velocity.y = CONFIG.jumpForce;
-            this.onGround = false;
-        }
-    },
-
-    fire() {
-        const now = Date.now() / 1000;
-        const w = this.currentWeapon;
-        
-        if (now - w.lastShot < w.data.fireRate) return;
-        if (w.ammo <= 0) {
-            this.reload();
-            return;
-        }
-
-        // Effect: Recoil
-        w.lastShot = now;
-        w.ammo--;
-        
-        // Visual Kickback
-        w.model.mesh.position.z += 0.1;
-        
-        // Camera Recoil
-        this.recoilPitch = w.data.recoil;
-        this.pitchObject.rotation.x += w.data.recoil; 
-        
-        // Raycast Shoot
-        // Calculate Spread
-        const spreadX = (Math.random() - 0.5) * w.data.spread;
-        const spreadY = (Math.random() - 0.5) * w.data.spread;
-        
-        const raycaster = new THREE.Raycaster();
-        // Start from camera center but modified by spread
-        raycaster.setFromCamera({ x: spreadX, y: spreadY }, camera);
-        
-        const hits = raycaster.intersectObjects(scene.children, true);
-        
-        // Logic hit processing
-        for (let hit of hits) {
-            if (hit.object.userData.isEnemy) {
-                // Hit enemy
-                const dmg = w.data.damage; // Simple damage, can add headshot multiplier logic based on hit.point.y
-                hit.object.userData.parentBot.takeDamage(dmg);
-                
-                // Hitmarker visual (briefly change crosshair color)
-                const ch = document.getElementsByClassName('ch-part');
-                ch[0].style.backgroundColor = 'red'; ch[1].style.backgroundColor = 'red';
-                setTimeout(()=> { ch[0].style.backgroundColor = '#0f0'; ch[1].style.backgroundColor = '#0f0'; }, 100);
-                break; // Hit only one enemy per shot
+        // --- БАЗА ЗНАНЬ (Knowledge Base) ---
+        const knowledgeBase = [
+            {
+                // Привітання
+                triggers: [/(привіт|вітаю|добрий день|здоров|хай)/i],
+                responses: [
+                    "Вітаю! Як я можу допомогти вам сьогодні?",
+                    "Привіт. Готовий до роботи. Яке у вас завдання?",
+                    "Радий вас чути. Чим можу бути корисним?"
+                ],
+                type: "simple"
+            },
+            {
+                // Самоідентифікація
+                triggers: [/(хто ти|що ти таке|твоє ім.?я|як тебе звати)/i],
+                responses: [
+                    "Я Nexus AI, автономна інтелектуальна система, що працює безпосередньо у вашому браузері.",
+                    "Мене звати Nexus. Я штучний інтелект, створений для допомоги з кодом, текстами та аналізом даних."
+                ],
+                type: "simple"
+            },
+            {
+                // Програмування: HTML
+                triggers: [/(як|напиши|створи).*html.*(структура|код|файл)/i, /(приклад|код).*html/i],
+                responses: [
+                    "Ось базова структура HTML5 документу:\n```html\n<!DOCTYPE html>\n<html lang=\"uk\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>Document</title>\n</head>\n<body>\n    <h1>Hello World</h1>\n</body>\n</html>\n```\nЦей код створює пусту сторінку з заголовком."
+                ],
+                type: "code"
+            },
+            {
+                // Програмування: JS Loop
+                triggers: [/(цикл|loop).*js|javascript/i, /як зробити цикл/i],
+                responses: [
+                    "У JavaScript найпопулярнішим є цикл `for`. Ось приклад:\n```javascript\n// Виведе числа від 0 до 4\nfor (let i = 0; i < 5; i++) {\n    console.log('Ітерація:', i);\n}\n```"
+                ],
+                type: "code"
+            },
+            {
+                // Програмування: Python
+                triggers: [/(код|напиши).*python/i, /як.*python/i],
+                responses: [
+                    "Звісно. Ось простий приклад функції на Python:\n```python\ndef greet(name):\n    return f'Hello, {name}!'\n\nprint(greet('User'))\n```"
+                ],
+                type: "code"
+            },
+            {
+                // Математика (тригер)
+                triggers: [/(порахуй|скільки буде|обчисли|калькулятор)/i],
+                action: "calculate",
+                type: "func"
+            },
+            {
+                // Час і дата
+                triggers: [/(котра година|який час|дата|який день)/i],
+                action: "datetime",
+                type: "func"
+            },
+            {
+                // Ігри
+                triggers: [/(давай пограємо|гра|загадай число)/i],
+                responses: ["Давай пограємо в 'Вгадай число'. Я загадав число від 1 до 10. Спробуй вгадати!"],
+                action: "startGame",
+                type: "game"
+            },
+            {
+                // Філософія
+                triggers: [/(сенс життя|що таке любов|чи ти живий)/i],
+                responses: [
+                    "Це складне питання. Як AI, я не маю почуттів, але розумію концепції. Сенс життя кожен визначає для себе сам.",
+                    "Я мислю (обробляю дані), отже я існую... у вашому браузері.",
+                    "Любов — це складна біохімічна реакція у людей."
+                ],
+                type: "simple"
+            },
+            {
+                // Збереження імені
+                triggers: [/(мене звати|моє ім.?я) (.+)/i],
+                action: "saveName",
+                type: "func"
+            },
+            {
+                // Згадування імені
+                triggers: [/(як мене звати|хто я)/i],
+                action: "getName",
+                type: "func"
             }
-            if (hit.distance > w.data.range) break;
-            
-            // Wall decal (simplified: create small plane)
-            if (!hit.object.userData.isPlayer && !hit.object.userData.isEnemy) {
-                const decal = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.1), new THREE.MeshBasicMaterial({color: 0x000000}));
-                decal.position.copy(hit.point);
-                decal.lookAt(hit.point.clone().add(hit.face.normal));
-                decal.position.add(hit.face.normal.multiplyScalar(0.01));
-                scene.add(decal);
-                setTimeout(() => scene.remove(decal), 5000);
-                break; // Stop at wall
-            }
-        }
-        
-        this.updateHUD();
-    },
-
-    reload() {
-        const w = this.currentWeapon;
-        if (w.reloading || w.ammo === w.data.clip || w.reserve <= 0) return;
-        
-        w.reloading = true;
-        // Animation
-        w.model.mesh.rotation.x = -0.5;
-        
-        // Message
-        Game.showMsg("Reloading...");
-
-        setTimeout(() => {
-            const needed = w.data.clip - w.ammo;
-            const take = Math.min(needed, w.reserve);
-            w.ammo += take;
-            w.reserve -= take;
-            w.reloading = false;
-            w.model.mesh.rotation.x = 0;
-            this.updateHUD();
-        }, w.data.reloadTime * 1000);
-    },
-
-    takeDamage(amount) {
-        if (this.armor > 0) {
-            const abs = amount * 0.5;
-            this.armor = Math.max(0, this.armor - abs);
-            this.hp -= (amount - abs);
-        } else {
-            this.hp -= amount;
-        }
-        
-        this.updateHUD();
-        
-        if (this.hp <= 0) Game.endMatch(false);
-    },
-
-    updateHUD() {
-        if (!this.currentWeapon) return;
-        document.getElementById('hud-ammo').innerText = `${this.currentWeapon.ammo} / ${this.currentWeapon.reserve}`;
-        document.getElementById('hud-hp').innerText = `${Math.ceil(this.hp)} HP`;
-        document.getElementById('hud-armor').innerText = `${Math.ceil(this.armor)} AP`;
-    }
-};
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 6: AI / BOTS
- * ------------------------------------------------------------------
- */
-class Bot {
-    constructor(x, z) {
-        this.hp = 100;
-        
-        // Geometry (Hitbox)
-        const geometry = new THREE.BoxGeometry(1, 2, 1);
-        const material = new THREE.MeshLambertMaterial({ color: 0xff4444 });
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.mesh.position.set(x, 2, z);
-        this.mesh.castShadow = true;
-        this.mesh.userData = { isEnemy: true, parentBot: this };
-        
-        scene.add(this.mesh);
-        
-        this.lastAttack = 0;
-        this.speed = 4 + Math.random() * 2;
-    }
-
-    update(dt) {
-        if (this.hp <= 0) return;
-
-        // Simple AI: Move towards player
-        const playerPos = Player.mesh.position;
-        const dist = this.mesh.position.distanceTo(playerPos);
-        
-        this.mesh.lookAt(playerPos.x, this.mesh.position.y, playerPos.z);
-        
-        if (dist > 5) {
-            // Chase
-            const dir = new THREE.Vector3().subVectors(playerPos, this.mesh.position).normalize();
-            this.mesh.position.add(dir.multiplyScalar(this.speed * dt));
-        } else {
-            // Attack
-            const now = Date.now() / 1000;
-            if (now - this.lastAttack > 1.0) { // 1 sec fire rate
-                Player.takeDamage(10 + Math.random() * 10);
-                this.lastAttack = now;
-                
-                // Muzzle flash visual
-                const flash = new THREE.PointLight(0xffaa00, 1, 3);
-                flash.position.copy(this.mesh.position);
-                flash.position.y += 0.5;
-                flash.position.add(this.mesh.getWorldDirection(new THREE.Vector3()));
-                scene.add(flash);
-                setTimeout(()=> scene.remove(flash), 50);
-            }
-        }
-    }
-
-    takeDamage(amount) {
-        this.hp -= amount;
-        // Damage Flash
-        this.mesh.material.emissive.setHex(0xffffff);
-        setTimeout(() => this.mesh.material.emissive.setHex(0x000000), 50);
-
-        if (this.hp <= 0) {
-            this.die();
-        }
-    }
-
-    die() {
-        scene.remove(this.mesh);
-        Game.bots = Game.bots.filter(b => b !== this);
-        Game.killFeed('Player', 'Bot');
-        Game.score.t += 1; // Bots are T
-        Player.money += 300;
-        UserData.money += 50; // Persistent meta-currency
-        UserData.save();
-        
-        // Respawn new bot
-        setTimeout(() => Game.spawnBot(), 3000);
-    }
-}
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 7: MAP GENERATOR (Procedural CS-style layout)
- * ------------------------------------------------------------------
- */
-function createMap() {
-    // Floor
-    const floor = new THREE.Mesh(
-        new THREE.PlaneGeometry(100, 100),
-        new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.8 })
-    );
-    floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
-    // Walls function
-    function createWall(x, z, w, h, d) {
-        const wall = new THREE.Mesh(
-            new THREE.BoxGeometry(w, h, d),
-            new THREE.MeshStandardMaterial({ color: 0x666666 }) // Gray walls
-        );
-        wall.position.set(x, h/2, z);
-        wall.castShadow = true;
-        wall.receiveShadow = true;
-        scene.add(wall);
-    }
-
-    // Boxes (Cover)
-    function createBox(x, z) {
-        const box = new THREE.Mesh(
-            new THREE.BoxGeometry(1.5, 1.5, 1.5),
-            new THREE.MeshStandardMaterial({ color: 0x8B4513 }) // Wood
-        );
-        box.position.set(x, 0.75, z);
-        box.castShadow = true;
-        scene.add(box);
-    }
-
-    // Border Walls
-    createWall(0, -50, 100, 10, 2);
-    createWall(0, 50, 100, 10, 2);
-    createWall(-50, 0, 2, 10, 100);
-    createWall(50, 0, 2, 10, 100);
-
-    // Mid obstacles
-    createWall(0, 0, 10, 4, 10); // Central block
-    createWall(-20, 10, 15, 4, 2);
-    createWall(20, -10, 2, 4, 15);
-
-    // Random covers
-    createBox(-10, -10);
-    createBox(15, 15);
-    createBox(-15, 20);
-    createBox(10, -20);
-}
-
-/**
- * ------------------------------------------------------------------
- * SYSTEM 8: UI & MENUS
- * ------------------------------------------------------------------
- */
-const Menu = {
-    renderInventory() {
-        const container = document.getElementById('inventory-grid');
-        container.innerHTML = '';
-        
-        UserData.inventory.forEach(item => {
-            const skin = SKINS[item.skinId];
-            const div = document.createElement('div');
-            div.className = `item-card rarity-${skin.rarity} ${item.equipped ? 'selected' : ''}`;
-            div.innerHTML = `
-                <div style="width:30px; height:30px; background:#${skin.color.toString(16)}; margin: 0 auto;"></div>
-                <strong>${WEAPONS[item.weaponId.toUpperCase()].name}</strong><br>
-                <small>${skin.name}</small><br>
-                ${!item.equipped ? `<button class="btn" style="font-size:10px; padding:2px;" onclick="Menu.equip(${item.uid})">Equip</button>` : 'Equipped'}
-            `;
-            container.appendChild(div);
-        });
-    },
-
-    equip(uid) {
-        const item = UserData.inventory.find(i => i.uid === uid);
-        if (item) {
-            // Unequip others of same type
-            UserData.inventory.forEach(i => {
-                if (i.weaponId === item.weaponId) i.equipped = false;
-            });
-            item.equipped = true;
-            UserData.save();
-            this.renderInventory();
-        }
-    },
-
-    renderShop() {
-        const container = document.getElementById('shop-grid');
-        container.innerHTML = ''; // Placeholder for full weapon buying in menu? Usually in game.
-        container.innerHTML = 'Зброя купується під час матчу на кнопку B';
-    },
-
-    renderMarket() {
-        const container = document.getElementById('market-grid');
-        container.innerHTML = '';
-        // Fake Market Listings
-        const listings = [
-            { w: 'rifle', s: 'red_dragon', price: 1500 },
-            { w: 'pistol', s: 'gold', price: 5000 },
-            { w: 'knife', s: 'blue_camo', price: 400 }
         ];
 
-        listings.forEach(l => {
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            div.innerHTML = `
-                <strong>${SKINS[l.s].name}</strong><br>
-                <span class="currency">$${l.price}</span><br>
-                <button class="btn" onclick="Menu.buySkin('${l.w}', '${l.s}', ${l.price})">Купити</button>
-            `;
-            container.appendChild(div);
-        });
-    },
+        const fallbackResponses = [
+            "Я не зовсім зрозумів ваше питання. Можете перефразувати?",
+            "Цікаво, але мені потрібно більше деталей, щоб відповісти точно.",
+            "Мої алгоритми ще навчаються. Спробуйте запитати про програмування або математику.",
+            "Хм, я не певен щодо цього. Можливо, поговоримо про технології?"
+        ];
 
-    buySkin(wid, sid, price) {
-        if (UserData.money >= price) {
-            UserData.money -= price;
-            UserData.inventory.push({
-                uid: Date.now(),
-                weaponId: wid,
-                skinId: sid,
-                equipped: false
-            });
-            UserData.save();
-            alert('Скін куплено!');
-            this.renderMarket();
-            this.renderInventory();
-        } else {
-            alert('Недостатньо грошей!');
-        }
-    },
+        // --- DOM ЕЛЕМЕНТИ ---
+        const chatWindow = document.getElementById('chatWindow');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
 
-    showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById('tab-' + tabId).classList.remove('hidden');
-        if (tabId === 'inventory') this.renderInventory();
-        if (tabId === 'market') this.renderMarket();
-    }
-};
+        // --- ОСНОВНА ЛОГІКА ---
 
-/**
- * ------------------------------------------------------------------
- * MAIN GAME LOGIC
- * ------------------------------------------------------------------
- */
-const Game = {
-    state: 'MENU', // MENU, PLAYING
-    bots: [],
-    score: { ct: 0, t: 0 },
-    
-    init() {
-        UserData.load();
-        Menu.renderInventory();
-        createMap();
-        Input.init();
-        
-        // Render Loop
-        const clock = new THREE.Clock();
-        const animate = () => {
-            requestAnimationFrame(animate);
-            const dt = Math.min(clock.getDelta(), 0.1); // Cap delta
+        window.onload = () => { userInput.focus(); };
 
-            if (this.state === 'PLAYING') {
-                Player.update(dt);
-                this.bots.forEach(b => b.update(dt));
+        sendBtn.addEventListener('click', handleUserMessage);
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleUserMessage();
             }
-            
-            renderer.render(scene, camera);
-        };
-        animate();
-    },
-
-    startMatch() {
-        this.state = 'PLAYING';
-        document.getElementById('menu-screen').classList.add('hidden');
-        document.getElementById('hud-screen').classList.remove('hidden');
-        
-        // Reset Player
-        Player.init();
-        Player.hp = 100;
-        Player.mesh.position.set(0, 2, 40); // Spawn CT
-        
-        // Spawn Bots
-        this.bots.forEach(b => scene.remove(b.mesh));
-        this.bots = [];
-        for(let i=0; i<3; i++) this.spawnBot();
-
-        // Lock pointer
-        if (!Input.isMobile) document.body.requestPointerLock();
-    },
-
-    spawnBot() {
-        const x = (Math.random() - 0.5) * 60;
-        const z = -40 + (Math.random() * 20); // Spawn T side
-        this.bots.push(new Bot(x, z));
-    },
-
-    endMatch(win) {
-        this.state = 'MENU';
-        document.exitPointerLock();
-        document.getElementById('menu-screen').classList.remove('hidden');
-        document.getElementById('hud-screen').classList.add('hidden');
-        document.getElementById('mobile-controls').style.display = 'none';
-        alert(win ? "VICTORY" : "DEFEAT");
-    },
-
-    showMsg(text) {
-        // Simple hud message
-        const div = document.createElement('div');
-        div.innerText = text;
-        div.style.cssText = "position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); color:white; font-size:20px; font-weight:bold;";
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 1000);
-    },
-
-    killFeed(killer, victim) {
-        const feed = document.getElementById('killfeed');
-        const item = document.createElement('div');
-        item.className = 'feed-item';
-        item.innerHTML = `<b>${killer}</b> <span style="color:#f55">🔫</span> ${victim}`;
-        feed.appendChild(item);
-        setTimeout(() => item.remove(), 4000);
-    },
-
-    toggleShop() {
-        if (this.state !== 'PLAYING') return;
-        const shopEl = document.getElementById('ingame-shop');
-        const isOpen = shopEl.style.display === 'block';
-        
-        if (isOpen) {
-            shopEl.style.display = 'none';
-            if (!Input.isMobile) document.body.requestPointerLock();
-        } else {
-            document.exitPointerLock();
-            shopEl.style.display = 'block';
-            this.renderInGameShop();
-        }
-    },
-
-    renderInGameShop() {
-        const grid = document.getElementById('ingame-shop-grid');
-        grid.innerHTML = '';
-        Object.values(WEAPONS).forEach(w => {
-            if (w.price === 0) return;
-            const div = document.createElement('div');
-            div.className = 'item-card';
-            div.innerHTML = `
-                <strong>${w.name}</strong><br>
-                <span class="currency">$${w.price}</span><br>
-                <button class="btn" onclick="Game.buyWeapon('${w.id}')">Купити</button>
-            `;
-            grid.appendChild(div);
         });
-    },
 
-    buyWeapon(id) {
-        const wData = WEAPONS[id.toUpperCase()];
-        if (Player.money >= wData.price) {
-            Player.money -= wData.price;
-            Player.switchWeapon(id);
-            Player.currentWeapon.ammo = wData.clip;
-            Player.currentWeapon.reserve = wData.reserve;
-            this.toggleShop(); // close shop
-        } else {
-            alert('Немає грошей!');
+        function handleUserMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            userInput.value = '';
+            userInput.style.height = 'auto'; // Скидання висоти
+
+            showTypingIndicator();
+
+            // Імітація затримки мислення
+            setTimeout(() => {
+                removeTypingIndicator();
+                const response = generateAIResponse(text);
+                addMessage(response.text, 'ai', response.isCode);
+            }, 800 + Math.random() * 1000);
         }
-    }
-};
 
-// HELPER TWEEN (Simple linear interpolation helper)
-class TWEEN {
-    constructor(target, to, duration) {
-        const start = {};
-        for(let k in to) start[k] = target[k];
-        const startTime = Date.now();
-        
-        const tick = () => {
-            const now = Date.now();
-            const progress = Math.min(1, (now - startTime) / duration);
-            
-            for(let k in to) {
-                target[k] = start[k] + (to[k] - start[k]) * progress;
+        function generateAIResponse(input) {
+            const cleanInput = input.toLowerCase();
+
+            // Перевірка гри
+            if (memory.awaitingAnswer === 'guessNumber') {
+                const num = parseInt(cleanInput);
+                if (isNaN(num)) return { text: "Будь ласка, введіть число." };
+                
+                memory.awaitingAnswer = null;
+                const target = memory.gameTarget;
+                if (num === target) return { text: `Точно! Це було число ${target}. Ти виграв! 🎉` };
+                else return { text: `Ні, я загадав число ${target}. Пощастить наступного разу!` };
             }
+
+            // Пошук у базі знань
+            for (const entry of knowledgeBase) {
+                const match = entry.triggers.some(trigger => trigger.test(cleanInput));
+                if (match) {
+                    if (entry.type === 'func' || entry.type === 'game') {
+                        return executeAction(entry.action, cleanInput, input);
+                    }
+                    const reply = getRandom(entry.responses);
+                    return { text: reply, isCode: entry.type === 'code' };
+                }
+            }
+
+            // Математика (без явного тригера)
+            if (/[\d]+\s*[\+\-\*\/]/.test(cleanInput)) {
+                try {
+                    const mathExpression = cleanInput.match(/[\d\.\s\+\-\*\/%\(\)]+/)[0];
+                    // eslint-disable-next-line no-new-func
+                    const result = new Function('return ' + mathExpression)();
+                    return { text: `Результат: ${result}` };
+                } catch (e) {}
+            }
+
+            return { text: getRandom(fallbackResponses) };
+        }
+
+        function executeAction(action, cleanInput, originalInput) {
+            if (action === 'calculate') {
+                const match = originalInput.match(/(\d+(?:\.\d+)?)\s*([\+\-\*\/])\s*(\d+(?:\.\d+)?)/);
+                if (match) {
+                    const a = parseFloat(match[1]);
+                    const op = match[2];
+                    const b = parseFloat(match[3]);
+                    let res = 0;
+                    if(op==='+') res=a+b; else if(op==='-') res=a-b; else if(op==='*') res=a*b; else if(op==='/') res=b!==0?(a/b).toFixed(2):"Помилка";
+                    return { text: `Я порахував: ${a} ${op} ${b} = ${res}` };
+                }
+                return { text: "Напишіть приклад, наприклад: 2 + 2" };
+            }
+
+            if (action === 'datetime') {
+                const now = new Date();
+                return { text: `Зараз: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}` };
+            }
+
+            if (action === 'startGame') {
+                memory.awaitingAnswer = 'guessNumber';
+                memory.gameTarget = Math.floor(Math.random() * 10) + 1;
+                return { text: "Я загадав число від 1 до 10. Введи свій варіант!" };
+            }
+
+            if (action === 'saveName') {
+                const match = originalInput.match(/(мене звати|моє ім.?я)\s+(.+)/i);
+                if (match && match[2]) {
+                    memory.userName = match[2];
+                    return { text: `Приємно познайомитись, ${memory.userName}.` };
+                }
+            }
+
+            if (action === 'getName') {
+                return memory.userName ? { text: `Тебе звати ${memory.userName}.` } : { text: "Ми ще не знайомі." };
+            }
+
+            return { text: "Помилка системи." };
+        }
+
+        // --- UI ФУНКЦІЇ ---
+        function addMessage(text, sender, isCode = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', `${sender}-message`);
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.classList.add('avatar');
+            avatarDiv.textContent = sender === 'ai' ? 'AI' : 'U';
+
+            const textDiv = document.createElement('div');
+            textDiv.classList.add('text');
+
+            if (isCode) {
+                const parts = text.split('```');
+                parts.forEach((part, index) => {
+                    if (index % 2 === 1) {
+                        const code = document.createElement('div');
+                        code.className = 'code-block';
+                        code.textContent = part.trim();
+                        textDiv.appendChild(code);
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = part;
+                        textDiv.appendChild(p);
+                    }
+                });
+            } else {
+                textDiv.textContent = text;
+            }
+
+            msgDiv.appendChild(avatarDiv);
+            msgDiv.appendChild(textDiv);
+            chatWindow.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function showTypingIndicator() {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'ai-message');
+            msgDiv.id = 'typingIndicator';
             
-            if (progress < 1) requestAnimationFrame(tick);
-        };
-        tick();
-    }
-}
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = 'AI';
 
-// Start
-window.onload = () => Game.init();
+            const textDiv = document.createElement('div');
+            textDiv.className = 'text';
+            textDiv.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
 
-</script>
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(textDiv);
+            chatWindow.appendChild(msgDiv);
+            scrollToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function scrollToBottom() {
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function getRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+    </script>
 </body>
 </html>
