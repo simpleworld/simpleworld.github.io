@@ -167,9 +167,20 @@ footer{margin-top:80px;padding:40px;text-align:center;color:#777}
 </style>
 </head>
 <body>
-
-<!-- ===================== HEADER ===================== -->
-<header>
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <canvas id="bgParticles"></canvas>
+  <div class="hero-content">
+    <h1>REALLY WORLD</h1>
+    <p>Приєднуйся до найкращого Minecraft сервера</p>
+    <div class="hero-buttons">
+      <button class="btn buy-btn" data-item="start-pack">Купити старт</button>
+      <button class="btn play-btn">Почати гру</button>
+    </div>
+  </div>
+  <img src="player.png" class="hero-player" />
+</section>
+<header>>
   <div class="header-inner">
     <div class="logo">SW <span>SimpleWorld</span></div>
     <nav>
@@ -286,6 +297,21 @@ function updateCurrency(v){
  document.getElementById('coins').innerText=v+'R';
  document.getElementById('eur').innerText='€'+(v/100).toFixed(2);
 }
+</script>
+<script>
+ document.querySelectorAll('.buy-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    alert('Покупка: '+btn.dataset.item);
+  });
+ });
+ const canvas=document.getElementById('bgParticles');
+ if(canvas){
+ const ctx=canvas.getContext('2d');
+ canvas.width=window.innerWidth;
+ canvas.height=window.innerHeight;
+ let p=[];
+ for(let i=0;i<80;i++)p.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:Math.random()*0.6,vy:Math.random()*0.6});
+ function a(){ctx.clearRect(0,0,canvas.width,canvas.height);p.forEach(o=>{o.x+=o.vx;o.y+=o.vy;if(o.x>canvas.width)o.x=0;if(o.y>canvas.height)o.y=0;ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(o.x,o.y,2,2)});requestAnimationFrame(a)}a();}
 </script>
 </body>
 </html>
