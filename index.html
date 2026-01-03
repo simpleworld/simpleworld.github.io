@@ -566,13 +566,13 @@
                     <div class="exchange-grid">
                         <div class="ex-box">
                             <div class="ex-label">До сплати</div>
-                            <div class="ex-value" id="priceDisplay">€5.00</div>
+                            <div class="ex-value" id="priceDisplay">5.00 UAH</div>
                         </div>
                         <div class="ex-box">
                             <div class="ex-label">Ви отримуєте</div>
                             <div class="ex-value" id="coinsDisplay">500 R</div>
                         </div>
-                        <button class="buy-currency-btn" onclick="openModal('Покупка валюти')">
+                        <button class="buy-currency-btn" onclick="openModalCurrency()">
                             ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>
@@ -632,22 +632,25 @@
 
     <script>
         const products = [
-            { id: 1, type: 'ranks', name: 'PEGAS', price: '€21.26', old: '€77.77', img: 'orange', discount: true },
-            { id: 2, type: 'ranks', name: 'GOD', price: '€44.44', old: '€77.77', img: 'blue', discount: true },
-            { id: 3, type: 'ranks', name: 'HELPER', price: '€66.66', old: null, img: 'cyan', discount: false },
-            { id: 4, type: 'ranks', name: 'DRAGON', price: '€18.99', old: null, img: 'purple', discount: false },
-            { id: 5, type: 'ranks', name: 'IMPERATOR', price: '€9.99', old: null, img: 'red', discount: false },
-            { id: 6, type: 'ranks', name: 'MAGISTER', price: '€5.89', old: null, img: 'yellow', discount: false },
-            { id: 7, type: 'ranks', name: 'OVERLORD', price: '€2.89', old: null, img: 'blue', discount: false },
-            { id: 8, type: 'ranks', name: 'AVENGER', price: '€1.29', old: null, img: 'dark', discount: false },
-            { id: 9, type: 'ranks', name: 'TITAN', price: '€0.89', old: null, img: 'green', discount: false },
-            { id: 10, type: 'ranks', name: 'HERO', price: '€0.39', old: null, img: 'light', discount: false },
-            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '€0.46', img: 'chest', discount: false },
-            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '€1.49', img: 'chest', discount: false },
-            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '€3.99', img: 'chest', discount: false },
-            { id: 14, type: 'cases', name: '3 Скрині донату', price: '€3.99', img: 'chest_rare', discount: false },
-            { id: 20, type: 'services', name: 'Розбан', price: '€3.49', img: 'scroll', discount: false },
-            { id: 21, type: 'services', name: 'Розмут', price: '€1.19', img: 'scroll', discount: false },
+            // RANKS
+            { id: 1, type: 'ranks', name: 'Premium', price: '29 UAH', img: 'orange', discount: false },
+            { id: 2, type: 'ranks', name: 'Elite', price: '49 UAH', img: 'blue', discount: false },
+            { id: 3, type: 'ranks', name: 'Deluxe', price: '69 UAH', img: 'cyan', discount: false },
+            { id: 4, type: 'ranks', name: 'Ultra', price: '99 UAH', img: 'purple', discount: false },
+            { id: 5, type: 'ranks', name: 'Immortal', price: '119 UAH', img: 'red', discount: false },
+            { id: 6, type: 'ranks', name: 'Supreme', price: '149 UAH', img: 'yellow', discount: false },
+            { id: 7, type: 'ranks', name: 'Legend', price: '199 UAH', img: 'blue', discount: false },
+            { id: 8, type: 'ranks', name: 'Infinity', price: '249 UAH', img: 'dark', discount: false },
+            
+            // CASES
+            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '15 UAH', img: 'chest', discount: false },
+            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '45 UAH', img: 'chest', discount: false },
+            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '99 UAH', img: 'chest', discount: false },
+            { id: 14, type: 'cases', name: '3 Скрині донату', price: '99 UAH', img: 'chest_rare', discount: false },
+
+            // SERVICES
+            { id: 20, type: 'services', name: 'Розбан', price: '89 UAH', img: 'scroll', discount: false },
+            { id: 21, type: 'services', name: 'Розмут', price: '29 UAH', img: 'scroll', discount: false },
         ];
 
         const grid = document.getElementById('shopGrid');
@@ -712,10 +715,10 @@
         function updateCurrency() {
             const range = document.getElementById('currencyRange');
             const coins = range.value;
-            const price = (coins / 100).toFixed(2);
+            const price = (coins * 0.01).toFixed(2); // 1 UAH = 100 релік
             
             document.getElementById('coinsDisplay').innerText = coins + ' R';
-            document.getElementById('priceDisplay').innerText = '€' + price;
+            document.getElementById('priceDisplay').innerText = price + ' UAH';
         }
 
         let count = 0;
@@ -747,6 +750,16 @@
             document.getElementById('modalTitle').innerText = itemName;
             document.getElementById('itemNameInput').value = itemName;
             document.getElementById('itemPriceInput').value = itemPrice || 'N/A';
+            modal.classList.add('open');
+        }
+
+        function openModalCurrency() {
+            const coins = document.getElementById('currencyRange').value;
+            const price = document.getElementById('priceDisplay').innerText;
+            
+            document.getElementById('modalTitle').innerText = 'Покупка валюти';
+            document.getElementById('itemNameInput').value = `${coins} Релік`;
+            document.getElementById('itemPriceInput').value = price;
             modal.classList.add('open');
         }
         
