@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleWorld — Minecraft Server Network</title>
+    <title>ReallyWorld — Minecraft Server Network</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="blob:https://gemini.google.com/7549d577-9a23-4594-b954-3a995fd0abe1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
@@ -94,6 +95,7 @@
             gap: 12px;
             color: #000;
         }
+        .logo img { height: 40px; }
         .logo span { color: var(--primary); }
 
         .nav-links a {
@@ -103,7 +105,6 @@
             color: var(--text-muted);
             transition: var(--transition);
             position: relative;
-            cursor: pointer;
         }
         .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
         .nav-links a.active::after {
@@ -116,28 +117,8 @@
             border-radius: 3px 3px 0 0;
         }
 
-        .hero-btn {
-            background: var(--primary);
-            color: white;
-            padding: 12px 24px;
-            border-radius: var(--radius-md);
-            font-weight: 800;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: var(--transition);
-        }
-        .hero-btn:hover { background: var(--primary-dark); }
-
-        .page {
-            display: none;
-            margin-top: 80px;
-            min-height: calc(100vh - 80px);
-        }
-        .page.active { display: block; }
-
         .hero {
+            margin-top: 80px;
             height: 600px;
             background: linear-gradient(135deg, #ff9800 0%, #ff6d00 100%);
             position: relative;
@@ -177,6 +158,21 @@
             margin-bottom: 30px;
             max-width: 480px;
         }
+
+        .hero-btn {
+            background: white;
+            color: var(--primary-dark);
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
 
         .hero-char {
             position: absolute;
@@ -253,6 +249,7 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
         }
+        .currency-icon img { width: 70px; }
 
         .currency-content { flex-grow: 1; }
         .currency-header { margin-bottom: 25px; }
@@ -359,6 +356,8 @@
             position: relative;
             overflow: hidden;
         }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .shop-card:hover .card-img-wrap img { transform: scale(1.1); }
 
         .price-badge {
             position: absolute;
@@ -371,6 +370,13 @@
             font-size: 14px;
             z-index: 2;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 15px; right: 15px;
+            z-index: 2;
+            transform: rotate(15deg);
         }
 
         .card-body { padding: 20px; text-align: center; }
@@ -394,7 +400,7 @@
         }
 
         .service-row {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
         }
         .service-btn {
             background: #2d3436;
@@ -405,6 +411,7 @@
             font-weight: 700;
             transition: var(--transition);
         }
+        .service-vk { background: #4c75a3; }
         .service-yt { background: #ff0000; }
         .service-ds { background: #5865F2; }
         .service-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
@@ -463,166 +470,6 @@
         }
         .close-modal:hover { color: var(--text-main); }
 
-        .content-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 40px;
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 30px;
-        }
-
-        .content-card h2 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: var(--primary);
-        }
-
-        .content-card h3 {
-            font-size: 22px;
-            font-weight: 700;
-            margin: 25px 0 15px;
-        }
-
-        .content-card p, .content-card li {
-            margin-bottom: 15px;
-            line-height: 1.8;
-        }
-
-        .rule-item {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .rule-item strong {
-            color: var(--primary);
-            font-size: 18px;
-        }
-
-        .perk-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            box-shadow: var(--shadow-soft);
-            transition: var(--transition);
-            border: 2px solid transparent;
-        }
-
-        .perk-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-
-        .perk-header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .perk-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: white;
-        }
-
-        .perk-title {
-            font-size: 24px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .perk-price {
-            color: var(--primary);
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .perk-features {
-            list-style: none;
-            margin: 20px 0;
-        }
-
-        .perk-features li {
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .perk-features li i {
-            color: var(--success);
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-soft);
-            text-align: center;
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 15px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--text-main);
-        }
-
-        .stat-label {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .auth-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 15px;
-            border-radius: 12px;
-            background: #f4f6f8;
-            font-weight: 700;
-            transition: var(--transition);
-            cursor: pointer;
-        }
-
-        .auth-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(50px); } to { transform: translateY(0); } }
 
@@ -634,8 +481,7 @@
             .currency-card { flex-direction: column; padding: 20px; }
             .exchange-grid { grid-template-columns: 1fr; width: 100%; }
             .nav-links { display: none; }
-            .service-row { grid-template-columns: 1fr; }
-            .dashboard-grid { grid-template-columns: 1fr; }
+            .service-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -643,135 +489,338 @@
 
     <header>
         <div class="container flex flex-between nav-inner">
-            <a onclick="showPage('home')" class="logo" style="cursor:pointer;">
+            <a href="#" class="logo">
                 <i class="fa-solid fa-cube fa-xl" style="color:var(--primary)"></i>
                 SW <span>SIMPLEWORLD</span>
             </a>
             <nav class="nav-links flex">
-                <a onclick="showPage('home')" class="active"><i class="fa-solid fa-house"></i> Головна</a>
-                <a onclick="showPage('shop')"><i class="fa-solid fa-cart-shopping"></i> Магазин</a>
-                <a onclick="showPage('rules')"><i class="fa-solid fa-book"></i> Правила</a>
-                <a onclick="showPage('perks')"><i class="fa-solid fa-crown"></i> Привілеї</a>
-                <a onclick="showPage('support')"><i class="fa-solid fa-headset"></i> Підтримка</a>
+                <a href="#" class="active"><i class="fa-solid fa-house"></i> Головна</a>
+                <a href="#shop"><i class="fa-solid fa-cart-shopping"></i> Магазин</a>
+                <a href="#"><i class="fa-solid fa-book"></i> Правила</a>
+                <a href="#"><i class="fa-solid fa-crown"></i> Привілеї</a>
+                <a href="#"><i class="fa-solid fa-headset"></i> Підтримка</a>
             </nav>
-            <button class="hero-btn" onclick="openAuthModal()" id="authBtn">
-                <i class="fa-solid fa-user"></i> Вхід
+            <button class="hero-btn" onclick="openModal('Вхід в кабінет')">
+                <i class="fa-solid fa-user"></i> Кабінет
             </button>
         </div>
     </header>
 
-    <!-- ГОЛОВНА -->
-    <div class="page active" id="home">
-        <section class="hero">
-            <div class="container flex flex-between" style="width: 100%;">
-                <div class="hero-content">
-                    <h1>SIMPLEWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
-                    <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
-                    <div class="flex" style="gap:15px; flex-wrap:wrap;">
-                        <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="showPage('shop')">
-                            <i class="fa-solid fa-bag-shopping"></i> Придбати донат
-                        </button>
-                        <button class="hero-btn">
-                            <i class="fa-solid fa-play"></i> Почати гру
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="container info-bar-wrapper">
-            <div class="info-card">
-                <div class="server-status">
-                    <div class="status-icon"><i class="fa-solid fa-star"></i></div>
-                    <div class="status-text">
-                        <h3>НАШ СЕРВЕР</h3>
-                        <p>Онлайн: <span class="online-count" id="onlineCount">0</span> гравців</p>
-                    </div>
-                </div>
-                
-                <div class="ip-block">
-                    <div class="ip-text" id="ipAddress">simpleworld.aternos.me</div>
-                    <button class="copy-btn" onclick="copyIP()">
-                        <i class="fa-regular fa-copy"></i>
+    <section class="hero">
+        <div class="container flex flex-between" style="width: 100%;">
+            <div class="hero-content">
+                <h1>SIMPLEWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
+                <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
+                <div class="flex" style="gap:15px; flex-wrap:wrap;">
+                    <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="scrollToShop()">
+                        <i class="fa-solid fa-bag-shopping"></i> Придбати донат
+                    </button>
+                    <button class="hero-btn">
+                        <i class="fa-solid fa-play"></i> Почати гру
                     </button>
                 </div>
             </div>
+            <img src="https://www.bing.com/images/search?view=detailV2&ccid=AXp%2bjr0p&id=79335E08651BA6A43B878A588CB3068D4CD827BD&thid=OIP.AXp-jr0pIxrHVy-_DYliGwHaID&mediaurl=https%3a%2f%2fi.pinimg.com%2foriginals%2f53%2fa9%2f36%2f53a936a79884e31672ddbca6c069da74.png&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.017a7e8ebd29231ac7572fbf0d89621b%3frik%3dvSfYTI0Gs4xYig%26pid%3dImgRaw%26r%3d0&exph=1121&expw=1030&q=minecraft+stive&FORM=IRPRST&ck=B1D6A53F526715AE99D5EF4D2F3A46C5&selectedIndex=2&itb=0" class="hero-char" alt="Minecraft Character">
         </div>
+    </section>
 
-        <section class="section">
-            <div class="container">
-                <div class="currency-card">
-                    <div class="currency-icon">
-                        <i class="fa-solid fa-coins fa-3x" style="color: #f57c00;"></i>
+    <div class="container info-bar-wrapper">
+        <div class="info-card">
+            <div class="server-status">
+                <div class="status-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="status-text">
+                    <h3>НАШ СЕРВЕР</h3>
+                    <p>Онлайн: <span class="online-count" id="onlineCount">0</span> гравців</p>
+                </div>
+            </div>
+            
+            <div class="ip-block">
+                <div class="ip-text" id="ipAddress">simpleworld.aternos.me</div>
+                <button class="copy-btn" onclick="copyIP()">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="container">
+            <div class="currency-card">
+                <div class="currency-icon">
+                    <i class="fa-solid fa-coins fa-3x" style="color: #f57c00;"></i>
+                </div>
+                <div class="currency-content">
+                    <div class="currency-header">
+                        <h2>Покупка ігрової валюти</h2>
+                        <p style="color:#777">Використовуйте повзунок для вибору суми</p>
                     </div>
-                    <div class="currency-content">
-                        <div class="currency-header">
-                            <h2>Покупка ігрової валюти</h2>
-                            <p style="color:#777">Використовуйте повзунок для вибору суми</p>
+                    
+                    <div class="range-wrapper">
+                        <input type="range" class="range-input" min="100" max="10000" step="1" value="500" id="currencyRange" oninput="updateCurrency()">
+                        <div class="range-labels">
+                            <span>100 R</span>
+                            <span>10000 R</span>
                         </div>
-                        
-                        <div class="range-wrapper">
-                            <input type="range" class="range-input" min="100" max="10000" step="1" value="500" id="currencyRange" oninput="updateCurrency()">
-                            <div class="range-labels">
-                                <span>100 R</span>
-                                <span>10000 R</span>
-                            </div>
-                        </div>
+                    </div>
 
-                        <div class="exchange-grid">
-                            <div class="ex-box">
-                                <div class="ex-label">До сплати</div>
-                                <div class="ex-value" id="priceDisplay">5.00 UAH</div>
-                            </div>
-                            <div class="ex-box">
-                                <div class="ex-label">Ви отримуєте</div>
-                                <div class="ex-value" id="coinsDisplay">500 R</div>
-                            </div>
-                            <button class="buy-currency-btn" onclick="openModalCurrency()">
-                                ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
-                            </button>
+                    <div class="exchange-grid">
+                        <div class="ex-box">
+                            <div class="ex-label">До сплати</div>
+                            <div class="ex-value" id="priceDisplay">5.00 UAH</div>
                         </div>
+                        <div class="ex-box">
+                            <div class="ex-label">Ви отримуєте</div>
+                            <div class="ex-value" id="coinsDisplay">500 R</div>
+                        </div>
+                        <button class="buy-currency-btn" onclick="openModalCurrency()">
+                            ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section class="container" style="margin-bottom: 50px;">
-            <div class="service-row">
-                <a href="https://www.youtube.com/channel/UCTRqSuJ2xR4jBtYDADw_GxQ" class="service-btn service-yt"><i class="fa-brands fa-youtube fa-lg"></i> Наш YouTube</a>
-                <a href="https://discord.gg/X878gVyG" class="service-btn service-ds"><i class="fa-brands fa-discord fa-lg"></i> Discord Сервер</a>
-                <a onclick="showPage('support')" class="service-btn" style="background:#4a90e2; cursor:pointer;"><i class="fa-solid fa-headset fa-lg"></i> Підтримка</a>
-            </div>
-        </section>
-    </div>
-
-    <!-- МАГАЗИН -->
-    <div class="page" id="shop">
-        <section class="section" style="margin-top: 80px;">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">Магазин Привілеїв</h2>
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="filterShop('ranks')">Донати</button>
-                        <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
-                        <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
-                    </div>
+    <section class="section" id="shop">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Магазин Привілеїв</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="filterShop('ranks')">Донати</button>
+                    <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
+                    <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
                 </div>
-
-                <div class="cards-grid" id="shopGrid"></div>
             </div>
-        </section>
+
+            <div class="cards-grid" id="shopGrid"></div>
+        </div>
+    </section>
+
+    <section class="container" style="margin-bottom: 50px;">
+        <div class="service-row"; text-align: center;>
+            <a href="#" class="service-btn" style="background:#4a90e2"><i class="fa-regular fa-comments fa-lg"></i> Форум</a>
+            <a href="https://www.youtube.com/channel/UCTRqSuJ2xR4jBtYDADw_GxQ" class="service-btn service-yt"><i class="fa-brands fa-youtube fa-lg"></i> Наш YouTube</a>
+            <a href="https://discord.gg/X878gVyG" class="service-btn service-ds"><i class="fa-brands fa-discord fa-lg"></i> Discord Сервер</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ReallyWorld Project. Not affiliated with Mojang AB.</p>
+            <p style="font-size:13px; margin-top:10px;">Договір оферти | Політика конфіденційності</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal">
+            <div class="close-modal" onclick="closeModal()">&times;</div>
+            <div style="font-size: 50px; color: var(--primary); margin-bottom: 20px;">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <h2 id="modalTitle">Покупка</h2>
+            <p>Введіть ваш нікнейм на сервері для продовження</p>
+            <form id="purchaseForm" onsubmit="submitPurchase(event)">
+                <input type="text" name="nickname" placeholder="Ваш нікнейм (Steve)" required>
+                <input type="text" name="promocode" placeholder="Промокод (якщо є)">
+                <input type="hidden" name="item" id="itemNameInput">
+                <input type="hidden" name="price" id="itemPriceInput">
+                <button type="submit" class="modal-btn">ПЕРЕЙТИ ДО ОПЛАТИ</button>
+            </form>
+        </div>
     </div>
 
-    <!-- ПРАВИЛА -->
-    <div class="page" id="rules">
-        <section class="section" style="margin-top: 80px;">
-            <div class="container">
-                <div class="content-card">
-                    <h2><i class="fa-solid fa-book"></i> Правила сервера SimpleWorld</h2>
-                    <p>Дотримуючись цих правил, ви робите гру приємнішою для всіх. Порушення правил призводить до покарань.</p>
+    <script>
+        const products = [
+            // RANKS
+            { id: 1, type: 'ranks', name: 'Premium', price: '29 UAH', img: 'orange', discount: false },
+            { id: 2, type: 'ranks', name: 'Elite', price: '49 UAH', img: 'blue', discount: false },
+            { id: 3, type: 'ranks', name: 'Deluxe', price: '69 UAH', img: 'cyan', discount: false },
+            { id: 4, type: 'ranks', name: 'Ultra', price: '99 UAH', img: 'purple', discount: false },
+            { id: 5, type: 'ranks', name: 'Immortal', price: '119 UAH', img: 'red', discount: false },
+            { id: 6, type: 'ranks', name: 'Supreme', price: '149 UAH', img: 'yellow', discount: false },
+            { id: 7, type: 'ranks', name: 'Legend', price: '199 UAH', img: 'blue', discount: false },
+            { id: 8, type: 'ranks', name: 'Infinity', price: '249 UAH', img: 'dark', discount: false },
+            
+            // CASES
+            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '15 UAH', img: 'chest', discount: false },
+            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '45 UAH', img: 'chest', discount: false },
+            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '99 UAH', img: 'chest', discount: false },
+            { id: 14, type: 'cases', name: '3 Скрині донату', price: '99 UAH', img: 'chest_rare', discount: false },
 
-                    <h3>📋 Загальні правила</h3>
-                    <div class="rule-item">
-                        <strong>1. Повага до гравців</strong>
-                        <p>Заборонено образи, расизм, сексизм та будь
+            // SERVICES
+            { id: 20, type: 'services', name: 'Розбан', price: '89 UAH', img: 'scroll', discount: false },
+            { id: 21, type: 'services', name: 'Розмут', price: '29 UAH', img: 'scroll', discount: false },
+        ];
+
+        const grid = document.getElementById('shopGrid');
+        const btns = document.querySelectorAll('.tab-btn');
+
+        function renderCards(filterType) {
+            grid.innerHTML = '';
+            
+            const getGradient = (color) => {
+                const map = {
+                    'orange': 'linear-gradient(135deg, #ff9800, #ff5722)',
+                    'blue': 'linear-gradient(135deg, #2196f3, #03a9f4)',
+                    'cyan': 'linear-gradient(135deg, #00bcd4, #80deea)',
+                    'purple': 'linear-gradient(135deg, #673ab7, #9c27b0)',
+                    'red': 'linear-gradient(135deg, #f44336, #e91e63)',
+                    'yellow': 'linear-gradient(135deg, #ffeb3b, #fbc02d)',
+                    'green': 'linear-gradient(135deg, #4caf50, #8bc34a)',
+                    'dark': 'linear-gradient(135deg, #2d3436, #636e72)',
+                    'chest': 'linear-gradient(135deg, #795548, #5d4037)',
+                    'chest_rare': 'linear-gradient(135deg, #009688, #4db6ac)',
+                    'scroll': 'linear-gradient(135deg, #ffca28, #ff6f00)'
+                };
+                return map[color] || map['orange'];
+            };
+
+            const items = products.filter(p => p.type === filterType);
+
+            items.forEach(item => {
+                const discountHTML = item.discount 
+                    ? `<div class="badge badge-red discount-badge">ЗНИЖКА</div>` 
+                    : '';
+                
+                const imgHTML = `<div style="width:100%; height:100%; background:${getGradient(item.img)}; display:flex; align-items:center; justify-content:center; color:white; font-size:40px;">
+                    <i class="fa-solid ${item.type === 'ranks' ? 'fa-shield-halved' : (item.type === 'cases' ? 'fa-box-open' : 'fa-scroll')}"></i>
+                </div>`;
+
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="price-badge">${item.price}</div>
+                    ${discountHTML}
+                    <div class="card-img-wrap">${imgHTML}</div>
+                    <div class="card-body">
+                        <div class="card-title" style="color:${item.type==='ranks'?'var(--primary)':'#333'}">${item.name}</div>
+                        <button class="card-btn" onclick="openModal('${item.name}', '${item.price}')">
+                            <i class="fa-solid fa-cart-plus"></i> КУПИТИ
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterShop(type) {
+            btns.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderCards(type);
+        }
+
+        renderCards('ranks');
+
+        function updateCurrency() {
+            const range = document.getElementById('currencyRange');
+            const coins = range.value;
+            const price = (coins * 0.01).toFixed(0.01); // 1 UAH = 100 релік
+            
+            document.getElementById('coinsDisplay').innerText = coins + ' R';
+            document.getElementById('priceDisplay').innerText = price + ' UAH';
+        }
+
+        let count = 0;
+        const target = 14203;
+        const counterElement = document.getElementById('onlineCount');
+        const interval = setInterval(() => {
+            count += 123;
+            if (count >= target) {
+                count = target;
+                clearInterval(interval);
+            }
+            counterElement.innerText = count.toLocaleString();
+        }, 10);
+
+        function copyIP() {
+            navigator.clipboard.writeText('mc.reallyworld.ua');
+            const btn = document.querySelector('.copy-btn');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btn.style.background = 'var(--success)';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                btn.style.background = 'var(--primary)';
+            }, 2000);
+        }
+
+        const modal = document.getElementById('buyModal');
+        
+        function openModal(itemName, itemPrice) {
+            document.getElementById('modalTitle').innerText = itemName;
+            document.getElementById('itemNameInput').value = itemName;
+            document.getElementById('itemPriceInput').value = itemPrice || 'N/A';
+            modal.classList.add('open');
+        }
+
+        function openModalCurrency() {
+            const coins = document.getElementById('currencyRange').value;
+            const price = document.getElementById('priceDisplay').innerText;
+            
+            document.getElementById('modalTitle').innerText = 'Покупка валюти';
+            document.getElementById('itemNameInput').value = `${coins} Релік`;
+            document.getElementById('itemPriceInput').value = price;
+            modal.classList.add('open');
+        }
+        
+        function closeModal() {
+            modal.classList.remove('open');
+            document.getElementById('purchaseForm').reset();
+        }
+        
+        async function submitPurchase(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            const nickname = formData.get('nickname');
+            const promocode = formData.get('promocode') || 'Немає';
+            const item = formData.get('item');
+            const price = formData.get('price');
+            
+            // Створюємо FormData для FormSubmit
+            const submitData = new FormData();
+            submitData.append('Товар', item);
+            submitData.append('Ціна', price);
+            submitData.append('Нікнейм', nickname);
+            submitData.append('Промокод', promocode);
+            submitData.append('Діскорд', promocode);
+            submitData.append('Час', new Date().toLocaleString('uk-UA'));
+            submitData.append('_subject', `🎮 Замовлення: ${item} - ${nickname}`);
+            submitData.append('_captcha', 'false');
+            submitData.append('_template', 'table');
+            
+            try {
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Відправка...';
+                
+                const response = await fetch('https://formsubmit.co/simpleworld237@gmail.com', {
+                    method: 'POST',
+                    body: submitData
+                });
+                
+                if (response.ok) {
+                    alert('✅ Замовлення успішно відправлено! Очікуйте на підтвердження.');
+                    closeModal();
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                alert('❌ Помилка відправки. Спробуйте ще раз або напишіть нам напряму.');
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = false;
+                btn.innerHTML = 'ПЕРЕЙТИ ДО ОПЛАТИ';
+            }
+        }
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        function scrollToShop() {
+            document.getElementById('shop').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>
