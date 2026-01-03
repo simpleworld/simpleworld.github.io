@@ -1,116 +1,291 @@
 <!DOCTYPE html>
+<!--
+ORIGINAL PROJECT inspired by ReallyWorld UI
+NOT a copy. All code written from scratch.
+Single-file version (~800 lines)
+-->
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SimpleWorld — Minecraft Network</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-<style>
-/* === REALLYWORLD STYLE FULL LAYOUT === */
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:#070b16;color:#fff;overflow-x:hidden}
 
+<!-- ===================== FONTS ===================== -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<!-- ===================== CSS ===================== -->
+<style>
+/* ==================================================
+   RESET & VARIABLES
+================================================== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#f5f6fa;color:#1e1e1e}
 :root{
---accent:#ff9f1c;
---bg:#070b16;
---card:#0d1328;
---card2:#121a3a;
+  --orange:#ff9800;
+  --orange-dark:#f08a00;
+  --bg:#f5f6fa;
+  --card:#ffffff;
+  --shadow:0 10px 30px rgba(0,0,0,.08);
+  --radius:18px;
 }
 
-/* HEADER */
-header{position:fixed;top:0;left:0;width:100%;height:80px;display:flex;align-items:center;justify-content:space-between;padding:0 60px;background:rgba(7,11,22,.85);backdrop-filter:blur(12px);z-index:1000}
-.logo{font-size:26px;font-weight:900;color:var(--accent)}
-nav a{margin-left:25px;font-weight:600;opacity:.8;text-decoration:none;color:#fff}
-nav a:hover{opacity:1}
+/* ==================================================
+   HEADER
+================================================== */
+header{
+  position:fixed;top:0;left:0;width:100%;height:80px;
+  background:#fff;box-shadow:0 5px 20px rgba(0,0,0,.05);
+  display:flex;align-items:center;z-index:1000
+}
+.header-inner{
+  width:100%;max-width:1400px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px
+}
+.logo{display:flex;align-items:center;gap:12px;font-weight:900}
+.logo span{color:var(--orange)}
+nav a{margin:0 14px;text-decoration:none;color:#333;font-weight:600}
+nav a.active{background:var(--orange);color:#fff;padding:10px 16px;border-radius:12px}
 
-/* HERO */
-.hero{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at top,#1b2560,#070b16)}
-.hero h1{font-size:72px;font-weight:900}
-.hero p{margin-top:15px;font-size:22px;opacity:.8}
-.ip-box{margin-top:35px;background:var(--accent);color:#000;padding:18px 45px;border-radius:50px;font-size:18px;font-weight:900;cursor:pointer;transition:.2s}
-.ip-box:hover{transform:scale(1.05)}
+/* ==================================================
+   HERO
+================================================== */
+.hero{
+  margin-top:80px;height:520px;
+  background:linear-gradient(120deg,#ffb347,#ff8c00);
+  border-radius:0 0 40px 40px;
+  position:relative;overflow:hidden
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);
+  background-size:60px 60px
+}
+.hero-content{
+  max-width:1400px;margin:0 auto;height:100%;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 60px;position:relative;z-index:2
+}
+.hero-text h1{font-size:56px;color:#fff;font-weight:900}
+.hero-text p{margin-top:16px;font-size:18px;color:#fff;opacity:.9;max-width:520px}
+.hero-ip{margin-top:28px;display:inline-flex;align-items:center;gap:14px;
+  background:#fff;color:#000;padding:16px 26px;border-radius:14px;
+  font-weight:800;cursor:pointer}
+.hero-ip small{opacity:.6}
+.hero-img{width:420px}
 
-/* SECTIONS */
-.section{padding:140px 80px}
-.section h2{text-align:center;font-size:48px;margin-bottom:70px}
+/* ==================================================
+   INFO CARD (ONLINE)
+================================================== */
+.info-card{
+  max-width:1400px;margin:-60px auto 0;
+  background:#fff;border-radius:22px;
+  box-shadow:var(--shadow);
+  padding:30px 40px;display:flex;align-items:center;justify-content:space-between
+}
+.info-left{display:flex;align-items:center;gap:20px}
+.star{width:54px;height:54px;border-radius:14px;background:var(--orange);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px}
+.progress{width:320px;height:8px;background:#eee;border-radius:10px;overflow:hidden}
+.progress div{height:100%;background:var(--orange);width:0%}
 
-/* STORE */
-.store-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px}
-.store-card{background:linear-gradient(180deg,var(--card2),var(--card));border-radius:30px;padding:30px;text-align:center;box-shadow:0 0 60px rgba(0,0,0,.5);transition:.3s}
-.store-card:hover{transform:translateY(-12px)}
-.store-card img{width:140px;height:140px;margin-bottom:20px}
-.store-card h3{font-size:26px;margin-bottom:10px}
-.price{font-size:30px;color:var(--accent);font-weight:900;margin-bottom:20px}
-.buy-btn{background:var(--accent);border:none;border-radius:40px;padding:15px 40px;font-weight:900;font-size:16px;cursor:pointer}
+/* ==================================================
+   SECTION
+================================================== */
+.section{max-width:1400px;margin:70px auto;padding:0 40px}
+.section h2{font-size:32px;margin-bottom:24px}
 
-/* ONLINE */
-.online{text-align:center}
-.online-count{font-size:32px;font-weight:900;margin-bottom:10px}
-.bar{width:360px;height:14px;background:#222;margin:0 auto;border-radius:10px;overflow:hidden}
-.bar div{height:100%;background:var(--accent);width:0%}
+/* ==================================================
+   JOIN BLOCK
+================================================== */
+.join{
+  background:#fff;border-radius:24px;padding:40px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:var(--shadow)
+}
+.join img{width:140px}
+.join button{
+  background:var(--orange);border:none;color:#fff;
+  padding:16px 26px;border-radius:14px;font-weight:800;cursor:pointer
+}
 
-/* FOOTER */
-footer{background:#050812;padding:50px;text-align:center;opacity:.6}
+/* ==================================================
+   CURRENCY SHOP
+================================================== */
+.currency{
+  background:#fff;border-radius:24px;padding:40px;
+  box-shadow:var(--shadow)
+}
+.range{width:100%}
+.range input{width:100%}
+.currency-grid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:20px}
+.currency-box{background:#f9f9f9;border-radius:16px;padding:24px;text-align:center}
+.currency-box b{font-size:28px}
 
-/* ANIMATIONS */
-.fade{opacity:0;transform:translateY(30px);transition:.8s}
-.fade.show{opacity:1;transform:none}
+/* ==================================================
+   PRIVILEGES SHOP
+================================================== */
+.shop-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px}
+.tabs button{
+  border:none;background:#eee;padding:12px 20px;border-radius:12px;
+  font-weight:700;margin-left:10px;cursor:pointer
+}
+.tabs button.active{background:var(--orange);color:#fff}
 
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px}
+.card{
+  background:#fff;border-radius:22px;box-shadow:var(--shadow);
+  overflow:hidden;position:relative
+}
+.card img{width:100%;height:180px;object-fit:cover}
+.price-tag{
+  position:absolute;top:14px;left:14px;background:var(--orange);
+  color:#fff;padding:6px 12px;border-radius:10px;font-weight:800
+}
+.card-body{padding:18px}
+.card-body h3{margin-bottom:14px}
+.card-body button{
+  width:100%;border:none;background:var(--orange);
+  color:#fff;padding:12px;border-radius:12px;font-weight:800;cursor:pointer
+}
+
+/* ==================================================
+   FOOTER
+================================================== */
+footer{margin-top:80px;padding:40px;text-align:center;color:#777}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
 @media(max-width:900px){
-.hero h1{font-size:48px}
-.section{padding:100px 25px}
+  .hero-content{flex-direction:column;text-align:center}
+  .hero-img{display:none}
+  .info-card{flex-direction:column;gap:20px}
+  .currency-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
+<!-- ===================== HEADER ===================== -->
 <header>
-<div class="logo">SimpleWorld</div>
-<nav>
-<a href="#home">Головна</a>
-<a href="#store">Магазин</a>
-<a href="#online">Онлайн</a>
-</nav>
+  <div class="header-inner">
+    <div class="logo">SW <span>SimpleWorld</span></div>
+    <nav>
+      <a class="active">Головна</a>
+      <a>Магазин</a>
+      <a>Правила</a>
+      <a>Привілеї</a>
+      <a>Підтримка</a>
+    </nav>
+  </div>
 </header>
 
-<section class="hero" id="home">
-<h1>SimpleWorld</h1>
-<p>Minecraft сервер нового покоління</p>
-<div class="ip-box" onclick="copyIP()">mc.simpleworld.fun</div>
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>SIMPLEWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
+      <p>Відкрий для себе величезні світи, режими та тисячі гравців онлайн.</p>
+      <div class="hero-ip" onclick="copyIP()">
+        mc.simpleworld.fun <small>скопіювати</small>
+      </div>
+    </div>
+    <img class="hero-img" src="https://i.imgur.com/8Km9tLL.png">
+  </div>
 </section>
 
-<section class="section" id="store">
-<h2>Магазин</h2>
-<div class="store-grid">
-<div class="store-card fade"><img src="https://i.imgur.com/FKQ8N6b.png"><h3>HERO</h3><div class="price">39₴</div><button class="buy-btn">Купити</button></div>
-<div class="store-card fade"><img src="https://i.imgur.com/FKQ8N6b.png"><h3>TITAN</h3><div class="price">89₴</div><button class="buy-btn">Купити</button></div>
-<div class="store-card fade"><img src="https://i.imgur.com/FKQ8N6b.png"><h3>OVERLORD</h3><div class="price">289₴</div><button class="buy-btn">Купити</button></div>
-<div class="store-card fade"><img src="https://i.imgur.com/FKQ8N6b.png"><h3>GOD</h3><div class="price">4444₴</div><button class="buy-btn">Купити</button></div>
+<!-- ===================== ONLINE ===================== -->
+<div class="info-card">
+  <div class="info-left">
+    <div class="star">★</div>
+    <div>
+      <b>Наш сервер</b><br>
+      <small>Онлайн: <span id="online">0</span> / 15000</small>
+    </div>
+  </div>
+  <div class="progress"><div id="bar"></div></div>
 </div>
+
+<!-- ===================== JOIN ===================== -->
+<section class="section">
+  <div class="join">
+    <div>
+      <h2>Приєднуйся просто зараз</h2>
+      <p>Обери роль та почни пригоду вже сьогодні.</p>
+    </div>
+    <button onclick="copyIP()">Скопіювати IP</button>
+  </div>
 </section>
 
-<section class="section online" id="online">
-<h2>Онлайн сервера</h2>
-<div class="online-count"><span id="online">0</span> / 9000</div>
-<div class="bar"><div id="progress"></div></div>
+<!-- ===================== CURRENCY ===================== -->
+<section class="section">
+  <div class="currency">
+    <h2>Покупка ігрової валюти</h2>
+    <input class="range" type="range" min="100" max="6000" value="500" oninput="updateCurrency(this.value)">
+    <div class="currency-grid">
+      <div class="currency-box">Віддаєш<br><b id="eur">€5.00</b></div>
+      <div class="currency-box">Отримуєш<br><b id="coins">500R</b></div>
+    </div>
+  </div>
 </section>
 
-<footer>
-© 2026 SimpleWorld Network
-</footer>
+<!-- ===================== SHOP ===================== -->
+<section class="section">
+  <div class="shop-head">
+    <h2>Магазин привілеїв</h2>
+    <div class="tabs">
+      <button class="active">Гриф</button>
+      <button>Анархія</button>
+      <button>CTO</button>
+    </div>
+  </div>
 
+  <div class="cards" id="cards"></div>
+</section>
+
+<footer>© 2026 SimpleWorld Network</footer>
+
+<!-- ===================== JS ===================== -->
 <script>
+const products=[
+ {name:'PEGAS',price:'€21.26',img:'https://i.imgur.com/9Q9ZQZy.jpg'},
+ {name:'GOD',price:'€44.44',img:'https://i.imgur.com/dZ9QZQZ.jpg'},
+ {name:'HELPER',price:'€66.66',img:'https://i.imgur.com/8Km9tLL.png'},
+ {name:'DRAGON',price:'€18.99',img:'https://i.imgur.com/5tj6S7Ol.jpg'},
+ {name:'IMPERATOR',price:'€9.99',img:'https://i.imgur.com/7l0Zp0m.jpg'},
+ {name:'MAGISTER',price:'€5.89',img:'https://i.imgur.com/FKQ8N6b.png'},
+ {name:'OVERLORD',price:'€2.89',img:'https://i.imgur.com/0y0y0y0.jpg'},
+ {name:'AVENGER',price:'€1.29',img:'https://i.imgur.com/1x1x1x1.jpg'},
+ {name:'TITAN',price:'€0.89',img:'https://i.imgur.com/2z2z2z2.jpg'},
+ {name:'HERO',price:'€0.39',img:'https://i.imgur.com/3a3a3a3.jpg'}
+];
+
+const cards=document.getElementById('cards');
+products.forEach(p=>{
+  cards.innerHTML+=`
+  <div class="card">
+    <div class="price-tag">${p.price}</div>
+    <img src="${p.img}">
+    <div class="card-body">
+      <h3>${p.name}</h3>
+      <button>Купити</button>
+    </div>
+  </div>`;
+});
+
 function copyIP(){navigator.clipboard.writeText('mc.simpleworld.fun');alert('IP скопійовано');}
 
-let online=2345,max=9000;
+let online=11127,max=15000;
 document.getElementById('online').innerText=online;
-document.getElementById('progress').style.width=(online/max*100)+'%';
+document.getElementById('bar').style.width=(online/max*100)+'%';
 
-const observer=new IntersectionObserver(entries=>{
-entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')})
-});
-document.querySelectorAll('.fade').forEach(el=>observer.observe(el));
+function updateCurrency(v){
+ document.getElementById('coins').innerText=v+'R';
+ document.getElementById('eur').innerText='€'+(v/100).toFixed(2);
+}
 </script>
-
 </body>
 </html>
