@@ -755,7 +755,7 @@
             document.getElementById('purchaseForm').reset();
         }
         
-        function submitPurchase(event) {
+        async function submitPurchase(event) {
             event.preventDefault();
             
             const form = event.target;
@@ -766,26 +766,39 @@
             const item = formData.get('item');
             const price = formData.get('price');
             
-            const subject = `Замовлення: ${item} - ${nickname}`;
-            const body = `
-НОВЕ ЗАМОВЛЕННЯ З САЙТУ REALLYWORLD
-
-Товар: ${item}
-Ціна: ${price}
-Нікнейм: ${nickname}
-Промокод: ${promocode}
-Час замовлення: ${new Date().toLocaleString('uk-UA')}
-            `.trim();
+            // Створюємо FormData для FormSubmit
+            const submitData = new FormData();
+            submitData.append('Товар', item);
+            submitData.append('Ціна', price);
+            submitData.append('Нікнейм', nickname);
+            submitData.append('Промокод', promocode);
+            submitData.append('Час', new Date().toLocaleString('uk-UA'));
+            submitData.append('_subject', `🎮 Замовлення: ${item} - ${nickname}`);
+            submitData.append('_captcha', 'false');
+            submitData.append('_template', 'table');
             
-            // Відкриваємо email клієнт
-            const mailtoLink = `mailto:simpleworld237@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.location.href = mailtoLink;
-            
-            // Показуємо повідомлення
-            setTimeout(() => {
-                alert('✅ Відкрито ваш email клієнт. Відправте лист для підтвердження замовлення!');
-                closeModal();
-            }, 500);
+            try {
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Відправка...';
+                
+                const response = await fetch('https://formsubmit.co/simpleworld237@gmail.com', {
+                    method: 'POST',
+                    body: submitData
+                });
+                
+                if (response.ok) {
+                    alert('✅ Замовлення успішно відправлено! Очікуйте на підтвердження.');
+                    closeModal();
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                alert('❌ Помилка відправки. Спробуйте ще раз або напишіть нам напряму.');
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = false;
+                btn.innerHTML = 'ПЕРЕЙТИ ДО ОПЛАТИ';
+            }
         }
         
         modal.addEventListener('click', (e) => {
