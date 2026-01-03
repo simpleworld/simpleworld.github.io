@@ -755,7 +755,7 @@
             document.getElementById('purchaseForm').reset();
         }
         
-        async function submitPurchase(event) {
+        function submitPurchase(event) {
             event.preventDefault();
             
             const form = event.target;
@@ -766,7 +766,8 @@
             const item = formData.get('item');
             const price = formData.get('price');
             
-            const emailBody = `
+            const subject = `Замовлення: ${item} - ${nickname}`;
+            const body = `
 НОВЕ ЗАМОВЛЕННЯ З САЙТУ REALLYWORLD
 
 Товар: ${item}
@@ -776,28 +777,15 @@
 Час замовлення: ${new Date().toLocaleString('uk-UA')}
             `.trim();
             
-            const submitData = new FormData();
-            submitData.append('_subject', `Замовлення: ${item} - ${nickname}`);
-            submitData.append('message', emailBody);
+            // Відкриваємо email клієнт
+            const mailtoLink = `mailto:simpleworld237@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
             
-            try {
-                const response = await fetch('https://formsubmit.co/simpleworld237@gmail.com', {
-                    method: 'POST',
-                    body: submitData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    alert('✅ Замовлення успішно відправлено! Очікуйте на підтвердження.');
-                    closeModal();
-                } else {
-                    alert('❌ Помилка відправки. Спробуйте ще раз.');
-                }
-            } catch (error) {
-                alert('❌ Помилка з\'єднання. Перевірте інтернет.');
-            }
+            // Показуємо повідомлення
+            setTimeout(() => {
+                alert('✅ Відкрито ваш email клієнт. Відправте лист для підтвердження замовлення!');
+                closeModal();
+            }, 500);
         }
         
         modal.addEventListener('click', (e) => {
