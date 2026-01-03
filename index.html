@@ -16,18 +16,14 @@
             --primary: #ff9800;
             --primary-dark: #f57c00;
             --primary-gradient: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
-            --secondary: #2d3436;
             --bg-body: #f4f6f8;
-            --bg-card: #ffffff;
             --text-main: #2d3436;
             --text-muted: #636e72;
             --danger: #ff4757;
             --success: #2ecc71;
             --radius-lg: 20px;
             --radius-md: 12px;
-            --radius-sm: 8px;
             --shadow-soft: 0 10px 40px rgba(0,0,0,0.05);
-            --shadow-hover: 0 20px 50px rgba(255, 152, 0, 0.2);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -41,9 +37,8 @@
             line-height: 1.6;
         }
 
-        a { text-decoration: none; color: inherit; }
-        ul { list-style: none; }
         button { cursor: pointer; border: none; font-family: inherit; }
+        a { text-decoration: none; color: inherit; }
 
         /* ========================================================================
            2. UTILITIES & ANIMATIONS
@@ -51,29 +46,21 @@
         .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
         .flex { display: flex; align-items: center; }
         .flex-between { justify-content: space-between; }
-        .flex-center { justify-content: center; }
-        .grid { display: grid; gap: 24px; }
-        
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 800; text-transform: uppercase; }
         .badge-red { background: var(--danger); color: white; }
-        .badge-green { background: var(--success); color: white; }
 
+        /* Анімація фону (наближення) */
+        @keyframes panZoom {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Анімація персонажа (плавання) */
         @keyframes float {
             0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
             100% { transform: translateY(0px); }
-        }
-
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 152, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
         }
 
         /* ========================================================================
@@ -84,430 +71,176 @@
             backdrop-filter: blur(10px);
             height: 80px;
             position: fixed;
-            top: 0; left: 0; right: 0;
+            top: 0; left: 0; width: 100%;
             z-index: 1000;
             box-shadow: 0 2px 20px rgba(0,0,0,0.03);
         }
-
         .nav-inner { height: 100%; }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #000;
-        }
-        .logo img { height: 40px; } /* Placeholder for logo img */
+        .logo { font-size: 24px; font-weight: 900; color: #000; display: flex; align-items: center; gap: 10px; }
         .logo span { color: var(--primary); }
+        
+        .nav-links a { margin: 0 15px; font-weight: 600; color: var(--text-muted); transition: var(--transition); }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); }
 
-        .nav-links a {
-            margin: 0 15px;
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--text-muted);
-            transition: var(--transition);
-            position: relative;
+        .btn-header {
+            background: var(--primary); color: white; padding: 10px 20px;
+            border-radius: 10px; font-weight: 700; transition: var(--transition);
         }
-        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
-        .nav-links a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -28px;
-            left: 0; right: 0;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 3px 3px 0 0;
-        }
+        .btn-header:hover { background: var(--primary-dark); }
 
         /* ========================================================================
-           4. HERO SECTION
+           4. HERO SECTION (ANIMATED)
            ======================================================================== */
         .hero {
             margin-top: 80px;
-            height: 600px;
-            background: linear-gradient(135deg, #ff9800 0%, #ff6d00 100%);
+            height: 650px;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
         }
 
-        /* Background Pattern */
-        .hero::before {
-            content: '';
+        /* ФОН - ЗАМІНИТИ URL НИЖЧЕ НА СВІЙ, ЯКЩО ТРЕБА */
+        .hero-bg {
             position: absolute; inset: 0;
-            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
-            opacity: 0.1;
+            background: url('https://wallpapers.com/images/hd/minecraft-shaders-orange-sunset-castle-640a45f9d1e.jpg') center/cover no-repeat;
+            z-index: 1;
+            animation: panZoom 20s ease-in-out infinite;
+        }
+        
+        /* Помаранчевий оверлей поверх картинки */
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(255,152,0,0.85) 0%, rgba(255,109,0,0.6) 100%);
+            z-index: 2;
+        }
+
+        /* Canvas для частинок */
+        #particles {
+            position: absolute; inset: 0; z-index: 3;
+            pointer-events: none;
         }
 
         .hero-content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            max-width: 600px;
+            position: relative; z-index: 5;
+            color: white; max-width: 650px;
         }
+        .hero h1 { font-size: 56px; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .hero p { font-size: 18px; opacity: 0.95; margin-bottom: 30px; font-weight: 500; }
 
-        .hero h1 {
-            font-size: 56px;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .hero p {
-            font-size: 18px;
-            opacity: 0.9;
-            margin-bottom: 30px;
-            max-width: 480px;
-        }
-
-        .hero-btn {
-            background: white;
-            color: var(--primary-dark);
-            padding: 16px 32px;
-            border-radius: var(--radius-md);
-            font-weight: 800;
-            font-size: 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
+        .hero-btns { display: flex; gap: 15px; }
+        .btn-hero {
+            background: white; color: var(--primary-dark);
+            padding: 16px 32px; border-radius: 14px;
+            font-weight: 800; font-size: 16px;
+            display: flex; align-items: center; gap: 10px;
             transition: var(--transition);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
 
-        /* Char Image */
+        /* ПЕРСОНАЖ - ЗАМІНИТИ URL НИЖЧЕ НА СВІЙ */
         .hero-char {
-            position: absolute;
-            right: 5%;
-            bottom: -50px;
-            height: 700px; /* Large character */
-            z-index: 1;
-            animation: float 6s ease-in-out infinite;
-            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
+            position: absolute; right: 2%; bottom: -40px;
+            height: 680px; z-index: 4;
+            animation: float 5s ease-in-out infinite;
+            filter: drop-shadow(-20px 0 30px rgba(0,0,0,0.3));
         }
 
         /* ========================================================================
-           5. INFO BAR & IP COPY
+           5. INFO BAR
            ======================================================================== */
-        .info-bar-wrapper {
-            margin-top: -50px;
-            position: relative;
-            z-index: 10;
-        }
-        
+        .info-bar-wrapper { margin-top: -60px; position: relative; z-index: 10; }
         .info-card {
-            background: white;
-            padding: 30px 40px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: white; padding: 30px 40px;
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);
+            display: flex; align-items: center; justify-content: space-between;
         }
-
-        .server-status { display: flex; align-items: center; gap: 20px; }
-        .status-icon {
-            width: 60px; height: 60px;
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 24px;
-            box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
-        }
-        .status-text h3 { font-size: 18px; font-weight: 800; }
-        .status-text p { font-size: 14px; color: var(--text-muted); }
-        .online-count { color: var(--success); font-weight: 700; }
-
         .ip-block {
-            background: #f4f6f8;
-            padding: 10px 10px 10px 25px;
-            border-radius: 14px;
-            display: flex; align-items: center; gap: 20px;
-            border: 1px solid #e1e4e8;
+            background: #f4f6f8; padding: 12px 25px;
+            border-radius: 14px; display: flex; align-items: center; gap: 20px;
+            border: 1px solid #e1e4e8; cursor: pointer;
         }
-        .ip-text { font-family: monospace; font-size: 18px; font-weight: 700; color: #333; }
-        .copy-btn {
-            background: var(--primary); color: white;
-            width: 44px; height: 44px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
-        }
-        .copy-btn:hover { background: var(--primary-dark); }
+        .ip-text { font-family: monospace; font-size: 20px; font-weight: 800; color: #333; }
 
         /* ========================================================================
-           6. CURRENCY SECTION (SLIDER)
+           6. SECTIONS (CURRENCY & SHOP)
            ======================================================================== */
         .section { padding: 80px 0; }
         
         .currency-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 40px;
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            align-items: center;
-            gap: 50px;
+            background: white; padding: 40px;
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);
+            display: flex; align-items: center; gap: 40px;
         }
+        .range-wrapper { width: 100%; margin: 20px 0; }
+        .range-input { width: 100%; height: 10px; background: #eee; border-radius: 5px; -webkit-appearance: none; }
+        .range-input::-webkit-slider-thumb { -webkit-appearance: none; width: 25px; height: 25px; background: var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 5px rgba(255,152,0,0.2); }
 
-        .currency-icon {
-            width: 120px; height: 120px;
-            flex-shrink: 0;
-            background: #fff3e0;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .currency-icon img { width: 70px; }
-
-        .currency-content { flex-grow: 1; }
-        .currency-header { margin-bottom: 25px; }
-        .currency-header h2 { font-size: 28px; font-weight: 800; }
-        
-        .range-wrapper { margin-bottom: 30px; position: relative; }
-        .range-input {
-            width: 100%;
-            -webkit-appearance: none;
-            height: 10px;
-            border-radius: 5px;
-            background: #e0e0e0;
-            outline: none;
-        }
-        .range-input::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-            box-shadow: 0 0 0 6px rgba(255, 152, 0, 0.2);
-            transition: .2s;
-        }
-        .range-labels {
-            display: flex; justify-content: space-between;
-            margin-top: 10px; font-size: 13px; color: var(--text-muted); font-weight: 600;
-        }
-
-        .exchange-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr;
-            gap: 20px;
-            align-items: center;
-        }
-        .ex-box {
-            background: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 12px;
-            border: 1px solid #eee;
-        }
-        .ex-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
-        .ex-value { font-size: 24px; font-weight: 800; color: var(--text-main); }
-        .buy-currency-btn {
-            height: 100%;
-            background: var(--primary-gradient);
-            color: white;
-            border-radius: 12px;
-            font-weight: 800;
-            font-size: 16px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            transition: var(--transition);
-        }
-        .buy-currency-btn:hover { box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3); transform: translateY(-2px); }
-
-        /* ========================================================================
-           7. SHOP GRID (PRIVILEGES)
-           ======================================================================== */
-        .section-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 40px;
-        }
-        .section-title { font-size: 32px; font-weight: 900; }
-        
-        .tabs {
-            background: white;
-            padding: 5px;
-            border-radius: 12px;
-            display: inline-flex;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .tab-btn {
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-weight: 700;
-            color: var(--text-muted);
-            transition: var(--transition);
-        }
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 25px;
-        }
-
+        /* SHOP GRID */
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; margin-top: 30px; }
         .shop-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-soft);
-            transition: var(--transition);
-            position: relative;
-            border: 1px solid transparent;
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: var(--shadow-soft); transition: var(--transition);
+            position: relative; border: 1px solid transparent;
         }
-        .shop-card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-hover);
-            border-color: rgba(255, 152, 0, 0.3);
-        }
-
-        .card-img-wrap {
-            height: 180px;
-            background: #eee;
-            position: relative;
-            overflow: hidden;
-        }
-        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .shop-card:hover .card-img-wrap img { transform: scale(1.1); }
+        .shop-card:hover { transform: translateY(-8px); border-color: var(--primary); }
         
-        /* Gradient overlays for different tiers */
-        .overlay-orange { background: linear-gradient(to top, rgba(255,152,0,0.8), transparent); }
-        .overlay-red { background: linear-gradient(to top, rgba(255,71,87,0.8), transparent); }
-        .overlay-purple { background: linear-gradient(to top, rgba(162,155,254,0.8), transparent); }
-
-        .price-badge {
-            position: absolute;
-            top: 15px; left: 15px;
-            background: var(--primary);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 14px;
-            z-index: 2;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .card-img {
+            height: 160px; display: flex; align-items: center; justify-content: center;
+            font-size: 45px; color: white;
         }
-        
-        .discount-badge {
-            position: absolute;
-            top: 15px; right: 15px;
-            z-index: 2;
-            transform: rotate(15deg);
-        }
-
-        .card-body { padding: 20px; text-align: center; }
-        .card-title {
-            font-size: 20px; font-weight: 800; text-transform: uppercase;
-            margin-bottom: 15px; letter-spacing: 0.5px;
-        }
-        
-        .card-btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            background: #f4f6f8;
-            color: var(--text-main);
-            font-weight: 700;
-            transition: var(--transition);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .card-btn:hover {
+        .price-tag {
+            position: absolute; top: 15px; left: 15px;
             background: var(--primary); color: white;
+            padding: 6px 12px; border-radius: 8px; font-weight: 800;
         }
-
-        /* ========================================================================
-           8. SERVICES & FOOTER
-           ======================================================================== */
-        .service-row {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-        }
-        .service-btn {
-            background: #2d3436;
-            color: white;
-            padding: 20px;
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center; gap: 15px;
-            font-weight: 700;
+        .card-body { padding: 20px; text-align: center; }
+        .btn-buy {
+            width: 100%; padding: 12px; border-radius: 10px;
+            background: #f4f6f8; font-weight: 800; color: #333;
             transition: var(--transition);
         }
-        .service-vk { background: #4c75a3; }
-        .service-yt { background: #ff0000; }
-        .service-ds { background: #5865F2; }
-        .service-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
-
-        footer {
-            background: white;
-            padding: 40px 0;
-            margin-top: 80px;
-            border-top: 1px solid #eee;
-            text-align: center;
-            color: var(--text-muted);
-        }
+        .shop-card:hover .btn-buy { background: var(--primary); color: white; }
 
         /* ========================================================================
-           9. MODAL
+           7. MODAL & FORM
            ======================================================================== */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-            display: none;
-            align-items: center; justify-content: center;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
         }
         .modal-overlay.open { display: flex; animation: fadeIn 0.3s; }
         
         .modal {
-            background: white;
-            width: 90%; max-width: 500px;
-            border-radius: 24px;
-            padding: 40px;
-            position: relative;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            animation: slideUp 0.3s;
+            background: white; width: 90%; max-width: 450px;
+            border-radius: 24px; padding: 40px; position: relative;
+            text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+        .modal h2 { margin-bottom: 10px; font-size: 26px; }
+        
+        .modal-form input {
+            width: 100%; padding: 16px; margin-bottom: 15px;
+            border: 2px solid #eee; border-radius: 12px;
+            font-size: 16px; transition: .3s;
+        }
+        .modal-form input:focus { border-color: var(--primary); }
+        
+        .btn-submit {
+            width: 100%; padding: 16px; background: var(--primary);
+            color: white; font-weight: 800; border-radius: 12px; font-size: 18px;
+            box-shadow: 0 5px 15px rgba(255,152,0,0.3);
         }
         
-        .modal h2 { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
-        .modal p { color: var(--text-muted); margin-bottom: 30px; }
-        .modal input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #eee;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-size: 16px;
-            font-weight: 600;
-            transition: .3s;
-        }
-        .modal input:focus { border-color: var(--primary); }
-        .modal-btn {
-            width: 100%; padding: 16px;
-            background: var(--primary); color: white;
-            font-weight: 800; border-radius: 12px; font-size: 18px;
-        }
-        .close-modal {
-            position: absolute; top: 20px; right: 20px;
-            font-size: 24px; color: #ccc; cursor: pointer;
-        }
-        .close-modal:hover { color: var(--text-main); }
-
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(50px); } to { transform: translateY(0); } }
 
-        /* Mobile */
+        /* MOBILE */
         @media(max-width: 900px) {
-            .hero { height: auto; padding: 60px 0; text-align: center; }
-            .hero-content { margin: 0 auto; }
+            .hero { text-align: center; height: auto; padding: 100px 0; }
             .hero-char { display: none; }
-            .info-card { flex-direction: column; gap: 20px; text-align: center; }
-            .currency-card { flex-direction: column; padding: 20px; }
-            .exchange-grid { grid-template-columns: 1fr; width: 100%; }
-            .nav-links { display: none; } /* Simplified for demo */
-            .service-row { grid-template-columns: 1fr 1fr; }
+            .info-card, .currency-card { flex-direction: column; gap: 20px; text-align: center; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
@@ -515,56 +248,52 @@
 
     <header>
         <div class="container flex flex-between nav-inner">
-            <a href="#" class="logo">
+            <div class="logo">
                 <i class="fa-solid fa-cube fa-xl" style="color:var(--primary)"></i>
                 RW <span>NETWORK</span>
-            </a>
+            </div>
             <nav class="nav-links flex">
-                <a href="#" class="active"><i class="fa-solid fa-house"></i> Головна</a>
-                <a href="#shop"><i class="fa-solid fa-cart-shopping"></i> Магазин</a>
-                <a href="#"><i class="fa-solid fa-book"></i> Правила</a>
-                <a href="#"><i class="fa-solid fa-crown"></i> Привілеї</a>
-                <a href="#"><i class="fa-solid fa-headset"></i> Підтримка</a>
+                <a href="#" class="active">Головна</a>
+                <a href="#shop">Магазин</a>
+                <a href="#">Правила</a>
+                <a href="#">Підтримка</a>
             </nav>
-            <button class="hero-btn" onclick="openModal('Вхід в кабінет')">
-                <i class="fa-solid fa-user"></i> Кабінет
-            </button>
+            <button class="btn-header" onclick="openModal('Вхід в кабінет', '')">Кабінет</button>
         </div>
     </header>
 
     <section class="hero">
-        <div class="container flex flex-between" style="width: 100%;">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+        <canvas id="particles"></canvas>
+
+        <div class="container flex flex-between" style="width: 100%; position:relative; z-index:5;">
             <div class="hero-content">
                 <h1>REALLYWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
-                <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
-                <div class="flex" style="gap:15px; flex-wrap:wrap;">
-                    <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="scrollToShop()">
-                        <i class="fa-solid fa-bag-shopping"></i> Придбати донат
+                <p>Приєднуйся до найкращого сервера з анархією та гриферським виживанням. Твоя пригода починається тут!</p>
+                <div class="hero-btns">
+                    <button class="btn-hero" onclick="window.location.href='#shop'">
+                        <i class="fa-solid fa-cart-shopping"></i> Купити донат
                     </button>
-                    <button class="hero-btn">
+                    <button class="btn-hero" style="background:rgba(255,255,255,0.2); color:white; box-shadow:none;">
                         <i class="fa-solid fa-play"></i> Почати гру
                     </button>
                 </div>
             </div>
-            <img src="https://i.imgur.com/8Km9tLL.png" class="hero-char" alt="Minecraft Character">
+            
+            <img src="https://i.imgur.com/7l0Zp0m.png" class="hero-char" alt="Minecraft Skin">
         </div>
     </section>
 
     <div class="container info-bar-wrapper">
         <div class="info-card">
-            <div class="server-status">
-                <div class="status-icon"><i class="fa-solid fa-star"></i></div>
-                <div class="status-text">
-                    <h3>НАШ СЕРВЕР</h3>
-                    <p>Онлайн: <span class="online-count" id="onlineCount">0</span> гравців</p>
-                </div>
+            <div>
+                <h3 style="font-size:20px; font-weight:800">НАШ СЕРВЕР</h3>
+                <p style="color:#777">Онлайн: <span id="online" style="color:var(--success); font-weight:700">0</span> гравців</p>
             </div>
-            
-            <div class="ip-block">
-                <div class="ip-text" id="ipAddress">mc.reallyworld.ua</div>
-                <button class="copy-btn" onclick="copyIP()">
-                    <i class="fa-regular fa-copy"></i>
-                </button>
+            <div class="ip-block" onclick="copyIP()">
+                <div class="ip-text">mc.reallyworld.ua</div>
+                <i class="fa-regular fa-copy" style="color:var(--primary)"></i>
             </div>
         </div>
     </div>
@@ -572,227 +301,170 @@
     <section class="section">
         <div class="container">
             <div class="currency-card">
-                <div class="currency-icon">
-                    <i class="fa-solid fa-coins fa-3x" style="color: #f57c00;"></i>
-                </div>
-                <div class="currency-content">
-                    <div class="currency-header">
-                        <h2>Покупка ігрової валюти (Ріліки)</h2>
-                        <p style="color:#777">Використовуйте повзунок для вибору суми</p>
-                    </div>
-                    
+                <div style="flex:1">
+                    <h2>Покупка ігрової валюти</h2>
                     <div class="range-wrapper">
-                        <input type="range" class="range-input" min="100" max="10000" step="50" value="500" id="currencyRange" oninput="updateCurrency()">
-                        <div class="range-labels">
-                            <span>100 R</span>
-                            <span>10000 R</span>
-                        </div>
+                        <input type="range" class="range-input" min="100" max="5000" step="50" value="500" id="range" oninput="updateCalc()">
                     </div>
-
-                    <div class="exchange-grid">
-                        <div class="ex-box">
-                            <div class="ex-label">До сплати</div>
-                            <div class="ex-value" id="priceDisplay">€5.00</div>
+                    <div class="flex flex-between">
+                        <div>
+                            <small>ДО СПЛАТИ</small>
+                            <div style="font-size:24px; font-weight:800" id="priceVal">€5.00</div>
                         </div>
-                        <div class="ex-box">
-                            <div class="ex-label">Ви отримуєте</div>
-                            <div class="ex-value" id="coinsDisplay">500 R</div>
+                        <div style="text-align:right">
+                            <small>ОТРИМУЄШ</small>
+                            <div style="font-size:24px; font-weight:800; color:var(--primary)" id="coinsVal">500 R</div>
                         </div>
-                        <button class="buy-currency-btn" onclick="openModal('Покупка валюти')">
-                            ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
-                        </button>
                     </div>
                 </div>
+                <button class="btn-submit" style="width:auto; padding:0 40px;" onclick="buyCurrency()">ПРИДБАТИ</button>
             </div>
         </div>
     </section>
 
     <section class="section" id="shop">
         <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Магазин Привілеїв</h2>
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="filterShop('ranks')">Гриф</button>
-                    <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
-                    <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
-                </div>
-            </div>
-
-            <div class="cards-grid" id="shopGrid"></div>
-        </div>
-    </section>
-
-    <section class="container" style="margin-bottom: 50px;">
-        <div class="service-row">
-            <a href="#" class="service-btn service-vk"><i class="fa-brands fa-vk fa-lg"></i> Ми ВКонтакті</a>
-            <a href="#" class="service-btn" style="background:#4a90e2"><i class="fa-regular fa-comments fa-lg"></i> Форум</a>
-            <a href="#" class="service-btn service-yt"><i class="fa-brands fa-youtube fa-lg"></i> Наш YouTube</a>
-            <a href="#" class="service-btn service-ds"><i class="fa-brands fa-discord fa-lg"></i> Discord Сервер</a>
+            <h2 style="font-size:32px; font-weight:900; margin-bottom:20px">Магазин Привілеїв</h2>
+            <div class="cards-grid" id="grid"></div>
         </div>
     </section>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2026 ReallyWorld Project. Not affiliated with Mojang AB.</p>
-            <p style="font-size:13px; margin-top:10px;">Договір оферти | Політика конфіденційності</p>
+        <div class="container" style="text-align:center; padding:40px 0; color:#888;">
+            &copy; 2026 ReallyWorld. Всі права захищено.
         </div>
     </footer>
 
-    <div class="modal-overlay" id="buyModal">
+    <div class="modal-overlay" id="modal">
         <div class="modal">
-            <div class="close-modal" onclick="closeModal()">&times;</div>
-            <div style="font-size: 50px; color: var(--primary); margin-bottom: 20px;">
-                <i class="fa-solid fa-cart-shopping"></i>
-            </div>
+            <div style="position:absolute; top:20px; right:20px; cursor:pointer; font-size:24px;" onclick="closeModal()">&times;</div>
             <h2 id="modalTitle">Покупка</h2>
-            <p>Введіть ваш нікнейм на сервері для продовження</p>
-            <input type="text" placeholder="Ваш нікнейм (Steve)">
-            <input type="text" placeholder="Промокод (якщо є)">
-            <button class="modal-btn">ПЕРЕЙТИ ДО ОПЛАТИ</button>
+            <p style="color:#777; margin-bottom:20px;">Заповніть форму для оплати</p>
+            
+            <form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST" class="modal-form">
+                
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="Нове замовлення донату!">
+                <input type="hidden" name="_next" value="https://mc.reallyworld.ua"> <input type="hidden" id="formItem" name="Товар" value="">
+                <input type="hidden" id="formPrice" name="Сума" value="">
+
+                <input type="text" name="nickname" placeholder="Ваш ігровий нікнейм" required>
+                <input type="text" name="promocode" placeholder="Промокод (необов'язково)">
+                <input type="email" name="email" placeholder="Ваш Email (для чеку)" required>
+                
+                <button type="submit" class="btn-submit">ПЕРЕЙТИ ДО ОПЛАТИ</button>
+            </form>
         </div>
     </div>
 
     <script>
-        /* ---------------- DATA ---------------- */
-        const products = [
-            // RANKS
-            { id: 1, type: 'ranks', name: 'PEGAS', price: '€21.26', old: '€77.77', img: 'orange', discount: true },
-            { id: 2, type: 'ranks', name: 'GOD', price: '€44.44', old: '€77.77', img: 'blue', discount: true },
-            { id: 3, type: 'ranks', name: 'HELPER', price: '€66.66', old: null, img: 'cyan', discount: false },
-            { id: 4, type: 'ranks', name: 'DRAGON', price: '€18.99', old: null, img: 'purple', discount: false },
-            { id: 5, type: 'ranks', name: 'IMPERATOR', price: '€9.99', old: null, img: 'red', discount: false },
-            { id: 6, type: 'ranks', name: 'MAGISTER', price: '€5.89', old: null, img: 'yellow', discount: false },
-            { id: 7, type: 'ranks', name: 'OVERLORD', price: '€2.89', old: null, img: 'blue', discount: false },
-            { id: 8, type: 'ranks', name: 'AVENGER', price: '€1.29', old: null, img: 'dark', discount: false },
-            { id: 9, type: 'ranks', name: 'TITAN', price: '€0.89', old: null, img: 'green', discount: false },
-            { id: 10, type: 'ranks', name: 'HERO', price: '€0.39', old: null, img: 'light', discount: false },
-            
-            // CASES
-            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '€0.46', img: 'chest', discount: false },
-            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '€1.49', img: 'chest', discount: false },
-            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '€3.99', img: 'chest', discount: false },
-            { id: 14, type: 'cases', name: '3 Скрині донату', price: '€3.99', img: 'chest_rare', discount: false },
+        // 1. PARTICLES ANIMATION (Частинки на фоні)
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
 
-            // SERVICES
-            { id: 20, type: 'services', name: 'Розбан', price: '€3.49', img: 'scroll', discount: false },
-            { id: 21, type: 'services', name: 'Розмут', price: '€1.19', img: 'scroll', discount: false },
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = document.querySelector('.hero').offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1;
+                this.vy = (Math.random() - 0.5) * 1;
+                this.size = Math.random() * 3;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                if(this.x<0 || this.x>width || this.y<0 || this.y>height) this.reset();
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+        for(let i=0; i<70; i++) particles.push(new Particle());
+        function animate() {
+            ctx.clearRect(0,0,width,height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 2. PRODUCTS DATA
+        const products = [
+            { name: 'PEGAS', price: '€21.26', color: '#ff9800', icon: 'fa-dragon' },
+            { name: 'GOD', price: '€44.44', color: '#2196f3', icon: 'fa-bolt' },
+            { name: 'HELPER', price: '€66.66', color: '#00bcd4', icon: 'fa-hand-holding-heart' },
+            { name: 'DRAGON', price: '€18.99', color: '#9c27b0', icon: 'fa-dungeon' },
+            { name: 'IMPERATOR', price: '€9.99', color: '#f44336', icon: 'fa-crown' },
+            { name: 'MAGISTER', price: '€5.89', color: '#ffeb3b', icon: 'fa-graduation-cap' },
+            { name: 'TITAN', price: '€0.89', color: '#4caf50', icon: 'fa-shield-alt' },
+            { name: 'HERO', price: '€0.39', color: '#607d8b', icon: 'fa-user-shield' }
         ];
 
-        /* ---------------- SHOP RENDERER ---------------- */
-        const grid = document.getElementById('shopGrid');
-        const btns = document.querySelectorAll('.tab-btn');
-
-        function renderCards(filterType) {
-            grid.innerHTML = '';
-            
-            // Generate distinct colors/gradients for placeholders based on data
-            const getGradient = (color) => {
-                const map = {
-                    'orange': 'linear-gradient(135deg, #ff9800, #ff5722)',
-                    'blue': 'linear-gradient(135deg, #2196f3, #03a9f4)',
-                    'cyan': 'linear-gradient(135deg, #00bcd4, #80deea)',
-                    'purple': 'linear-gradient(135deg, #673ab7, #9c27b0)',
-                    'red': 'linear-gradient(135deg, #f44336, #e91e63)',
-                    'yellow': 'linear-gradient(135deg, #ffeb3b, #fbc02d)',
-                    'green': 'linear-gradient(135deg, #4caf50, #8bc34a)',
-                    'dark': 'linear-gradient(135deg, #2d3436, #636e72)',
-                    'chest': 'linear-gradient(135deg, #795548, #5d4037)',
-                    'chest_rare': 'linear-gradient(135deg, #009688, #4db6ac)',
-                    'scroll': 'linear-gradient(135deg, #ffca28, #ff6f00)'
-                };
-                return map[color] || map['orange'];
-            };
-
-            const items = products.filter(p => p.type === filterType);
-
-            items.forEach(item => {
-                const discountHTML = item.discount 
-                    ? `<div class="badge badge-red discount-badge">ЗНИЖКА</div>` 
-                    : '';
-                
-                // Simulate an image with a colored div
-                const imgHTML = `<div style="width:100%; height:100%; background:${getGradient(item.img)}; display:flex; align-items:center; justify-content:center; color:white; font-size:40px;">
-                    <i class="fa-solid ${item.type === 'ranks' ? 'fa-shield-halved' : (item.type === 'cases' ? 'fa-box-open' : 'fa-scroll')}"></i>
-                </div>`;
-
-                const card = document.createElement('div');
-                card.className = 'shop-card';
-                card.innerHTML = `
-                    <div class="price-badge">${item.price}</div>
-                    ${discountHTML}
-                    <div class="card-img-wrap">${imgHTML}</div>
-                    <div class="card-body">
-                        <div class="card-title" style="color:${item.type==='ranks'?'var(--primary)':'#333'}">${item.name}</div>
-                        <button class="card-btn" onclick="openModal('${item.name}')">
-                            <i class="fa-solid fa-cart-plus"></i> КУПИТИ
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function filterShop(type) {
-            btns.forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            renderCards(type);
-        }
-
-        // Init
-        renderCards('ranks');
-
-        /* ---------------- CURRENCY LOGIC ---------------- */
-        function updateCurrency() {
-            const range = document.getElementById('currencyRange');
-            const coins = range.value;
-            const price = (coins / 100).toFixed(2); // 100 coins = 1 EUR rate
-            
-            document.getElementById('coinsDisplay').innerText = coins + ' R';
-            document.getElementById('priceDisplay').innerText = '€' + price;
-        }
-
-        /* ---------------- UTILS ---------------- */
-        // Online Counter Animation
-        let count = 0;
-        const target = 14203;
-        const counterElement = document.getElementById('onlineCount');
-        const interval = setInterval(() => {
-            count += 123;
-            if (count >= target) {
-                count = target;
-                clearInterval(interval);
-            }
-            counterElement.innerText = count.toLocaleString();
-        }, 10);
-
-        // Copy IP
-        function copyIP() {
-            navigator.clipboard.writeText('mc.reallyworld.ua');
-            const btn = document.querySelector('.copy-btn');
-            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-            btn.style.background = 'var(--success)';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
-                btn.style.background = 'var(--primary)';
-            }, 2000);
-        }
-
-        // Modal
-        const modal = document.getElementById('buyModal');
-        function openModal(itemName) {
-            document.getElementById('modalTitle').innerText = itemName;
-            modal.classList.add('open');
-        }
-        function closeModal() {
-            modal.classList.remove('open');
-        }
-        // Close on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
+        const grid = document.getElementById('grid');
+        products.forEach(p => {
+            grid.innerHTML += `
+            <div class="shop-card">
+                <div class="price-tag">${p.price}</div>
+                <div class="card-img" style="background: linear-gradient(135deg, ${p.color}, #333)">
+                    <i class="fa-solid ${p.icon}"></i>
+                </div>
+                <div class="card-body">
+                    <h3 style="margin-bottom:10px; color:${p.color}">${p.name}</h3>
+                    <button class="btn-buy" onclick="openBuyModal('${p.name}', '${p.price}')">КУПИТИ</button>
+                </div>
+            </div>`;
         });
 
-        function scrollToShop() {
-            document.getElementById('shop').scrollIntoView({behavior: 'smooth'});
+        // 3. LOGIC
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const formItem = document.getElementById('formItem');
+        const formPrice = document.getElementById('formPrice');
+
+        function openBuyModal(name, price) {
+            modalTitle.innerText = 'Купити ' + name;
+            formItem.value = name;
+            formPrice.value = price;
+            modal.classList.add('open');
+        }
+
+        function buyCurrency() {
+            const val = document.getElementById('coinsVal').innerText;
+            const price = document.getElementById('priceVal').innerText;
+            openBuyModal('Валюта (' + val + ')', price);
+        }
+
+        function closeModal() { modal.classList.remove('open'); }
+
+        function updateCalc() {
+            const v = document.getElementById('range').value;
+            document.getElementById('coinsVal').innerText = v + ' R';
+            document.getElementById('priceVal').innerText = '€' + (v/100).toFixed(2);
+        }
+
+        // Online Count Animation
+        let current = 0;
+        const target = 14320;
+        const obj = document.getElementById('online');
+        const timer = setInterval(() => {
+            current += 111;
+            if(current >= target) { current = target; clearInterval(timer); }
+            obj.innerText = current.toLocaleString();
+        }, 10);
+
+        function copyIP() {
+            navigator.clipboard.writeText('mc.reallyworld.ua');
+            alert('IP скопійовано!');
         }
     </script>
 </body>
