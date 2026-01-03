@@ -509,7 +509,7 @@
     <section class="hero">
         <div class="container flex flex-between" style="width: 100%;">
             <div class="hero-content">
-                <h1>REALLYWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
+                <h1>SIMPLEWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
                 <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
                 <div class="flex" style="gap:15px; flex-wrap:wrap;">
                     <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="scrollToShop()">
@@ -535,7 +535,7 @@
             </div>
             
             <div class="ip-block">
-                <div class="ip-text" id="ipAddress">mc.reallyworld.ua</div>
+                <div class="ip-text" id="ipAddress">simpleworld.aternos.me</div>
                 <button class="copy-btn" onclick="copyIP()">
                     <i class="fa-regular fa-copy"></i>
                 </button>
@@ -556,7 +556,7 @@
                     </div>
                     
                     <div class="range-wrapper">
-                        <input type="range" class="range-input" min="100" max="10000" step="50" value="500" id="currencyRange" oninput="updateCurrency()">
+                        <input type="range" class="range-input" min="100" max="10000" step="1" value="500" id="currencyRange" oninput="updateCurrency()">
                         <div class="range-labels">
                             <span>100 R</span>
                             <span>10000 R</span>
@@ -570,7 +570,7 @@
                         </div>
                         <div class="ex-box">
                             <div class="ex-label">Ви отримуєте</div>
-                            <div class="ex-value" id="coinsDisplay">500 R</div>
+                            <div class="ex-value" id="coinsDisplay">5 R</div>
                         </div>
                         <button class="buy-currency-btn" onclick="openModalCurrency()">
                             ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
@@ -586,7 +586,7 @@
             <div class="section-header">
                 <h2 class="section-title">Магазин Привілеїв</h2>
                 <div class="tabs">
-                    <button class="tab-btn active" onclick="filterShop('ranks')">Гриф</button>
+                    <button class="tab-btn active" onclick="filterShop('ranks')">Донати</button>
                     <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
                     <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
                 </div>
