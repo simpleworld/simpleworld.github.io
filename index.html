@@ -1,514 +1,799 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReallyWorld Style — Minecraft Server</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReallyWorld — Minecraft Server Network</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================================================
+           1. CORE VARIABLES & RESET
+           ======================================================================== */
+        :root {
+            --primary: #ff9800;
+            --primary-dark: #f57c00;
+            --primary-gradient: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+            --secondary: #2d3436;
+            --bg-body: #f4f6f8;
+            --bg-card: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --danger: #ff4757;
+            --success: #2ecc71;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-soft: 0 10px 40px rgba(0,0,0,0.05);
+            --shadow-hover: 0 20px 50px rgba(255, 152, 0, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
-/* ==================================================
-   RESET & VARIABLES
-================================================== */
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: #0d0e12; /* Темний фон як на ReallyWorld */
-  color: #ffffff;
-  overflow-x: hidden;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
 
-:root {
-  --accent: #ff9000;          /* Фірмовий помаранчевий */
-  --accent-glow: rgba(255, 144, 0, 0.4);
-  --bg-dark: #0d0e12;
-  --bg-card: #16181f;
-  --text-gray: #8b9bb4;
-  --radius: 16px;
-  --transition: all 0.3s ease;
-}
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; font-family: inherit; }
 
-/* ==================================================
-   UTILITIES
-================================================== */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-.btn {
-  border: none;
-  cursor: pointer;
-  font-weight: 800;
-  border-radius: 12px;
-  transition: var(--transition);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-.btn-primary {
-  background: var(--accent);
-  color: #fff;
-  padding: 14px 32px;
-  box-shadow: 0 4px 20px var(--accent-glow);
-}
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--accent-glow);
-  background: #ff7b00;
-}
+        /* ========================================================================
+           2. UTILITIES & ANIMATIONS
+           ======================================================================== */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+        .flex { display: flex; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .flex-center { justify-content: center; }
+        .grid { display: grid; gap: 24px; }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .badge-red { background: var(--danger); color: white; }
+        .badge-green { background: var(--success); color: white; }
 
-/* ==================================================
-   HEADER
-================================================== */
-header {
-  position: fixed;
-  top: 0; left: 0; width: 100%;
-  height: 80px;
-  background: rgba(13, 14, 18, 0.85);
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  display: flex; align-items: center;
-}
-.nav-inner {
-  display: flex; justify-content: space-between; align-items: center; width: 100%;
-}
-.logo {
-  font-size: 24px; font-weight: 900; letter-spacing: -1px;
-  display: flex; align-items: center; gap: 10px;
-}
-.logo span { color: var(--accent); }
-nav a {
-  color: var(--text-gray);
-  text-decoration: none;
-  font-weight: 600;
-  margin-left: 30px;
-  transition: var(--transition);
-}
-nav a:hover, nav a.active { color: #fff; }
-nav a.active { color: var(--accent); }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
 
-/* ==================================================
-   HERO SECTION
-================================================== */
-.hero {
-  position: relative;
-  height: 600px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  margin-top: 80px;
-}
-/* Фоновий градієнт */
-.hero::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at center, rgba(255,144,0,0.15) 0%, rgba(13,14,18,1) 70%);
-  z-index: 1;
-}
-#bgParticles {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  z-index: 0; opacity: 0.6;
-}
-.hero-content {
-  position: relative; z-index: 5;
-  text-align: center;
-  max-width: 800px;
-}
-.hero h1 {
-  font-size: 64px;
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 20px;
-  text-shadow: 0 0 30px rgba(0,0,0,0.5);
-}
-.hero h1 span { color: var(--accent); }
-.hero p {
-  font-size: 20px;
-  color: var(--text-gray);
-  margin-bottom: 40px;
-}
-.ip-box {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 20px 40px;
-  border-radius: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 20px;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.ip-box:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: var(--accent);
-}
-.ip-address {
-  font-size: 24px; font-weight: 800; color: #fff;
-}
-.ip-copy {
-  font-size: 14px; color: var(--accent); text-transform: uppercase; font-weight: 700;
-}
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
 
-/* ==================================================
-   ONLINE STATUS
-================================================== */
-.online-stat {
-  margin-top: -50px;
-  position: relative;
-  z-index: 10;
-  margin-bottom: 80px;
-}
-.stat-card {
-  background: var(--bg-card);
-  border-radius: 20px;
-  padding: 30px;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.stat-info h3 { font-size: 20px; margin-bottom: 5px; }
-.stat-info p { color: var(--text-gray); }
-.stat-info span { color: var(--accent); font-weight: bold; }
+        /* ========================================================================
+           3. HEADER
+           ======================================================================== */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            height: 80px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.03);
+        }
 
-.progress-wrapper {
-  width: 50%;
-  background: #252833;
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-  position: relative;
-}
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), #ff5e00);
-  width: 0%;
-  border-radius: 6px;
-  box-shadow: 0 0 15px var(--accent-glow);
-  transition: width 1s ease-out;
-}
+        .nav-inner { height: 100%; }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #000;
+        }
+        .logo img { height: 40px; } /* Placeholder for logo img */
+        .logo span { color: var(--primary); }
 
-/* ==================================================
-   DONATE / SHOP
-================================================== */
-.section-title {
-  text-align: center; margin-bottom: 50px;
-}
-.section-title h2 { font-size: 36px; font-weight: 900; margin-bottom: 10px; }
-.section-title p { color: var(--text-gray); }
+        .nav-links a {
+            margin: 0 15px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -28px;
+            left: 0; right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
 
-.shop-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 25px;
-  margin-bottom: 100px;
-}
-.shop-card {
-  background: var(--bg-card);
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.03);
-  transition: var(--transition);
-  position: relative;
-}
-.shop-card:hover {
-  transform: translateY(-10px);
-  border-color: var(--accent);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-.card-img {
-  height: 160px;
-  background: #252833;
-  width: 100%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 40px; color: rgba(255,255,255,0.1);
-  position: relative;
-}
-.card-img img {
-  width: 100%; height: 100%; object-fit: cover;
-}
-.price-badge {
-  position: absolute; top: 15px; right: 15px;
-  background: var(--accent); color: #fff;
-  padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 14px;
-}
-.card-body { padding: 25px; text-align: center; }
-.card-body h3 { font-size: 22px; margin-bottom: 15px; text-transform: uppercase; font-weight: 800; }
-.card-body button {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
-  color: #fff; padding: 12px; border: none; border-radius: 10px;
-  font-weight: 700; cursor: pointer; transition: var(--transition);
-}
-.shop-card:hover .card-body button {
-  background: var(--accent);
-  box-shadow: 0 5px 20px var(--accent-glow);
-}
+        /* ========================================================================
+           4. HERO SECTION
+           ======================================================================== */
+        .hero {
+            margin-top: 80px;
+            height: 600px;
+            background: linear-gradient(135deg, #ff9800 0%, #ff6d00 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
 
-/* ==================================================
-   CURRENCY CONVERTER
-================================================== */
-.converter-box {
-  background: var(--bg-card);
-  padding: 40px;
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,0.05);
-  margin-bottom: 100px;
-}
-.range-slider {
-  width: 100%;
-  margin: 30px 0;
-  -webkit-appearance: none;
-  height: 8px; background: #252833; border-radius: 5px;
-}
-.range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px; height: 24px;
-  background: var(--accent);
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 15px var(--accent);
-}
-.conv-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-}
-.conv-item {
-  background: rgba(13,14,18,0.5);
-  padding: 20px; border-radius: 14px; text-align: center;
-}
-.conv-item span { color: var(--text-gray); display: block; margin-bottom: 5px; font-size: 14px;}
-.conv-item b { font-size: 32px; color: #fff; }
+        /* Background Pattern */
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.1;
+        }
 
-/* ==================================================
-   FOOTER
-================================================== */
-footer {
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding: 40px 0;
-  text-align: center;
-  color: var(--text-gray);
-  background: #0a0b0e;
-}
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            max-width: 600px;
+        }
 
-/* ==================================================
-   RESPONSIVE
-================================================== */
-@media(max-width: 768px) {
-  .hero h1 { font-size: 40px; }
-  .stat-card { flex-direction: column; gap: 20px; text-align: center; }
-  .progress-wrapper { width: 100%; }
-  .nav-links { display: none; } /* Спрощено для прикладу */
-}
-</style>
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 480px;
+        }
+
+        .hero-btn {
+            background: white;
+            color: var(--primary-dark);
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+
+        /* Char Image */
+        .hero-char {
+            position: absolute;
+            right: 5%;
+            bottom: -50px;
+            height: 700px; /* Large character */
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
+        }
+
+        /* ========================================================================
+           5. INFO BAR & IP COPY
+           ======================================================================== */
+        .info-bar-wrapper {
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .server-status { display: flex; align-items: center; gap: 20px; }
+        .status-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px;
+            box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+        }
+        .status-text h3 { font-size: 18px; font-weight: 800; }
+        .status-text p { font-size: 14px; color: var(--text-muted); }
+        .online-count { color: var(--success); font-weight: 700; }
+
+        .ip-block {
+            background: #f4f6f8;
+            padding: 10px 10px 10px 25px;
+            border-radius: 14px;
+            display: flex; align-items: center; gap: 20px;
+            border: 1px solid #e1e4e8;
+        }
+        .ip-text { font-family: monospace; font-size: 18px; font-weight: 700; color: #333; }
+        .copy-btn {
+            background: var(--primary); color: white;
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+        .copy-btn:hover { background: var(--primary-dark); }
+
+        /* ========================================================================
+           6. CURRENCY SECTION (SLIDER)
+           ======================================================================== */
+        .section { padding: 80px 0; }
+        
+        .currency-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .currency-icon {
+            width: 120px; height: 120px;
+            flex-shrink: 0;
+            background: #fff3e0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .currency-icon img { width: 70px; }
+
+        .currency-content { flex-grow: 1; }
+        .currency-header { margin-bottom: 25px; }
+        .currency-header h2 { font-size: 28px; font-weight: 800; }
+        
+        .range-wrapper { margin-bottom: 30px; position: relative; }
+        .range-input {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+        }
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 6px rgba(255, 152, 0, 0.2);
+            transition: .2s;
+        }
+        .range-labels {
+            display: flex; justify-content: space-between;
+            margin-top: 10px; font-size: 13px; color: var(--text-muted); font-weight: 600;
+        }
+
+        .exchange-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 20px;
+            align-items: center;
+        }
+        .ex-box {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+        .ex-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .ex-value { font-size: 24px; font-weight: 800; color: var(--text-main); }
+        .buy-currency-btn {
+            height: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: var(--transition);
+        }
+        .buy-currency-btn:hover { box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3); transform: translateY(-2px); }
+
+        /* ========================================================================
+           7. SHOP GRID (PRIVILEGES)
+           ======================================================================== */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        .section-title { font-size: 32px; font-weight: 900; }
+        
+        .tabs {
+            background: white;
+            padding: 5px;
+            border-radius: 12px;
+            display: inline-flex;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .shop-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid transparent;
+        }
+        .shop-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 152, 0, 0.3);
+        }
+
+        .card-img-wrap {
+            height: 180px;
+            background: #eee;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .shop-card:hover .card-img-wrap img { transform: scale(1.1); }
+        
+        /* Gradient overlays for different tiers */
+        .overlay-orange { background: linear-gradient(to top, rgba(255,152,0,0.8), transparent); }
+        .overlay-red { background: linear-gradient(to top, rgba(255,71,87,0.8), transparent); }
+        .overlay-purple { background: linear-gradient(to top, rgba(162,155,254,0.8), transparent); }
+
+        .price-badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 15px; right: 15px;
+            z-index: 2;
+            transform: rotate(15deg);
+        }
+
+        .card-body { padding: 20px; text-align: center; }
+        .card-title {
+            font-size: 20px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 15px; letter-spacing: 0.5px;
+        }
+        
+        .card-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f4f6f8;
+            color: var(--text-main);
+            font-weight: 700;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .card-btn:hover {
+            background: var(--primary); color: white;
+        }
+
+        /* ========================================================================
+           8. SERVICES & FOOTER
+           ======================================================================== */
+        .service-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+        }
+        .service-btn {
+            background: #2d3436;
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+        .service-vk { background: #4c75a3; }
+        .service-yt { background: #ff0000; }
+        .service-ds { background: #5865F2; }
+        .service-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
+
+        footer {
+            background: white;
+            padding: 40px 0;
+            margin-top: 80px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* ========================================================================
+           9. MODAL
+           ======================================================================== */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.3s; }
+        
+        .modal {
+            background: white;
+            width: 90%; max-width: 500px;
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+        
+        .modal h2 { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+        .modal p { color: var(--text-muted); margin-bottom: 30px; }
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: .3s;
+        }
+        .modal input:focus { border-color: var(--primary); }
+        .modal-btn {
+            width: 100%; padding: 16px;
+            background: var(--primary); color: white;
+            font-weight: 800; border-radius: 12px; font-size: 18px;
+        }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 24px; color: #ccc; cursor: pointer;
+        }
+        .close-modal:hover { color: var(--text-main); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); } to { transform: translateY(0); } }
+
+        /* Mobile */
+        @media(max-width: 900px) {
+            .hero { height: auto; padding: 60px 0; text-align: center; }
+            .hero-content { margin: 0 auto; }
+            .hero-char { display: none; }
+            .info-card { flex-direction: column; gap: 20px; text-align: center; }
+            .currency-card { flex-direction: column; padding: 20px; }
+            .exchange-grid { grid-template-columns: 1fr; width: 100%; }
+            .nav-links { display: none; } /* Simplified for demo */
+            .service-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="container nav-inner">
-    <div class="logo">
-      REALLY<span>WORLD</span>
+    <header>
+        <div class="container flex flex-between nav-inner">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-cube fa-xl" style="color:var(--primary)"></i>
+                RW <span>NETWORK</span>
+            </a>
+            <nav class="nav-links flex">
+                <a href="#" class="active"><i class="fa-solid fa-house"></i> Головна</a>
+                <a href="#shop"><i class="fa-solid fa-cart-shopping"></i> Магазин</a>
+                <a href="#"><i class="fa-solid fa-book"></i> Правила</a>
+                <a href="#"><i class="fa-solid fa-crown"></i> Привілеї</a>
+                <a href="#"><i class="fa-solid fa-headset"></i> Підтримка</a>
+            </nav>
+            <button class="hero-btn" onclick="openModal('Вхід в кабінет')">
+                <i class="fa-solid fa-user"></i> Кабінет
+            </button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container flex flex-between" style="width: 100%;">
+            <div class="hero-content">
+                <h1>REALLYWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
+                <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
+                <div class="flex" style="gap:15px; flex-wrap:wrap;">
+                    <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="scrollToShop()">
+                        <i class="fa-solid fa-bag-shopping"></i> Придбати донат
+                    </button>
+                    <button class="hero-btn">
+                        <i class="fa-solid fa-play"></i> Почати гру
+                    </button>
+                </div>
+            </div>
+            <img src="https://i.imgur.com/8Km9tLL.png" class="hero-char" alt="Minecraft Character">
+        </div>
+    </section>
+
+    <div class="container info-bar-wrapper">
+        <div class="info-card">
+            <div class="server-status">
+                <div class="status-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="status-text">
+                    <h3>НАШ СЕРВЕР</h3>
+                    <p>Онлайн: <span class="online-count" id="onlineCount">0</span> гравців</p>
+                </div>
+            </div>
+            
+            <div class="ip-block">
+                <div class="ip-text" id="ipAddress">mc.reallyworld.ua</div>
+                <button class="copy-btn" onclick="copyIP()">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
+            </div>
+        </div>
     </div>
-    <nav class="nav-links">
-      <a href="#" class="active">Головна</a>
-      <a href="#shop">Донат</a>
-      <a href="#">Правила</a>
-      <a href="#">Форум</a>
-      <a href="#">Допомога</a>
-    </nav>
-    <button class="btn btn-primary" onclick="window.location.href='#shop'">Особистий кабінет</button>
-  </div>
-</header>
 
-<section class="hero">
-  <canvas id="bgParticles"></canvas>
-  <div class="hero-content">
-    <h1>КРАЩИЙ СЕРВЕР<br><span>MINECRAFT</span></h1>
-    <p>Анархія, Гриферський режим та унікальні івенти. Почни свою історію прямо зараз!</p>
-    
-    <div class="ip-box" onclick="copyIP()">
-      <div>
-        <div class="ip-address">MC.REALLYWORLD.UA</div>
-        <div class="ip-copy">Натисни щоб скопіювати</div>
-      </div>
+    <section class="section">
+        <div class="container">
+            <div class="currency-card">
+                <div class="currency-icon">
+                    <i class="fa-solid fa-coins fa-3x" style="color: #f57c00;"></i>
+                </div>
+                <div class="currency-content">
+                    <div class="currency-header">
+                        <h2>Покупка ігрової валюти (Ріліки)</h2>
+                        <p style="color:#777">Використовуйте повзунок для вибору суми</p>
+                    </div>
+                    
+                    <div class="range-wrapper">
+                        <input type="range" class="range-input" min="100" max="10000" step="50" value="500" id="currencyRange" oninput="updateCurrency()">
+                        <div class="range-labels">
+                            <span>100 R</span>
+                            <span>10000 R</span>
+                        </div>
+                    </div>
+
+                    <div class="exchange-grid">
+                        <div class="ex-box">
+                            <div class="ex-label">До сплати</div>
+                            <div class="ex-value" id="priceDisplay">€5.00</div>
+                        </div>
+                        <div class="ex-box">
+                            <div class="ex-label">Ви отримуєте</div>
+                            <div class="ex-value" id="coinsDisplay">500 R</div>
+                        </div>
+                        <button class="buy-currency-btn" onclick="openModal('Покупка валюти')">
+                            ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="shop">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Магазин Привілеїв</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="filterShop('ranks')">Гриф</button>
+                    <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
+                    <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
+                </div>
+            </div>
+
+            <div class="cards-grid" id="shopGrid"></div>
+        </div>
+    </section>
+
+    <section class="container" style="margin-bottom: 50px;">
+        <div class="service-row">
+            <a href="#" class="service-btn service-vk"><i class="fa-brands fa-vk fa-lg"></i> Ми ВКонтакті</a>
+            <a href="#" class="service-btn" style="background:#4a90e2"><i class="fa-regular fa-comments fa-lg"></i> Форум</a>
+            <a href="#" class="service-btn service-yt"><i class="fa-brands fa-youtube fa-lg"></i> Наш YouTube</a>
+            <a href="#" class="service-btn service-ds"><i class="fa-brands fa-discord fa-lg"></i> Discord Сервер</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ReallyWorld Project. Not affiliated with Mojang AB.</p>
+            <p style="font-size:13px; margin-top:10px;">Договір оферти | Політика конфіденційності</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal">
+            <div class="close-modal" onclick="closeModal()">&times;</div>
+            <div style="font-size: 50px; color: var(--primary); margin-bottom: 20px;">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <h2 id="modalTitle">Покупка</h2>
+            <p>Введіть ваш нікнейм на сервері для продовження</p>
+            <input type="text" placeholder="Ваш нікнейм (Steve)">
+            <input type="text" placeholder="Промокод (якщо є)">
+            <button class="modal-btn">ПЕРЕЙТИ ДО ОПЛАТИ</button>
+        </div>
     </div>
-  </div>
-</section>
 
-<div class="container online-stat">
-  <div class="stat-card">
-    <div class="stat-info">
-      <h3>Моніторинг</h3>
-      <p>Гравців онлайн: <span id="onlineCount">0</span> із <span>15,000</span></p>
-    </div>
-    <div class="progress-wrapper">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-  </div>
-</div>
+    <script>
+        /* ---------------- DATA ---------------- */
+        const products = [
+            // RANKS
+            { id: 1, type: 'ranks', name: 'PEGAS', price: '€21.26', old: '€77.77', img: 'orange', discount: true },
+            { id: 2, type: 'ranks', name: 'GOD', price: '€44.44', old: '€77.77', img: 'blue', discount: true },
+            { id: 3, type: 'ranks', name: 'HELPER', price: '€66.66', old: null, img: 'cyan', discount: false },
+            { id: 4, type: 'ranks', name: 'DRAGON', price: '€18.99', old: null, img: 'purple', discount: false },
+            { id: 5, type: 'ranks', name: 'IMPERATOR', price: '€9.99', old: null, img: 'red', discount: false },
+            { id: 6, type: 'ranks', name: 'MAGISTER', price: '€5.89', old: null, img: 'yellow', discount: false },
+            { id: 7, type: 'ranks', name: 'OVERLORD', price: '€2.89', old: null, img: 'blue', discount: false },
+            { id: 8, type: 'ranks', name: 'AVENGER', price: '€1.29', old: null, img: 'dark', discount: false },
+            { id: 9, type: 'ranks', name: 'TITAN', price: '€0.89', old: null, img: 'green', discount: false },
+            { id: 10, type: 'ranks', name: 'HERO', price: '€0.39', old: null, img: 'light', discount: false },
+            
+            // CASES
+            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '€0.46', img: 'chest', discount: false },
+            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '€1.49', img: 'chest', discount: false },
+            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '€3.99', img: 'chest', discount: false },
+            { id: 14, type: 'cases', name: '3 Скрині донату', price: '€3.99', img: 'chest_rare', discount: false },
 
-<section class="container" id="shop">
-  <div class="section-title">
-    <h2>ПРИВІЛЕЇ</h2>
-    <p>Купуй донат та отримуй неймовірні можливості</p>
-  </div>
+            // SERVICES
+            { id: 20, type: 'services', name: 'Розбан', price: '€3.49', img: 'scroll', discount: false },
+            { id: 21, type: 'services', name: 'Розмут', price: '€1.19', img: 'scroll', discount: false },
+        ];
 
-  <div class="shop-grid" id="shopContainer">
-    </div>
-</section>
+        /* ---------------- SHOP RENDERER ---------------- */
+        const grid = document.getElementById('shopGrid');
+        const btns = document.querySelectorAll('.tab-btn');
 
-<section class="container">
-  <div class="section-title">
-    <h2>РІЛІКИ (ВАЛЮТА)</h2>
-    <p>Обмінюй реальні гроші на ігрову валюту</p>
-  </div>
-  
-  <div class="converter-box">
-    <input type="range" class="range-slider" min="50" max="5000" value="100" step="50" oninput="updateCalc(this.value)">
-    <div class="conv-grid">
-      <div class="conv-item">
-        <span>Ти отримуєш</span>
-        <b id="calcCoins">100 РЛ</b>
-      </div>
-      <div class="conv-item">
-        <span>До сплати</span>
-        <b id="calcPrice">50 ₴</b>
-      </div>
-    </div>
-    <br>
-    <button class="btn btn-primary" style="width:100%">Купити валюту</button>
-  </div>
-</section>
+        function renderCards(filterType) {
+            grid.innerHTML = '';
+            
+            // Generate distinct colors/gradients for placeholders based on data
+            const getGradient = (color) => {
+                const map = {
+                    'orange': 'linear-gradient(135deg, #ff9800, #ff5722)',
+                    'blue': 'linear-gradient(135deg, #2196f3, #03a9f4)',
+                    'cyan': 'linear-gradient(135deg, #00bcd4, #80deea)',
+                    'purple': 'linear-gradient(135deg, #673ab7, #9c27b0)',
+                    'red': 'linear-gradient(135deg, #f44336, #e91e63)',
+                    'yellow': 'linear-gradient(135deg, #ffeb3b, #fbc02d)',
+                    'green': 'linear-gradient(135deg, #4caf50, #8bc34a)',
+                    'dark': 'linear-gradient(135deg, #2d3436, #636e72)',
+                    'chest': 'linear-gradient(135deg, #795548, #5d4037)',
+                    'chest_rare': 'linear-gradient(135deg, #009688, #4db6ac)',
+                    'scroll': 'linear-gradient(135deg, #ffca28, #ff6f00)'
+                };
+                return map[color] || map['orange'];
+            };
 
-<footer>
-  <div class="container">
-    <p>&copy; 2026 ReallyWorld Project. Not affiliated with Mojang AB.</p>
-  </div>
-</footer>
+            const items = products.filter(p => p.type === filterType);
 
-<script>
-// 1. PRODUCTS DATA
-const products = [
-  { name: 'RABBIT', price: '49 ₴', color: '#a0a0a0' },
-  { name: 'DRAGON', price: '149 ₴', color: '#00cec9' },
-  { name: 'TITAN', price: '299 ₴', color: '#6c5ce7' },
-  { name: 'MAGISTER', price: '599 ₴', color: '#fdcb6e' },
-  { name: 'IMPERATOR', price: '999 ₴', color: '#e17055' },
-  { name: 'GOD', price: '2499 ₴', color: '#d63031' }
-];
+            items.forEach(item => {
+                const discountHTML = item.discount 
+                    ? `<div class="badge badge-red discount-badge">ЗНИЖКА</div>` 
+                    : '';
+                
+                // Simulate an image with a colored div
+                const imgHTML = `<div style="width:100%; height:100%; background:${getGradient(item.img)}; display:flex; align-items:center; justify-content:center; color:white; font-size:40px;">
+                    <i class="fa-solid ${item.type === 'ranks' ? 'fa-shield-halved' : (item.type === 'cases' ? 'fa-box-open' : 'fa-scroll')}"></i>
+                </div>`;
 
-// 2. RENDER SHOP
-const shopContainer = document.getElementById('shopContainer');
-products.forEach(item => {
-  // Use a placeholder colored box if no image
-  shopContainer.innerHTML += `
-    <div class="shop-card">
-      <div class="price-badge">${item.price}</div>
-      <div class="card-img" style="background: linear-gradient(135deg, ${item.color}22, #16181f)">
-        <span style="color:${item.color}; font-weight:900">${item.name[0]}</span>
-      </div>
-      <div class="card-body">
-        <h3 style="color:${item.color}">${item.name}</h3>
-        <button onclick="alert('Купівля: ${item.name}')">КУПИТИ</button>
-      </div>
-    </div>
-  `;
-});
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="price-badge">${item.price}</div>
+                    ${discountHTML}
+                    <div class="card-img-wrap">${imgHTML}</div>
+                    <div class="card-body">
+                        <div class="card-title" style="color:${item.type==='ranks'?'var(--primary)':'#333'}">${item.name}</div>
+                        <button class="card-btn" onclick="openModal('${item.name}')">
+                            <i class="fa-solid fa-cart-plus"></i> КУПИТИ
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
-// 3. COPY IP FUNCTION
-function copyIP() {
-  navigator.clipboard.writeText('mc.reallyworld.ua');
-  const txt = document.querySelector('.ip-copy');
-  const original = txt.innerText;
-  txt.innerText = 'СКОПІЙОВАНО!';
-  txt.style.color = '#fff';
-  setTimeout(() => {
-    txt.innerText = original;
-    txt.style.color = 'var(--accent)';
-  }, 2000);
-}
+        function filterShop(type) {
+            btns.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderCards(type);
+        }
 
-// 4. ONLINE COUNTER ANIMATION
-const onlineTarget = 12453;
-const maxPlayers = 15000;
-const duration = 2000;
-const counter = document.getElementById('onlineCount');
-const bar = document.getElementById('progressBar');
+        // Init
+        renderCards('ranks');
 
-let startTimestamp = null;
-const step = (timestamp) => {
-  if (!startTimestamp) startTimestamp = timestamp;
-  const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-  const currentVal = Math.floor(progress * onlineTarget);
-  
-  counter.innerText = currentVal.toLocaleString();
-  bar.style.width = (currentVal / maxPlayers * 100) + '%';
-  
-  if (progress < 1) {
-    window.requestAnimationFrame(step);
-  }
-};
-window.requestAnimationFrame(step);
+        /* ---------------- CURRENCY LOGIC ---------------- */
+        function updateCurrency() {
+            const range = document.getElementById('currencyRange');
+            const coins = range.value;
+            const price = (coins / 100).toFixed(2); // 100 coins = 1 EUR rate
+            
+            document.getElementById('coinsDisplay').innerText = coins + ' R';
+            document.getElementById('priceDisplay').innerText = '€' + price;
+        }
 
-// 5. CURRENCY CALCULATOR
-function updateCalc(val) {
-  document.getElementById('calcCoins').innerText = val + ' РЛ';
-  // Example rate: 1 RL = 0.5 UAH (change as needed)
-  document.getElementById('calcPrice').innerText = (val * 0.5).toFixed(0) + ' ₴';
-}
+        /* ---------------- UTILS ---------------- */
+        // Online Counter Animation
+        let count = 0;
+        const target = 14203;
+        const counterElement = document.getElementById('onlineCount');
+        const interval = setInterval(() => {
+            count += 123;
+            if (count >= target) {
+                count = target;
+                clearInterval(interval);
+            }
+            counterElement.innerText = count.toLocaleString();
+        }, 10);
 
-// 6. PARTICLES BACKGROUND
-const canvas = document.getElementById('bgParticles');
-const ctx = canvas.getContext('2d');
-let width, height;
-let particles = [];
+        // Copy IP
+        function copyIP() {
+            navigator.clipboard.writeText('mc.reallyworld.ua');
+            const btn = document.querySelector('.copy-btn');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btn.style.background = 'var(--success)';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                btn.style.background = 'var(--primary)';
+            }, 2000);
+        }
 
-function resize() {
-  width = canvas.width = window.innerWidth;
-  height = canvas.height = window.innerHeight; // restrict to hero height conceptually
-}
-window.addEventListener('resize', resize);
-resize();
+        // Modal
+        const modal = document.getElementById('buyModal');
+        function openModal(itemName) {
+            document.getElementById('modalTitle').innerText = itemName;
+            modal.classList.add('open');
+        }
+        function closeModal() {
+            modal.classList.remove('open');
+        }
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
 
-class Particle {
-  constructor() {
-    this.reset();
-  }
-  reset() {
-    this.x = Math.random() * width;
-    this.y = Math.random() * height;
-    this.vx = (Math.random() - 0.5) * 0.5;
-    this.vy = (Math.random() - 0.5) * 0.5;
-    this.size = Math.random() * 2 + 1;
-    this.alpha = Math.random() * 0.5 + 0.1;
-  }
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    if (this.x < 0 || this.x > width || this.y < 0 || this.y > height) this.reset();
-  }
-  draw() {
-    ctx.fillStyle = `rgba(255, 144, 0, ${this.alpha})`; // Orange particles
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-}
-
-for (let i = 0; i < 60; i++) particles.push(new Particle());
-
-function animate() {
-  ctx.clearRect(0, 0, width, height);
-  particles.forEach(p => {
-    p.update();
-    p.draw();
-  });
-  requestAnimationFrame(animate);
-}
-animate();
-
-// Initialize calc
-updateCalc(100);
-</script>
+        function scrollToShop() {
+            document.getElementById('shop').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
 </body>
 </html>
