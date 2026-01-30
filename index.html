@@ -711,10 +711,140 @@
             gap: 8px;
         }
 
+        .admin-section {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-section:last-child {
+            border-bottom: none;
+        }
+
+        .admin-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .verified-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .btn-remove {
+            background: #ff3b30;
+            color: white;
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-remove:hover {
+            background: #d32f2f;
+        }
+
+        .ban-duration-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-ban {
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .btn-ban:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-ban.permanent {
+            background: #ff3b30;
+        }
+
+        .btn-ban.permanent:hover {
+            background: #d32f2f;
+        }
+
+        .banned-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .banned-message.show {
+            display: flex;
+        }
+
+        .banned-content {
+            background: var(--bg-primary);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .banned-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .banned-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #ff3b30;
+            margin-bottom: 12px;
+        }
+
+        .banned-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
         .verified-badge {
-            color: var(--accent);
-            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: #0088cc;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
             margin-left: 4px;
+            transform: rotate(45deg);
+            position: relative;
+            top: -1px;
+        }
+
+        .verified-badge::before {
+            content: '✓';
+            transform: rotate(-45deg);
+            display: block;
         }
     </style>
 </head>
@@ -829,6 +959,17 @@
         </div>
     </div>
 
+    <!-- ========== BANNED MESSAGE ========== -->
+    <div class="banned-message" id="bannedMessage">
+        <div class="banned-content">
+            <div class="banned-icon">🚫</div>
+            <div class="banned-title">Акаунт заблоковано</div>
+            <div class="banned-text" id="bannedText">Ваш акаунт було заблоковано адміністратором.</div>
+            <div class="banned-text" id="bannedUntil"></div>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">Оновити сторінку</button>
+        </div>
+    </div>
+
     <!-- ========== SETTINGS MODAL ========== -->
     <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOnOverlay(event)">
         <div class="modal-content">
@@ -856,15 +997,39 @@
 
                 <div id="adminPanel" class="admin-panel hidden">
                     <div class="admin-title">🔒 Адмін панель</div>
-                    <div class="form-group">
-                        <label for="verifyNickname">Нікнейм для верифікації</label>
-                        <input type="text" id="verifyNickname" placeholder="Введіть нікнейм">
-                    </div>
-                    <button class="btn btn-primary" onclick="verifyUser()">✓ Видати галочку</button>
                     
-                    <div style="margin-top: 20px;">
-                        <div class="settings-label" style="margin-bottom: 12px;">Веріфіковані користувачі:</div>
-                        <div id="verifiedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
+                    <!-- Verification Section -->
+                    <div class="admin-section">
+                        <div class="admin-section-title">✓ Верифікація</div>
+                        <div class="form-group">
+                            <label for="verifyNickname">Нікнейм для верифікації</label>
+                            <input type="text" id="verifyNickname" placeholder="Введіть нікнейм">
+                        </div>
+                        <button class="btn btn-primary" onclick="verifyUser()">✓ Видати галочку</button>
+                        
+                        <div style="margin-top: 20px;">
+                            <div class="admin-section-title">Веріфіковані користувачі:</div>
+                            <div id="verifiedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
+                        </div>
+                    </div>
+
+                    <!-- Ban Section -->
+                    <div class="admin-section">
+                        <div class="admin-section-title">🚫 Блокування користувачів</div>
+                        <div class="form-group">
+                            <label for="banNickname">Нікнейм для блокування</label>
+                            <input type="text" id="banNickname" placeholder="Введіть нікнейм">
+                        </div>
+                        <div class="ban-duration-buttons">
+                            <button class="btn-ban" onclick="banUser(5)">5 хвилин</button>
+                            <button class="btn-ban" onclick="banUser(10)">10 хвилин</button>
+                            <button class="btn-ban permanent" onclick="banUser('permanent')">Назавжди</button>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <div class="admin-section-title">Заблоковані користувачі:</div>
+                            <div id="bannedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -877,6 +1042,7 @@
         let activeChat = null;
         let lastMessageCount = 0;
         let autoRefreshInterval = null;
+        let banCheckInterval = null;
         const ADMIN_PASSWORD = '12364578TYRR';
 
         // ========== UTILITY FUNCTIONS ==========
@@ -896,6 +1062,42 @@
         function isUserVerified(nickname) {
             const verified = getVerifiedUsers();
             return verified.includes(nickname);
+        }
+
+        // Отримати заблокованих користувачів
+        function getBannedUsers() {
+            const banned = localStorage.getItem('messenger_banned');
+            return banned ? JSON.parse(banned) : [];
+        }
+
+        // Зберегти заблокованих користувачів
+        function saveBannedUsers(banned) {
+            localStorage.setItem('messenger_banned', JSON.stringify(banned));
+        }
+
+        // Перевірити чи користувач заблокований
+        function isUserBanned(nickname) {
+            const banned = getBannedUsers();
+            const ban = banned.find(b => b.nickname === nickname);
+            
+            if (!ban) return false;
+            
+            // Якщо бан назавжди
+            if (ban.until === 'permanent') return true;
+            
+            // Перевіряємо чи минув час бану
+            if (Date.now() < ban.until) return true;
+            
+            // Час бану минув - видаляємо з списку
+            const updatedBanned = banned.filter(b => b.nickname !== nickname);
+            saveBannedUsers(updatedBanned);
+            return false;
+        }
+
+        // Отримати інформацію про бан
+        function getBanInfo(nickname) {
+            const banned = getBannedUsers();
+            return banned.find(b => b.nickname === nickname);
         }
         
         // Проста хеш-функція для паролів (SHA-256 альтернатива)
@@ -1045,6 +1247,12 @@
                 return;
             }
 
+            // Перевірка на бан
+            if (isUserBanned(user.nickname)) {
+                showBannedMessage(user.nickname);
+                return;
+            }
+
             // Успішний вхід
             currentUser = user;
             sessionStorage.setItem('currentUser', JSON.stringify(user));
@@ -1061,6 +1269,12 @@
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
+            }
+
+            // Зупиняємо перевірку банів
+            if (banCheckInterval) {
+                clearInterval(banCheckInterval);
+                banCheckInterval = null;
             }
 
             currentUser = null;
@@ -1085,11 +1299,55 @@
             
             // Додаємо галочку якщо користувач веріфікований
             if (isUserVerified(currentUser.nickname)) {
-                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge">✓</span>';
+                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge"></span>';
             }
             
             loadChats();
             startAutoRefresh();
+            startBanCheck();
+        }
+
+        // Перевірка на бан кожні 5 секунд
+        function startBanCheck() {
+            if (banCheckInterval) {
+                clearInterval(banCheckInterval);
+            }
+
+            banCheckInterval = setInterval(() => {
+                if (currentUser && isUserBanned(currentUser.nickname)) {
+                    showBannedMessage(currentUser.nickname);
+                }
+            }, 5000);
+        }
+
+        function showBannedMessage(nickname) {
+            const banInfo = getBanInfo(nickname);
+            const bannedMessageEl = document.getElementById('bannedMessage');
+            const bannedTextEl = document.getElementById('bannedText');
+            const bannedUntilEl = document.getElementById('bannedUntil');
+
+            if (banInfo.until === 'permanent') {
+                bannedTextEl.textContent = 'Ваш акаунт було заблоковано адміністратором назавжди.';
+                bannedUntilEl.textContent = '';
+            } else {
+                const untilDate = new Date(banInfo.until);
+                bannedTextEl.textContent = 'Ваш акаунт тимчасово заблоковано.';
+                bannedUntilEl.textContent = `Бан діє до: ${untilDate.toLocaleString('uk-UA')}`;
+            }
+
+            bannedMessageEl.classList.add('show');
+
+            // Виходимо з акаунта
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            if (banCheckInterval) {
+                clearInterval(banCheckInterval);
+            }
+            
+            currentUser = null;
+            activeChat = null;
+            sessionStorage.removeItem('currentUser');
         }
 
         // Автоматичне оновлення повідомлень
@@ -1174,7 +1432,7 @@
             chatsWithMessages.sort((a, b) => b.timestamp - a.timestamp);
 
             chatListEl.innerHTML = chatsWithMessages.map(chat => {
-                const verifiedBadge = isUserVerified(chat.user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+                const verifiedBadge = isUserVerified(chat.user.nickname) ? '<span class="verified-badge"></span>' : '';
                 return `
                     <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
                          onclick="openChat('${chat.user.id}')">
@@ -1214,7 +1472,7 @@
             }
 
             chatListEl.innerHTML = users.map(user => {
-                const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+                const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
                 return `
                     <div class="chat-item ${activeChat && activeChat.id === user.id ? 'active' : ''}" 
                          onclick="openChat('${user.id}')">
@@ -1236,7 +1494,7 @@
             activeChat = user;
 
             // Оновлюємо заголовок чату з галочкою якщо є
-            const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+            const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
             document.getElementById('chatHeaderName').innerHTML = user.nickname + verifiedBadge;
             
             // Показуємо елементи чату
@@ -1349,6 +1607,7 @@
         function openSettings() {
             document.getElementById('settingsModal').classList.add('show');
             updateVerifiedUsersList();
+            updateBannedUsersList();
         }
 
         function closeSettings() {
@@ -1377,6 +1636,7 @@
                 document.getElementById('adminPanel').classList.remove('hidden');
                 document.getElementById('adminPasswordInput').value = '';
                 updateVerifiedUsersList();
+                updateBannedUsersList();
             } else {
                 alert('Неправильний пароль!');
                 document.getElementById('adminPasswordInput').value = '';
@@ -1413,20 +1673,21 @@
             alert(`✓ Користувач ${nickname} отримав галочку верифікації!`);
             
             updateVerifiedUsersList();
-            
-            // Оновлюємо інтерфейс якщо це поточний користувач
-            if (currentUser.nickname === nickname) {
-                const nicknameEl = document.getElementById('currentUserNickname');
-                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge">✓</span>';
+            updateInterface();
+        }
+
+        function removeVerification(nickname) {
+            if (!confirm(`Видалити верифікацію з ${nickname}?`)) {
+                return;
             }
-            
-            // Оновлюємо чати
-            loadChats();
-            
-            // Оновлюємо заголовок активного чату якщо потрібно
-            if (activeChat && activeChat.nickname === nickname) {
-                document.getElementById('chatHeaderName').innerHTML = nickname + '<span class="verified-badge">✓</span>';
-            }
+
+            const verified = getVerifiedUsers();
+            const updated = verified.filter(n => n !== nickname);
+            saveVerifiedUsers(updated);
+
+            updateVerifiedUsersList();
+            updateInterface();
+            alert(`Верифікацію видалено з ${nickname}`);
         }
 
         function updateVerifiedUsersList() {
@@ -1437,8 +1698,133 @@
                 listEl.innerHTML = '<div style="opacity: 0.5;">Немає веріфікованих користувачів</div>';
             } else {
                 listEl.innerHTML = verified.map(nick => 
-                    `<div style="padding: 8px 0;">${nick} <span class="verified-badge">✓</span></div>`
+                    `<div class="verified-user-item">
+                        <span>${nick} <span class="verified-badge"></span></span>
+                        <button class="btn-remove" onclick="removeVerification('${nick}')">✕ Видалити</button>
+                    </div>`
                 ).join('');
+            }
+        }
+
+        function banUser(duration) {
+            const nickname = document.getElementById('banNickname').value.trim();
+            
+            if (!nickname) {
+                alert('Введіть нікнейм!');
+                return;
+            }
+
+            const users = getUsers();
+            const user = users.find(u => u.nickname === nickname);
+
+            if (!user) {
+                alert('Користувача з таким нікнеймом не знайдено!');
+                return;
+            }
+
+            const banned = getBannedUsers();
+            
+            // Видаляємо старий бан якщо є
+            const filteredBanned = banned.filter(b => b.nickname !== nickname);
+
+            let until;
+            let durationText;
+
+            if (duration === 'permanent') {
+                until = 'permanent';
+                durationText = 'назавжди';
+            } else {
+                until = Date.now() + (duration * 60 * 1000); // хвилини в мілісекунди
+                durationText = `на ${duration} хвилин`;
+            }
+
+            filteredBanned.push({
+                nickname: nickname,
+                username: user.username,
+                bannedAt: Date.now(),
+                until: until
+            });
+
+            saveBannedUsers(filteredBanned);
+
+            document.getElementById('banNickname').value = '';
+            alert(`🚫 Користувача ${nickname} заблоковано ${durationText}!`);
+            
+            updateBannedUsersList();
+
+            // Якщо заблокований користувач зараз в мережі
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                const currentSessionUser = JSON.parse(savedUser);
+                if (currentSessionUser.nickname === nickname) {
+                    // Це спрацює при наступній перевірці через 5 секунд
+                    alert('Користувач буде відключений протягом 5 секунд');
+                }
+            }
+        }
+
+        function unbanUser(nickname) {
+            if (!confirm(`Розблокувати ${nickname}?`)) {
+                return;
+            }
+
+            const banned = getBannedUsers();
+            const updated = banned.filter(b => b.nickname !== nickname);
+            saveBannedUsers(updated);
+
+            updateBannedUsersList();
+            alert(`Користувача ${nickname} розблоковано`);
+        }
+
+        function updateBannedUsersList() {
+            const banned = getBannedUsers();
+            const listEl = document.getElementById('bannedUsersList');
+            
+            if (banned.length === 0) {
+                listEl.innerHTML = '<div style="opacity: 0.5;">Немає заблокованих користувачів</div>';
+            } else {
+                listEl.innerHTML = banned.map(ban => {
+                    let untilText;
+                    if (ban.until === 'permanent') {
+                        untilText = 'Назавжди';
+                    } else {
+                        const untilDate = new Date(ban.until);
+                        if (Date.now() > ban.until) {
+                            untilText = 'Бан закінчився';
+                        } else {
+                            untilText = `До ${untilDate.toLocaleString('uk-UA')}`;
+                        }
+                    }
+                    
+                    return `<div class="verified-user-item">
+                        <div>
+                            <div>${ban.nickname}</div>
+                            <div style="font-size: 12px; opacity: 0.7;">${untilText}</div>
+                        </div>
+                        <button class="btn-remove" onclick="unbanUser('${ban.nickname}')">✕ Розблокувати</button>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        function updateInterface() {
+            // Оновлюємо інтерфейс якщо це поточний користувач
+            if (currentUser) {
+                const nicknameEl = document.getElementById('currentUserNickname');
+                nicknameEl.textContent = currentUser.nickname;
+                
+                if (isUserVerified(currentUser.nickname)) {
+                    nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge"></span>';
+                }
+            }
+            
+            // Оновлюємо чати
+            loadChats();
+            
+            // Оновлюємо заголовок активного чату якщо потрібно
+            if (activeChat) {
+                const verifiedBadge = isUserVerified(activeChat.nickname) ? '<span class="verified-badge"></span>' : '';
+                document.getElementById('chatHeaderName').innerHTML = activeChat.nickname + verifiedBadge;
             }
         }
 
@@ -1454,6 +1840,13 @@
             const savedUser = sessionStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
+                
+                // Перевіряємо чи не заблокований користувач
+                if (isUserBanned(currentUser.nickname)) {
+                    showBannedMessage(currentUser.nickname);
+                    return;
+                }
+                
                 document.getElementById('authContainer').style.display = 'none';
                 document.getElementById('appContainer').classList.add('active');
                 initApp();
