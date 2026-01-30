@@ -178,6 +178,29 @@
 
         .app-header h1 {
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hamburger-menu {
+            cursor: pointer;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: opacity 0.3s;
+        }
+
+        .hamburger-menu:hover {
+            opacity: 0.8;
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
         }
 
         .header-user {
@@ -536,6 +559,163 @@
         .hidden {
             display: none !important;
         }
+
+        /* ========== SETTINGS MODAL ========== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 0;
+            width: 400px;
+            max-width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 8px 32px var(--shadow);
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: var(--accent);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: calc(80vh - 60px);
+            overflow-y: auto;
+        }
+
+        .settings-item {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .settings-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .settings-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .admin-link {
+            color: var(--text-secondary);
+            font-size: 11px;
+            margin-top: 20px;
+            text-align: center;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        .admin-link:hover {
+            opacity: 0.5;
+        }
+
+        .admin-password-input {
+            margin-top: 8px;
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .admin-password-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .admin-panel {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border);
+        }
+
+        .admin-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ff3b30;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .verified-badge {
+            color: var(--accent);
+            font-size: 16px;
+            margin-left: 4px;
+        }
     </style>
 </head>
 <body>
@@ -589,13 +769,19 @@
     <!-- ========== MAIN APP ========== -->
     <div class="app-container" id="appContainer">
         <div class="app-header">
-            <h1>Messenger</h1>
+            <h1>
+                <div class="hamburger-menu" onclick="openSettings()">
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                    <div class="hamburger-line"></div>
+                </div>
+                Messenger
+            </h1>
             <div class="header-user">
                 <div class="user-info">
                     <div class="user-nickname" id="currentUserNickname"></div>
                     <div class="user-status">в мережі</div>
                 </div>
-                <button class="theme-toggle" onclick="toggleTheme()">🌓 Тема</button>
                 <button class="btn-logout" onclick="logout()">Вийти</button>
             </div>
         </div>
@@ -643,14 +829,74 @@
         </div>
     </div>
 
+    <!-- ========== SETTINGS MODAL ========== -->
+    <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOnOverlay(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ Налаштування</h2>
+                <button class="modal-close" onclick="closeSettings()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Тема інтерфейсу</div>
+                        <div class="settings-description">Світла або темна тема</div>
+                    </div>
+                    <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="toggleTheme()">Змінити тему</button>
+                </div>
+
+                <div class="admin-link" onclick="showAdminPasswordInput()">
+                    Адмін панель
+                </div>
+
+                <div id="adminPasswordSection" class="hidden">
+                    <input type="password" id="adminPasswordInput" class="admin-password-input" placeholder="Введіть пароль адміна">
+                    <button class="btn btn-primary" style="margin-top: 12px;" onclick="checkAdminPassword()">Підтвердити</button>
+                </div>
+
+                <div id="adminPanel" class="admin-panel hidden">
+                    <div class="admin-title">🔒 Адмін панель</div>
+                    <div class="form-group">
+                        <label for="verifyNickname">Нікнейм для верифікації</label>
+                        <input type="text" id="verifyNickname" placeholder="Введіть нікнейм">
+                    </div>
+                    <button class="btn btn-primary" onclick="verifyUser()">✓ Видати галочку</button>
+                    
+                    <div style="margin-top: 20px;">
+                        <div class="settings-label" style="margin-bottom: 12px;">Веріфіковані користувачі:</div>
+                        <div id="verifiedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========== GLOBALS ==========
         let currentUser = null;
         let activeChat = null;
         let lastMessageCount = 0;
         let autoRefreshInterval = null;
+        const ADMIN_PASSWORD = '12364578TYRR';
 
         // ========== UTILITY FUNCTIONS ==========
+        
+        // Отримати веріфікованих користувачів
+        function getVerifiedUsers() {
+            const verified = localStorage.getItem('messenger_verified');
+            return verified ? JSON.parse(verified) : [];
+        }
+
+        // Зберегти веріфікованих користувачів
+        function saveVerifiedUsers(verified) {
+            localStorage.setItem('messenger_verified', JSON.stringify(verified));
+        }
+
+        // Перевірити чи користувач веріфікований
+        function isUserVerified(nickname) {
+            const verified = getVerifiedUsers();
+            return verified.includes(nickname);
+        }
         
         // Проста хеш-функція для паролів (SHA-256 альтернатива)
         function simpleHash(str) {
@@ -834,7 +1080,14 @@
         // ========== APP FUNCTIONS ==========
         
         function initApp() {
-            document.getElementById('currentUserNickname').textContent = currentUser.nickname;
+            const nicknameEl = document.getElementById('currentUserNickname');
+            nicknameEl.textContent = currentUser.nickname;
+            
+            // Додаємо галочку якщо користувач веріфікований
+            if (isUserVerified(currentUser.nickname)) {
+                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge">✓</span>';
+            }
+            
             loadChats();
             startAutoRefresh();
         }
@@ -920,16 +1173,19 @@
             // Сортуємо за останнім повідомленням
             chatsWithMessages.sort((a, b) => b.timestamp - a.timestamp);
 
-            chatListEl.innerHTML = chatsWithMessages.map(chat => `
-                <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
-                     onclick="openChat('${chat.user.id}')">
-                    <div class="chat-item-header">
-                        <div class="chat-item-name">${chat.user.nickname}</div>
-                        <div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>
+            chatListEl.innerHTML = chatsWithMessages.map(chat => {
+                const verifiedBadge = isUserVerified(chat.user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+                return `
+                    <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
+                         onclick="openChat('${chat.user.id}')">
+                        <div class="chat-item-header">
+                            <div class="chat-item-name">${chat.user.nickname}${verifiedBadge}</div>
+                            <div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>
+                        </div>
+                        <div class="chat-item-preview">${escapeHtml(chat.lastMessage.text)}</div>
                     </div>
-                    <div class="chat-item-preview">${escapeHtml(chat.lastMessage.text)}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function searchUsers() {
@@ -957,15 +1213,18 @@
                 return;
             }
 
-            chatListEl.innerHTML = users.map(user => `
-                <div class="chat-item ${activeChat && activeChat.id === user.id ? 'active' : ''}" 
-                     onclick="openChat('${user.id}')">
-                    <div class="chat-item-header">
-                        <div class="chat-item-name">${user.nickname}</div>
+            chatListEl.innerHTML = users.map(user => {
+                const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+                return `
+                    <div class="chat-item ${activeChat && activeChat.id === user.id ? 'active' : ''}" 
+                         onclick="openChat('${user.id}')">
+                        <div class="chat-item-header">
+                            <div class="chat-item-name">${user.nickname}${verifiedBadge}</div>
+                        </div>
+                        <div class="chat-item-preview">@${user.username}</div>
                     </div>
-                    <div class="chat-item-preview">@${user.username}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function openChat(userId) {
@@ -976,8 +1235,9 @@
 
             activeChat = user;
 
-            // Оновлюємо заголовок чату
-            document.getElementById('chatHeaderName').textContent = user.nickname;
+            // Оновлюємо заголовок чату з галочкою якщо є
+            const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge">✓</span>' : '';
+            document.getElementById('chatHeaderName').innerHTML = user.nickname + verifiedBadge;
             
             // Показуємо елементи чату
             document.querySelector('.empty-chat').style.display = 'none';
@@ -1082,6 +1342,104 @@
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.setAttribute('data-theme', savedTheme);
+        }
+
+        // ========== SETTINGS & ADMIN ==========
+        
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('show');
+            updateVerifiedUsersList();
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
+            document.getElementById('adminPasswordSection').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+        }
+
+        function closeSettingsOnOverlay(event) {
+            if (event.target.id === 'settingsModal') {
+                closeSettings();
+            }
+        }
+
+        function showAdminPasswordInput() {
+            const section = document.getElementById('adminPasswordSection');
+            section.classList.toggle('hidden');
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPasswordInput').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('adminPasswordSection').classList.add('hidden');
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPasswordInput').value = '';
+                updateVerifiedUsersList();
+            } else {
+                alert('Неправильний пароль!');
+                document.getElementById('adminPasswordInput').value = '';
+            }
+        }
+
+        function verifyUser() {
+            const nickname = document.getElementById('verifyNickname').value.trim();
+            
+            if (!nickname) {
+                alert('Введіть нікнейм!');
+                return;
+            }
+
+            const users = getUsers();
+            const user = users.find(u => u.nickname === nickname);
+
+            if (!user) {
+                alert('Користувача з таким нікнеймом не знайдено!');
+                return;
+            }
+
+            const verified = getVerifiedUsers();
+            
+            if (verified.includes(nickname)) {
+                alert('Цей користувач вже веріфікований!');
+                return;
+            }
+
+            verified.push(nickname);
+            saveVerifiedUsers(verified);
+
+            document.getElementById('verifyNickname').value = '';
+            alert(`✓ Користувач ${nickname} отримав галочку верифікації!`);
+            
+            updateVerifiedUsersList();
+            
+            // Оновлюємо інтерфейс якщо це поточний користувач
+            if (currentUser.nickname === nickname) {
+                const nicknameEl = document.getElementById('currentUserNickname');
+                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge">✓</span>';
+            }
+            
+            // Оновлюємо чати
+            loadChats();
+            
+            // Оновлюємо заголовок активного чату якщо потрібно
+            if (activeChat && activeChat.nickname === nickname) {
+                document.getElementById('chatHeaderName').innerHTML = nickname + '<span class="verified-badge">✓</span>';
+            }
+        }
+
+        function updateVerifiedUsersList() {
+            const verified = getVerifiedUsers();
+            const listEl = document.getElementById('verifiedUsersList');
+            
+            if (verified.length === 0) {
+                listEl.innerHTML = '<div style="opacity: 0.5;">Немає веріфікованих користувачів</div>';
+            } else {
+                listEl.innerHTML = verified.map(nick => 
+                    `<div style="padding: 8px 0;">${nick} <span class="verified-badge">✓</span></div>`
+                ).join('');
+            }
         }
 
         // ========== INITIALIZATION ==========
