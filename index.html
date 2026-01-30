@@ -647,6 +647,8 @@
         // ========== GLOBALS ==========
         let currentUser = null;
         let activeChat = null;
+        let lastMessageCount = 0;
+        let autoRefreshInterval = null;
 
         // ========== UTILITY FUNCTIONS ==========
         
@@ -809,6 +811,12 @@
         }
 
         function logout() {
+            // Зупиняємо автооновлення
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+
             currentUser = null;
             activeChat = null;
             sessionStorage.removeItem('currentUser');
@@ -828,47 +836,98 @@
         function initApp() {
             document.getElementById('currentUserNickname').textContent = currentUser.nickname;
             loadChats();
+            startAutoRefresh();
+        }
+
+        // Автоматичне оновлення повідомлень
+        function startAutoRefresh() {
+            // Очищаємо попередній інтервал якщо є
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+
+            // Перевіряємо нові повідомлення кожні 2 секунди
+            autoRefreshInterval = setInterval(() => {
+                checkForNewMessages();
+            }, 2000);
+        }
+
+        function checkForNewMessages() {
+            const messages = getMessages();
+            const currentMessageCount = messages.length;
+
+            // Якщо кількість повідомлень змінилась
+            if (currentMessageCount !== lastMessageCount) {
+                lastMessageCount = currentMessageCount;
+
+                // Оновлюємо список чатів
+                const searchQuery = document.getElementById('searchInput').value.trim();
+                if (!searchQuery) {
+                    loadChats();
+                }
+
+                // Якщо відкритий активний чат - оновлюємо повідомлення
+                if (activeChat) {
+                    const chatId = getChatId(currentUser.username, activeChat.username);
+                    const chatMessages = messages.filter(m => m.chatId === chatId);
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    const currentScrollHeight = messagesContainer.scrollHeight;
+                    const currentScrollTop = messagesContainer.scrollTop;
+                    const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
+
+                    loadMessages();
+
+                    // Прокручуємо вниз тільки якщо користувач був внизу
+                    if (isScrolledToBottom) {
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                }
+            }
         }
 
         function loadChats() {
             const chatListEl = document.getElementById('chatList');
-            const users = getUsers().filter(u => u.id !== currentUser.id);
             const messages = getMessages();
+            const users = getUsers().filter(u => u.id !== currentUser.id);
 
-            if (users.length === 0) {
+            // Знаходимо тільки тих користувачів, з якими є повідомлення
+            const chatsWithMessages = [];
+            
+            users.forEach(user => {
+                const chatId = getChatId(currentUser.username, user.username);
+                const chatMessages = messages.filter(m => m.chatId === chatId);
+                
+                if (chatMessages.length > 0) {
+                    const lastMessage = chatMessages[chatMessages.length - 1];
+                    chatsWithMessages.push({
+                        user: user,
+                        lastMessage: lastMessage,
+                        timestamp: lastMessage.timestamp
+                    });
+                }
+            });
+
+            if (chatsWithMessages.length === 0) {
                 chatListEl.innerHTML = `
                     <div class="empty-chats">
-                        <p>Почніть розмову!</p>
+                        <p>Немає активних чатів</p>
                         <p style="font-size: 13px; margin-top: 8px;">Знайдіть користувача за нікнеймом</p>
                     </div>
                 `;
                 return;
             }
 
-            // Створюємо список чатів
-            const chats = users.map(user => {
-                const chatId = getChatId(currentUser.username, user.username);
-                const chatMessages = messages.filter(m => m.chatId === chatId);
-                const lastMessage = chatMessages[chatMessages.length - 1];
-
-                return {
-                    user: user,
-                    lastMessage: lastMessage,
-                    timestamp: lastMessage ? lastMessage.timestamp : 0
-                };
-            });
-
             // Сортуємо за останнім повідомленням
-            chats.sort((a, b) => b.timestamp - a.timestamp);
+            chatsWithMessages.sort((a, b) => b.timestamp - a.timestamp);
 
-            chatListEl.innerHTML = chats.map(chat => `
+            chatListEl.innerHTML = chatsWithMessages.map(chat => `
                 <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
                      onclick="openChat('${chat.user.id}')">
                     <div class="chat-item-header">
                         <div class="chat-item-name">${chat.user.nickname}</div>
-                        ${chat.lastMessage ? `<div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>` : ''}
+                        <div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>
                     </div>
-                    ${chat.lastMessage ? `<div class="chat-item-preview">${chat.lastMessage.text}</div>` : '<div class="chat-item-preview">Почніть розмову</div>'}
+                    <div class="chat-item-preview">${escapeHtml(chat.lastMessage.text)}</div>
                 </div>
             `).join('');
         }
@@ -1029,6 +1088,9 @@
         
         window.onload = function() {
             loadTheme();
+
+            // Ініціалізуємо лічильник повідомлень
+            lastMessageCount = getMessages().length;
 
             // Перевірка збереженої сесії
             const savedUser = sessionStorage.getItem('currentUser');
