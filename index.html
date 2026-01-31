@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Messenger - Telegram Style</title>
     <style>
         * {
@@ -45,6 +45,8 @@
             color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         /* ========== AUTH SCREEN ========== */
@@ -118,6 +120,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-primary {
@@ -128,6 +132,10 @@
         .btn-primary:hover {
             background: var(--accent-hover);
             transform: translateY(-1px);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
@@ -190,10 +198,20 @@
             flex-direction: column;
             gap: 4px;
             transition: opacity 0.3s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-width: 40px;
+            min-height: 40px;
+            align-items: center;
+            justify-content: center;
         }
 
         .hamburger-menu:hover {
             opacity: 0.8;
+        }
+
+        .hamburger-menu:active {
+            opacity: 0.6;
         }
 
         .hamburger-line {
@@ -248,10 +266,17 @@
             font-size: 14px;
             font-weight: 500;
             transition: background 0.3s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 36px;
         }
 
         .btn-logout:hover {
             background: rgba(255, 59, 48, 1);
+        }
+
+        .btn-logout:active {
+            background: rgba(200, 40, 30, 1);
         }
 
         /* Main Content */
@@ -304,10 +329,20 @@
             border-bottom: 1px solid var(--border);
             cursor: pointer;
             transition: background 0.2s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 72px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .chat-item:hover {
             background: var(--bg-secondary);
+        }
+
+        .chat-item:active {
+            background: var(--bg-tertiary);
         }
 
         .chat-item.active {
@@ -502,15 +537,25 @@
             font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px;
+            white-space: nowrap;
         }
 
         .btn-send:hover {
             background: var(--accent-hover);
         }
 
+        .btn-send:active {
+            background: var(--accent-hover);
+            opacity: 0.8;
+        }
+
         .btn-send:disabled {
             background: var(--text-secondary);
             cursor: not-allowed;
+            opacity: 0.5;
         }
 
         /* Scrollbar */
@@ -533,105 +578,226 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .app-header {
+                padding: 10px 12px;
+            }
+
             .app-header h1 {
-                font-size: 16px;
-            }
-
-            .header-user {
-                gap: 8px;
-            }
-
-            .user-info {
-                display: none;
-            }
-
-            .hamburger-menu {
-                padding: 4px;
+                font-size: 18px;
+                gap: 12px;
             }
 
             .hamburger-line {
-                width: 20px;
+                width: 22px;
+                height: 2.5px;
+            }
+
+            .header-user {
+                gap: 10px;
+            }
+
+            .user-info .user-nickname {
+                font-size: 14px;
+            }
+
+            .user-info .user-status {
+                font-size: 11px;
+            }
+
+            .btn-logout {
+                padding: 8px 14px;
+                font-size: 13px;
+                min-height: 38px;
             }
 
             .sidebar {
                 width: 100%;
-                position: absolute;
-                left: 0;
-                top: 0;
-                bottom: 0;
-                z-index: 1;
-                transition: transform 0.3s;
             }
 
-            .sidebar.mobile-hidden {
-                transform: translateX(-100%);
+            .search-container {
+                padding: 12px;
+            }
+
+            .search-box input {
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+
+            .chat-item {
+                padding: 14px 12px;
+                min-height: 76px;
+            }
+
+            .chat-item-name {
+                font-size: 16px;
+            }
+
+            .chat-item-preview {
+                font-size: 14px;
             }
 
             .chat-area {
-                position: absolute;
+                display: none;
+                position: fixed;
                 top: 0;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                z-index: 2;
-                transform: translateX(100%);
-                transition: transform 0.3s;
+                z-index: 100;
+                background: var(--bg-secondary);
             }
 
             .chat-area.mobile-active {
-                display: flex;
-                transform: translateX(0);
+                display: flex !important;
+            }
+
+            .empty-chat {
+                display: none !important;
+            }
+
+            .chat-header {
+                padding: 14px 12px;
+                border-bottom: 2px solid var(--border);
+            }
+
+            .chat-header-name {
+                font-size: 16px;
+            }
+
+            .chat-header-status {
+                font-size: 12px;
+            }
+
+            .btn-back {
+                display: inline-flex !important;
+                font-size: 24px;
+                padding: 8px;
+                min-width: 40px;
+                min-height: 40px;
+                align-items: center;
+                justify-content: center;
+                margin-right: 4px;
+            }
+
+            .messages-container {
+                padding: 16px 12px;
+            }
+
+            .message {
+                margin-bottom: 10px;
             }
 
             .message-bubble {
                 max-width: 85%;
+                padding: 12px 14px;
+            }
+
+            .message-text {
+                font-size: 15px;
+            }
+
+            .input-area {
+                padding: 12px;
+                border-top: 2px solid var(--border);
+            }
+
+            .input-container {
+                gap: 10px;
+            }
+
+            .input-container textarea {
+                font-size: 15px;
+                padding: 12px 16px;
+            }
+
+            .btn-send {
+                padding: 12px 22px;
+                font-size: 15px;
+                min-height: 46px;
             }
 
             .modal-content {
                 max-height: 90vh;
+                width: 95%;
+                max-width: 400px;
             }
 
-            .btn-logout {
-                padding: 6px 12px;
+            .modal-body {
+                padding: 16px;
+            }
+
+            .settings-item {
+                padding: 14px 0;
+            }
+
+            .settings-label {
+                font-size: 15px;
+            }
+
+            .settings-description {
                 font-size: 13px;
             }
 
-            .chat-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+            .form-group {
+                margin-bottom: 16px;
             }
 
-            .btn-back {
-                background: var(--accent);
-                color: white;
-                border: none;
-                padding: 6px 12px;
-                border-radius: 6px;
+            .form-group input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .ban-duration-buttons {
+                flex-direction: column;
+            }
+
+            .btn-ban {
+                width: 100%;
+                padding: 12px 16px;
                 font-size: 14px;
-                cursor: pointer;
-                display: none;
             }
 
-            .chat-header.active .btn-back {
-                display: block;
+            .auth-box {
+                padding: 30px 20px;
+                width: 95%;
+            }
+
+            .auth-header h1 {
+                font-size: 28px;
+            }
+
+            .form-group input {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .btn {
+                padding: 16px;
+                font-size: 16px;
             }
         }
 
         .btn-back {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
             display: none;
+            align-items: center;
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 4px;
+            font-size: 15px;
+            cursor: pointer;
+            gap: 4px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-back:active {
+            opacity: 0.6;
         }
 
         @media (max-width: 768px) {
-            .btn-back {
-                display: inline-block;
+            .chat-header.active .btn-back {
+                display: inline-flex !important;
             }
         }
 
@@ -908,21 +1074,23 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%);
             color: white;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             margin-left: 4px;
-            border-radius: 50%;
+            transform: rotate(45deg);
             position: relative;
-            box-shadow: 0 2px 4px rgba(0, 136, 204, 0.3);
+            top: -1px;
             border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 136, 204, 0.3);
         }
 
         .verified-badge::before {
             content: '✓';
+            transform: rotate(-45deg);
             display: block;
         }
     </style>
@@ -1020,12 +1188,13 @@
                 </div>
 
                 <div class="chat-header" id="chatHeader">
-                    <button class="btn-back" onclick="closeChat()">← Назад</button>
-                    <div>
-                        <div class="chat-header-name" id="chatHeaderName"></div>
-                        <div class="chat-header-status">в мережі</div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                        <button class="btn-back" onclick="closeChat()">←</button>
+                        <div>
+                            <div class="chat-header-name" id="chatHeaderName"></div>
+                            <div class="chat-header-status">в мережі</div>
+                        </div>
                     </div>
-                    <div style="width: 60px;"></div>
                 </div>
 
                 <div class="messages-container" id="messagesContainer">
@@ -1673,12 +1842,9 @@
             document.getElementById('messagesContainer').classList.add('active');
             document.getElementById('inputArea').classList.add('active');
 
-            // Мобільна версія
-            document.getElementById('chatArea').classList.add('mobile-active');
-            
-            // Приховуємо сайдбар на мобільних
+            // Мобільна версія - показуємо чат поверх всього
             if (window.innerWidth <= 768) {
-                document.querySelector('.sidebar').classList.add('mobile-hidden');
+                document.getElementById('chatArea').classList.add('mobile-active');
             }
 
             // Завантажуємо повідомлення
@@ -1690,8 +1856,9 @@
 
         function closeChat() {
             // Повертаємось до списку чатів на мобільних
-            document.getElementById('chatArea').classList.remove('mobile-active');
-            document.querySelector('.sidebar').classList.remove('mobile-hidden');
+            if (window.innerWidth <= 768) {
+                document.getElementById('chatArea').classList.remove('mobile-active');
+            }
         }
 
         function loadMessages() {
