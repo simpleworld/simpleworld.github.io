@@ -1,5 +1,31 @@
 <!DOCTYPE html>
 <html lang="uk">
+<!--
+════════════════════════════════════════════════════════════════════════════════
+    MESSENGER - TELEGRAM STYLE
+════════════════════════════════════════════════════════════════════════════════
+
+📋 ЯК ДОДАТИ ХАРДКОД КОРИСТУВАЧА (для доступу з будь-якого пристрою):
+
+1. Знайдіть в коді секцію "HARDCODED_USERS"
+2. Додайте новий об'єкт в масив у форматі:
+
+{
+    id: 'user_1',                           // Унікальний ID (user_1, user_2, etc.)
+    nickname: 'Ваш нікнейм',                // Нікнейм користувача
+    username: 'логін',                      // Логін для входу
+    password: simpleHash('ваш_пароль'),     // Пароль (буде захешований)
+    createdAt: Date.now()                   // Дата створення
+}
+
+⚠️ ВАЖЛИВО: 
+- Хардкод користувачі НІКОЛИ не видаляються
+- Вони доступні на ВСІХ пристроях
+- Пароль автоматично хешується функцією simpleHash()
+- Щоб дізнатися хеш вашого пароля, можна тимчасово додати console.log(simpleHash('пароль'))
+
+════════════════════════════════════════════════════════════════════════════════
+-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -1099,7 +1125,6 @@
             transform: rotate(45deg);
             position: relative;
             top: -1px;
-            border: 2.5px solid white;
             box-shadow: 0 2px 6px rgba(0, 102, 204, 0.4);
         }
 
@@ -1376,6 +1401,55 @@
         let banCheckInterval = null;
         const ADMIN_PASSWORD = '12364578TYRR';
 
+        // Проста хеш-функція для паролів (SHA-256 альтернатива)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(36);
+        }
+
+        // ========== HARDCODED USERS (зберігаються в коді, не видаляються) ==========
+        // Ці користувачі завжди доступні на будь-якому пристрої
+        // 
+        // 📝 ПРИКЛАД ДОДАВАННЯ КОРИСТУВАЧА:
+        // {
+        //     id: 'user_1',
+        //     nickname: 'Admin',
+        //     username: 'admin',
+        //     password: simpleHash('admin123'),  // Пароль: admin123
+        //     createdAt: 1704067200000
+        // }
+        //
+        // 🔧 ЯК ДОДАТИ СВОГО КОРИСТУВАЧА:
+        // 1. Розкоментуйте (видаліть //) приклад вище
+        // 2. Змініть nickname, username та пароль в simpleHash('ваш_пароль')
+        // 3. Збережіть файл
+        // 4. Оновіть сторінку - користувач буде доступний на всіх пристроях!
+        
+        const HARDCODED_USERS = [
+            // Додайте своїх користувачів тут (розкоментуйте та змініть дані):
+            
+            // {
+            //     id: 'user_1',
+            //     nickname: 'Admin',
+            //     username: 'admin',
+            //     password: simpleHash('admin123'),
+            //     createdAt: Date.now()
+            // },
+            
+            // {
+            //     id: 'user_2',
+            //     nickname: 'User2',
+            //     username: 'user2',
+            //     password: simpleHash('password123'),
+            //     createdAt: Date.now()
+            // }
+        ];
+
         // ========== UTILITY FUNCTIONS ==========
         
         // Отримати веріфікованих користувачів
@@ -1430,27 +1504,37 @@
             const banned = getBannedUsers();
             return banned.find(b => b.nickname === nickname);
         }
-        
-        // Проста хеш-функція для паролів (SHA-256 альтернатива)
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return Math.abs(hash).toString(36);
-        }
 
-        // Отримати всіх користувачів
+        // Отримати всіх користувачів (хардкод + localStorage)
         function getUsers() {
-            const users = localStorage.getItem('messenger_users');
-            return users ? JSON.parse(users) : [];
+            const localUsers = localStorage.getItem('messenger_users');
+            const parsedLocalUsers = localUsers ? JSON.parse(localUsers) : [];
+            
+            // Об'єднуємо хардкод користувачів з localStorage
+            // Хардкод користувачі завжди на початку
+            const allUsers = [...HARDCODED_USERS, ...parsedLocalUsers];
+            
+            // Видаляємо дублікати по username
+            const uniqueUsers = [];
+            const seenUsernames = new Set();
+            
+            for (const user of allUsers) {
+                if (!seenUsernames.has(user.username)) {
+                    seenUsernames.add(user.username);
+                    uniqueUsers.push(user);
+                }
+            }
+            
+            return uniqueUsers;
         }
 
-        // Зберегти користувачів
+        // Зберегти користувачів (тільки нові, хардкод не чіпаємо)
         function saveUsers(users) {
-            localStorage.setItem('messenger_users', JSON.stringify(users));
+            // Фільтруємо тільки нехардкод користувачів
+            const hardcodedUsernames = new Set(HARDCODED_USERS.map(u => u.username));
+            const localOnlyUsers = users.filter(u => !hardcodedUsernames.has(u.username));
+            
+            localStorage.setItem('messenger_users', JSON.stringify(localOnlyUsers));
         }
 
         // Отримати повідомлення
