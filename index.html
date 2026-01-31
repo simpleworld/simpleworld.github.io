@@ -580,34 +580,49 @@
         @media (max-width: 768px) {
             .app-header {
                 padding: 10px 12px;
+                flex-wrap: nowrap;
             }
 
             .app-header h1 {
-                font-size: 18px;
-                gap: 12px;
+                font-size: 16px;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
+            .hamburger-menu {
+                padding: 6px;
+                min-width: 36px;
+                min-height: 36px;
             }
 
             .hamburger-line {
-                width: 22px;
+                width: 20px;
                 height: 2.5px;
             }
 
             .header-user {
-                gap: 10px;
+                gap: 8px;
+                flex-shrink: 0;
+            }
+
+            .user-info {
+                display: flex;
+                flex-direction: column;
             }
 
             .user-info .user-nickname {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .user-info .user-status {
-                font-size: 11px;
+                font-size: 10px;
             }
 
             .btn-logout {
-                padding: 8px 14px;
-                font-size: 13px;
-                min-height: 38px;
+                padding: 6px 10px;
+                font-size: 12px;
+                min-height: 32px;
+                white-space: nowrap;
             }
 
             .sidebar {
@@ -1074,24 +1089,25 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #0088cc 0%, #0066aa 100%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #1e90ff 0%, #0066cc 100%);
             color: white;
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 900;
             margin-left: 4px;
             transform: rotate(45deg);
             position: relative;
             top: -1px;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0, 136, 204, 0.3);
+            border: 2.5px solid white;
+            box-shadow: 0 2px 6px rgba(0, 102, 204, 0.4);
         }
 
         .verified-badge::before {
             content: '✓';
             transform: rotate(-45deg);
             display: block;
+            line-height: 1;
         }
     </style>
 </head>
@@ -1168,7 +1184,7 @@
             <div class="sidebar">
                 <div class="search-container">
                     <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Пошук користувачів..." onkeyup="searchUsers()">
+                        <input type="text" id="searchInput" placeholder="Пошук користувачів...">
                     </div>
                 </div>
                 <div class="chat-list" id="chatList">
@@ -1634,11 +1650,13 @@
         
         function initApp() {
             const nicknameEl = document.getElementById('currentUserNickname');
-            nicknameEl.textContent = currentUser.nickname;
+            nicknameEl.textContent = ''; // Очищаємо спочатку
             
             // Додаємо галочку якщо користувач веріфікований
             if (isUserVerified(currentUser.nickname)) {
-                nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge"></span>';
+                nicknameEl.innerHTML = escapeHtml(currentUser.nickname) + '<span class="verified-badge"></span>';
+            } else {
+                nicknameEl.textContent = currentUser.nickname;
             }
             
             loadChats();
@@ -1776,7 +1794,7 @@
                     <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
                          onclick="openChat('${chat.user.id}')">
                         <div class="chat-item-header">
-                            <div class="chat-item-name">${chat.user.nickname}${verifiedBadge}</div>
+                            <div class="chat-item-name">${escapeHtml(chat.user.nickname)}${verifiedBadge}</div>
                             <div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>
                         </div>
                         <div class="chat-item-preview">${escapeHtml(chat.lastMessage.text)}</div>
@@ -1795,7 +1813,7 @@
 
             const users = getUsers().filter(u => 
                 u.id !== currentUser.id && 
-                u.nickname.toLowerCase().includes(query)
+                (u.nickname.toLowerCase().includes(query) || u.username.toLowerCase().includes(query))
             );
 
             const chatListEl = document.getElementById('chatList');
@@ -1816,9 +1834,9 @@
                     <div class="chat-item ${activeChat && activeChat.id === user.id ? 'active' : ''}" 
                          onclick="openChat('${user.id}')">
                         <div class="chat-item-header">
-                            <div class="chat-item-name">${user.nickname}${verifiedBadge}</div>
+                            <div class="chat-item-name">${escapeHtml(user.nickname)}${verifiedBadge}</div>
                         </div>
-                        <div class="chat-item-preview">@${user.username}</div>
+                        <div class="chat-item-preview">@${escapeHtml(user.username)}</div>
                     </div>
                 `;
             }).join('');
@@ -1834,7 +1852,7 @@
 
             // Оновлюємо заголовок чату з галочкою якщо є
             const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
-            document.getElementById('chatHeaderName').innerHTML = user.nickname + verifiedBadge;
+            document.getElementById('chatHeaderName').innerHTML = escapeHtml(user.nickname) + verifiedBadge;
             
             // Показуємо елементи чату
             document.querySelector('.empty-chat').style.display = 'none';
@@ -2172,10 +2190,12 @@
             // Оновлюємо інтерфейс якщо це поточний користувач
             if (currentUser) {
                 const nicknameEl = document.getElementById('currentUserNickname');
-                nicknameEl.textContent = currentUser.nickname;
+                nicknameEl.textContent = '';
                 
                 if (isUserVerified(currentUser.nickname)) {
-                    nicknameEl.innerHTML = currentUser.nickname + '<span class="verified-badge"></span>';
+                    nicknameEl.innerHTML = escapeHtml(currentUser.nickname) + '<span class="verified-badge"></span>';
+                } else {
+                    nicknameEl.textContent = currentUser.nickname;
                 }
             }
             
@@ -2185,7 +2205,7 @@
             // Оновлюємо заголовок активного чату якщо потрібно
             if (activeChat) {
                 const verifiedBadge = isUserVerified(activeChat.nickname) ? '<span class="verified-badge"></span>' : '';
-                document.getElementById('chatHeaderName').innerHTML = activeChat.nickname + verifiedBadge;
+                document.getElementById('chatHeaderName').innerHTML = escapeHtml(activeChat.nickname) + verifiedBadge;
             }
         }
 
@@ -2328,6 +2348,14 @@
             document.getElementById('registerPassword').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') register();
             });
+
+            // Реал-тайм пошук - додаємо після того як додаток ініціалізований
+            setTimeout(() => {
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', searchUsers);
+                }
+            }, 100);
         };
     </script>
 </body>
