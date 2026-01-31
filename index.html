@@ -1115,17 +1115,16 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 20px;
-            height: 20px;
-            background: linear-gradient(135deg, #1e90ff 0%, #0066cc 100%);
+            width: 18px;
+            height: 18px;
+            background: #0088cc;
             color: white;
-            font-size: 13px;
-            font-weight: 900;
+            font-size: 12px;
+            font-weight: bold;
             margin-left: 4px;
             transform: rotate(45deg);
             position: relative;
             top: -1px;
-            box-shadow: 0 2px 6px rgba(0, 102, 204, 0.4);
         }
 
         .verified-badge::before {
@@ -1314,6 +1313,14 @@
                         <div class="settings-description">Завантажити всі ваші дані</div>
                     </div>
                     <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="exportUserData()">Експорт</button>
+                </div>
+
+                <div class="settings-item">
+                    <div>
+                        <div class="settings-label">Експорт всіх акаунтів</div>
+                        <div class="settings-description">Отримати код для додавання в файл</div>
+                    </div>
+                    <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="exportAllUsersCode()">Отримати код</button>
                 </div>
 
                 <div class="admin-link" onclick="showAdminPasswordInput()">
@@ -1660,13 +1667,55 @@
             users.push(newUser);
             saveUsers(users);
 
+            // Показуємо код для додавання в файл
+            showCodeToAdd(nickname, username, password, newUser.id);
+
             // Очищення форми
             document.getElementById('registerNickname').value = '';
             document.getElementById('registerUsername').value = '';
             document.getElementById('registerPassword').value = '';
+        }
 
+        // Показати код для додавання в HARDCODED_USERS
+        function showCodeToAdd(nickname, username, password, userId) {
+            const code = `{
+    id: '${userId}',
+    nickname: '${nickname}',
+    username: '${username}',
+    password: simpleHash('${password}'),
+    createdAt: ${Date.now()}
+}`;
+
+            const message = `✅ Реєстрація успішна!
+
+📋 Щоб акаунт працював на ВСІХ пристроях, додайте цей код в файл:
+
+1. Відкрийте messenger.html в текстовому редакторі
+2. Знайдіть рядок: const HARDCODED_USERS = [
+3. Вставте цей код між дужками:
+
+${code}
+
+Приклад:
+const HARDCODED_USERS = [
+${code}
+];
+
+⚠️ Не забудьте додати кому (,) якщо є інші користувачі!
+
+Тепер можете увійти у систему.`;
+
+            alert(message);
+            
+            // Копіюємо код в буфер обміну
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(code).then(() => {
+                    console.log('Код скопійовано в буфер обміну!');
+                });
+            }
+            
             showLogin();
-            showError('loginError', '✓ Реєстрація успішна! Увійдіть у систему.');
+            showError('loginError', '✓ Реєстрація успішна! Код для додавання в файл показано. Тепер увійдіть у систему.');
         }
 
         function login() {
@@ -2332,6 +2381,66 @@
             
             URL.revokeObjectURL(url);
             alert('✓ Дані експортовано!');
+        }
+
+        function exportAllUsersCode() {
+            const users = getUsers();
+            const hardcodedUsernames = new Set(HARDCODED_USERS.map(u => u.username));
+            
+            // Беремо тільки нехардкод користувачів
+            const localUsers = users.filter(u => !hardcodedUsernames.has(u.username));
+
+            if (localUsers.length === 0) {
+                alert('Немає локальних користувачів для експорту!\n\nВсі існуючі користувачі вже в коді.');
+                return;
+            }
+
+            const usersCode = localUsers.map(user => {
+                // Знаходимо оригінальний пароль з localStorage якщо можна
+                return `    {
+        id: '${user.id}',
+        nickname: '${user.nickname}',
+        username: '${user.username}',
+        password: '${user.password}', // Вже захешований
+        createdAt: ${user.createdAt}
+    }`;
+            }).join(',\n');
+
+            const fullCode = `const HARDCODED_USERS = [
+${usersCode}
+];`;
+
+            const message = `📋 КОД ДЛЯ ДОДАВАННЯ ВСІХ КОРИСТУВАЧІВ В ФАЙЛ:
+
+Скопіюйте цей код і замініть рядок:
+const HARDCODED_USERS = [
+    // ...
+];
+
+На цей код:
+
+${fullCode}
+
+⚠️ УВАГА: Паролі вже захешовані!
+Користувачів: ${localUsers.length}
+
+Код скопійовано в буфер обміну!`;
+
+            // Копіюємо в буфер обміну
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(fullCode).then(() => {
+                    alert(message);
+                });
+            } else {
+                alert(message);
+            }
+
+            // Також показуємо в консолі
+            console.log('═══════════════════════════════════════════');
+            console.log('КОД ДЛЯ HARDCODED_USERS:');
+            console.log('═══════════════════════════════════════════');
+            console.log(fullCode);
+            console.log('═══════════════════════════════════════════');
         }
 
         function updateStatistics() {
