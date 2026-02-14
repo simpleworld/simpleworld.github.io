@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>SimpleWorld — Підтримка</title>
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#ff8c00,#ff6a00);
+}
+
+header{
+background:white;
+padding:15px 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.logo{
+font-weight:bold;
+color:#ff7a00;
+font-size:22px;
+}
+
+.home-btn{
+background:#ff7a00;
+color:white;
+padding:10px 18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.container{
+max-width:600px;
+margin:60px auto;
+}
+
+.card{
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+h2{
+color:#ff7a00;
+margin-top:0;
+}
+
+input, textarea{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:1px solid #ccc;
+}
+
+button{
+margin-top:15px;
+width:100%;
+background:#ff7a00;
+color:white;
+border:none;
+padding:14px;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">SW SIMPLEWORLD — Підтримка</div>
+<button class="home-btn" onclick="window.location.href='index.html'">
+🏠 На головну
+</button>
+</header>
+
+<div class="container">
+<div class="card">
+
+<h2>📩 Зв'язок з техпідтримкою</h2>
+
+<form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+
+<input type="text" name="contact" placeholder="Ваш Telegram або Discord" required>
+
+<input type="text" name="minecraft" placeholder="Ваш нік в Minecraft" required>
+
+<textarea name="problem" rows="5" placeholder="Опишіть проблему" required></textarea>
+
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_template" value="box">
+<input type="hidden" name="_subject" value="Нова заявка підтримки SimpleWorld">
+
+<button type="submit">Відправити заявку</button>
+
+</form>
+
+</div>
+</div>
+
+</body>
+</html>
