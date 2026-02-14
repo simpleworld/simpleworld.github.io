@@ -714,7 +714,7 @@
         function updateCurrency() {
             const range = document.getElementById('currencyRange');
             const coins = range.value;
-            const price = (coins * 0.01).toFixed(0.01); // 1 UAH = 100 релік
+            const price = coins; // 1 UAH = 100 релік
             
             document.getElementById('coinsDisplay').innerText = coins + ' R';
             document.getElementById('priceDisplay').innerText = price + ' UAH';
