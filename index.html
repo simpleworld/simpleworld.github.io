@@ -632,14 +632,15 @@
     <script>
         const products = [
             // RANKS
-            { id: 1, type: 'ranks', name: 'Premium', price: '29 UAH', img: 'orange', discount: false },
-            { id: 2, type: 'ranks', name: 'Elite', price: '49 UAH', img: 'blue', discount: false },
-            { id: 3, type: 'ranks', name: 'Deluxe', price: '69 UAH', img: 'cyan', discount: false },
-            { id: 4, type: 'ranks', name: 'Ultra', price: '99 UAH', img: 'purple', discount: false },
-            { id: 5, type: 'ranks', name: 'Immortal', price: '119 UAH', img: 'red', discount: false },
-            { id: 6, type: 'ranks', name: 'Supreme', price: '149 UAH', img: 'yellow', discount: false },
-            { id: 7, type: 'ranks', name: 'Legend', price: '199 UAH', img: 'blue', discount: false },
-            { id: 8, type: 'ranks', name: 'Infinity', price: '249 UAH', img: 'dark', discount: false },
+          { id: 8, type: 'ranks', name: 'Infinity', price: '249 UAH', img: 'dark', discount: false },
+          { id: 7, type: 'ranks', name: 'Legend', price: '199 UAH', img: 'blue', discount: false },
+          { id: 6, type: 'ranks', name: 'Supreme', price: '149 UAH', img: 'yellow', discount: false },
+          { id: 5, type: 'ranks', name: 'Immortal', price: '119 UAH', img: 'red', discount: false },
+          { id: 4, type: 'ranks', name: 'Ultra', price: '99 UAH', img: 'purple', discount: false },
+          { id: 3, type: 'ranks', name: 'Deluxe', price: '69 UAH', img: 'cyan', discount: false },
+          { id: 2, type: 'ranks', name: 'Elite', price: '49 UAH', img: 'blue', discount: false },
+          { id: 1, type: 'ranks', name: 'Premium', price: '29 UAH', img: 'orange', discount: false },
+
             
             // CASES
             { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '15 UAH', img: 'chest', discount: false },
@@ -716,7 +717,7 @@
             const coins = range.value;
             const price = coins; // 1 UAH = 100 релік
             
-            document.getElementById('coinsDisplay').innerText = coins + ' R';
+            document.getElementById('coinsDisplay').innerText = coins + ' C';
             document.getElementById('priceDisplay').innerText = price + ' UAH';
         }
 
@@ -757,7 +758,7 @@
             const price = document.getElementById('priceDisplay').innerText;
             
             document.getElementById('modalTitle').innerText = 'Покупка валюти';
-            document.getElementById('itemNameInput').value = `${coins} Релік`;
+            document.getElementById('itemNameInput').value = `${coins} Коінів`;
             document.getElementById('itemPriceInput').value = price;
             modal.classList.add('open');
         }
