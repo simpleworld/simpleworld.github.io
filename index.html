@@ -1,2555 +1,827 @@
 <!DOCTYPE html>
 <html lang="uk">
-<!--
-════════════════════════════════════════════════════════════════════════════════
-    MESSENGER - TELEGRAM STYLE
-════════════════════════════════════════════════════════════════════════════════
-
-📋 ЯК ДОДАТИ ХАРДКОД КОРИСТУВАЧА (для доступу з будь-якого пристрою):
-
-1. Знайдіть в коді секцію "HARDCODED_USERS"
-2. Додайте новий об'єкт в масив у форматі:
-
-{
-    id: 'user_1',                           // Унікальний ID (user_1, user_2, etc.)
-    nickname: 'Ваш нікнейм',                // Нікнейм користувача
-    username: 'логін',                      // Логін для входу
-    password: simpleHash('ваш_пароль'),     // Пароль (буде захешований)
-    createdAt: Date.now()                   // Дата створення
-}
-
-⚠️ ВАЖЛИВО: 
-- Хардкод користувачі НІКОЛИ не видаляються
-- Вони доступні на ВСІХ пристроях
-- Пароль автоматично хешується функцією simpleHash()
-- Щоб дізнатися хеш вашого пароля, можна тимчасово додати console.log(simpleHash('пароль'))
-
-════════════════════════════════════════════════════════════════════════════════
--->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Messenger - Telegram Style</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReallyWorld — Minecraft Server Network</title>
+    
+    <link href="blob:https://gemini.google.com/7549d577-9a23-4594-b954-3a995fd0abe1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f4f4f5;
-            --bg-tertiary: #e5e5ea;
-            --text-primary: #000000;
-            --text-secondary: #6e6e73;
-            --accent: #0088cc;
-            --accent-hover: #006699;
-            --message-out: #effdde;
-            --message-in: #ffffff;
-            --border: #d1d1d6;
-            --shadow: rgba(0, 0, 0, 0.1);
+            --primary: #ff9800;
+            --primary-dark: #f57c00;
+            --primary-gradient: linear-gradient(90deg, #ff9800 0%, #ffb74d 100%);
+            --secondary: #2d3436;
+            --bg-body: #f4f6f8;
+            --bg-card: #ffffff;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --danger: #ff4757;
+            --success: #2ecc71;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-soft: 0 10px 40px rgba(0,0,0,0.05);
+            --shadow-hover: 0 20px 50px rgba(255, 152, 0, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        [data-theme="dark"] {
-            --bg-primary: #212121;
-            --bg-secondary: #181818;
-            --bg-tertiary: #2c2c2c;
-            --text-primary: #ffffff;
-            --text-secondary: #aaaaaa;
-            --accent: #5eb3f6;
-            --accent-hover: #4a9dd9;
-            --message-out: #2b5278;
-            --message-in: #2c2c2c;
-            --border: #3a3a3a;
-            --shadow: rgba(0, 0, 0, 0.3);
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        /* ========== AUTH SCREEN ========== */
-        .auth-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
-        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { cursor: pointer; border: none; font-family: inherit; }
 
-        .auth-box {
-            background: var(--bg-primary);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px var(--shadow);
-            width: 400px;
-            max-width: 90%;
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .auth-header h1 {
-            color: var(--accent);
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .auth-header p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 15px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-primary {
-            background: var(--accent);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--accent-hover);
-            transform: translateY(-1px);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--accent);
-            margin-top: 12px;
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-secondary);
-        }
-
-        .error-message {
-            background: #ff3b30;
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        /* ========== MAIN APP ========== */
-        .app-container {
-            display: none;
-            height: 100vh;
-            flex-direction: column;
-        }
-
-        .app-container.active {
-            display: flex;
-        }
-
-        /* Header */
-        .app-header {
-            background: var(--accent);
-            color: white;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .app-header h1 {
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .hamburger-menu {
-            cursor: pointer;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            transition: opacity 0.3s;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            min-width: 40px;
-            min-height: 40px;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hamburger-menu:hover {
-            opacity: 0.8;
-        }
-
-        .hamburger-menu:active {
-            opacity: 0.6;
-        }
-
-        .hamburger-line {
-            width: 24px;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-        }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-info {
-            text-align: right;
-        }
-
-        .user-nickname {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .user-status {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .theme-toggle {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 20px; }
+        .flex { display: flex; align-items: center; }
+        .flex-between { justify-content: space-between; }
+        .flex-center { justify-content: center; }
+        .grid { display: grid; gap: 24px; }
+        
+        .badge {
+            padding: 4px 10px;
             border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
-        }
-
-        .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-logout {
-            background: rgba(255, 59, 48, 0.9);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background 0.3s;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 36px;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255, 59, 48, 1);
-        }
-
-        .btn-logout:active {
-            background: rgba(200, 40, 30, 1);
-        }
-
-        /* Main Content */
-        .app-main {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 320px;
-            background: var(--bg-primary);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .search-container {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .search-box {
-            position: relative;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 16px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 14px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .chat-list {
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .chat-item {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-            transition: background 0.2s;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 72px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .chat-item:hover {
-            background: var(--bg-secondary);
-        }
-
-        .chat-item:active {
-            background: var(--bg-tertiary);
-        }
-
-        .chat-item.active {
-            background: var(--bg-tertiary);
-        }
-
-        .chat-item-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-        }
-
-        .chat-item-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .chat-item-time {
             font-size: 12px;
-            color: var(--text-secondary);
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .badge-red { background: var(--danger); color: white; }
+        .badge-green { background: var(--success); color: white; }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
         }
 
-        .chat-item-preview {
-            font-size: 14px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
         }
 
-        .empty-chats {
-            padding: 40px 20px;
-            text-align: center;
-            color: var(--text-secondary);
+        @keyframes moveBackground {
+            0% { background-position: 0 0, 40px 40px; }
+            100% { background-position: 50px 50px, 90px 90px; }
         }
 
-        /* Chat Area */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-secondary);
-        }
-
-        .empty-chat {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-        }
-
-        .empty-chat-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-
-        .chat-header {
-            background: var(--bg-primary);
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: none;
-        }
-
-        .chat-header.active {
-            display: block;
-        }
-
-        .chat-header-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .chat-header-status {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-
-        .messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: none;
-        }
-
-        .messages-container.active {
-            display: block;
-        }
-
-        .message {
-            display: flex;
-            margin-bottom: 12px;
-            animation: messageSlide 0.3s ease;
-        }
-
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message.out {
-            justify-content: flex-end;
-        }
-
-        .message-bubble {
-            max-width: 60%;
-            padding: 10px 14px;
-            border-radius: 12px;
-            position: relative;
-        }
-
-        .message.in .message-bubble {
-            background: var(--message-in);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.out .message-bubble {
-            background: var(--message-out);
-            border-bottom-right-radius: 2px;
-        }
-
-        .message-text {
-            font-size: 15px;
-            line-height: 1.4;
-            word-wrap: break-word;
-        }
-
-        .message-time {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-            text-align: right;
-        }
-
-        .message.in .message-time {
-            text-align: left;
-        }
-
-        /* Input Area */
-        .input-area {
-            background: var(--bg-primary);
-            padding: 16px 20px;
-            border-top: 1px solid var(--border);
-            display: none;
-        }
-
-        .input-area.active {
-            display: block;
-        }
-
-        .input-container {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-
-        .input-container textarea {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 15px;
-            font-family: inherit;
-            resize: none;
-            max-height: 120px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .input-container textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .btn-send {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            min-height: 44px;
-            white-space: nowrap;
-        }
-
-        .btn-send:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-send:active {
-            background: var(--accent-hover);
-            opacity: 0.8;
-        }
-
-        .btn-send:disabled {
-            background: var(--text-secondary);
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--bg-secondary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-header {
-                padding: 10px 12px;
-                flex-wrap: nowrap;
-            }
-
-            .app-header h1 {
-                font-size: 16px;
-                gap: 8px;
-                flex-shrink: 0;
-            }
-
-            .hamburger-menu {
-                padding: 6px;
-                min-width: 36px;
-                min-height: 36px;
-            }
-
-            .hamburger-line {
-                width: 20px;
-                height: 2.5px;
-            }
-
-            .header-user {
-                gap: 8px;
-                flex-shrink: 0;
-            }
-
-            .user-info {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .user-info .user-nickname {
-                font-size: 13px;
-            }
-
-            .user-info .user-status {
-                font-size: 10px;
-            }
-
-            .btn-logout {
-                padding: 6px 10px;
-                font-size: 12px;
-                min-height: 32px;
-                white-space: nowrap;
-            }
-
-            .sidebar {
-                width: 100%;
-            }
-
-            .search-container {
-                padding: 12px;
-            }
-
-            .search-box input {
-                padding: 12px 16px;
-                font-size: 15px;
-            }
-
-            .chat-item {
-                padding: 14px 12px;
-                min-height: 76px;
-            }
-
-            .chat-item-name {
-                font-size: 16px;
-            }
-
-            .chat-item-preview {
-                font-size: 14px;
-            }
-
-            .chat-area {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                z-index: 100;
-                background: var(--bg-secondary);
-            }
-
-            .chat-area.mobile-active {
-                display: flex !important;
-            }
-
-            .empty-chat {
-                display: none !important;
-            }
-
-            .chat-header {
-                padding: 14px 12px;
-                border-bottom: 2px solid var(--border);
-            }
-
-            .chat-header-name {
-                font-size: 16px;
-            }
-
-            .chat-header-status {
-                font-size: 12px;
-            }
-
-            .btn-back {
-                display: inline-flex !important;
-                font-size: 24px;
-                padding: 8px;
-                min-width: 40px;
-                min-height: 40px;
-                align-items: center;
-                justify-content: center;
-                margin-right: 4px;
-            }
-
-            .messages-container {
-                padding: 16px 12px;
-            }
-
-            .message {
-                margin-bottom: 10px;
-            }
-
-            .message-bubble {
-                max-width: 85%;
-                padding: 12px 14px;
-            }
-
-            .message-text {
-                font-size: 15px;
-            }
-
-            .input-area {
-                padding: 12px;
-                border-top: 2px solid var(--border);
-            }
-
-            .input-container {
-                gap: 10px;
-            }
-
-            .input-container textarea {
-                font-size: 15px;
-                padding: 12px 16px;
-            }
-
-            .btn-send {
-                padding: 12px 22px;
-                font-size: 15px;
-                min-height: 46px;
-            }
-
-            .modal-content {
-                max-height: 90vh;
-                width: 95%;
-                max-width: 400px;
-            }
-
-            .modal-body {
-                padding: 16px;
-            }
-
-            .settings-item {
-                padding: 14px 0;
-            }
-
-            .settings-label {
-                font-size: 15px;
-            }
-
-            .settings-description {
-                font-size: 13px;
-            }
-
-            .form-group {
-                margin-bottom: 16px;
-            }
-
-            .form-group input {
-                padding: 14px 16px;
-                font-size: 15px;
-            }
-
-            .ban-duration-buttons {
-                flex-direction: column;
-            }
-
-            .btn-ban {
-                width: 100%;
-                padding: 12px 16px;
-                font-size: 14px;
-            }
-
-            .auth-box {
-                padding: 30px 20px;
-                width: 95%;
-            }
-
-            .auth-header h1 {
-                font-size: 28px;
-            }
-
-            .form-group input {
-                padding: 14px 16px;
-                font-size: 15px;
-            }
-
-            .btn {
-                padding: 16px;
-                font-size: 16px;
-            }
-        }
-
-        .btn-back {
-            display: none;
-            align-items: center;
-            background: transparent;
-            color: var(--text-primary);
-            border: none;
-            padding: 8px 4px;
-            font-size: 15px;
-            cursor: pointer;
-            gap: 4px;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .btn-back:active {
-            opacity: 0.6;
-        }
-
-        @media (max-width: 768px) {
-            .chat-header.active .btn-back {
-                display: inline-flex !important;
-            }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* ========== SETTINGS MODAL ========== */
-        .modal-overlay {
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            height: 80px;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
+            top: 0; left: 0; right: 0;
             z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.03);
         }
 
-        .modal-overlay.show {
+        .nav-inner { height: 100%; }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
             display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #000;
+        }
+        .logo img { height: 40px; }
+        .logo span { color: var(--primary); }
+
+        .nav-links a {
+            margin: 0 15px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-main); }
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -28px;
+            left: 0; right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
         }
 
-        .modal-content {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            padding: 0;
-            width: 400px;
-            max-width: 90%;
-            max-height: 80vh;
+        .hero {
+            margin-top: 80px;
+            height: 600px;
+            background: linear-gradient(135deg, #ff9800 0%, #ff6d00 100%);
+            position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 32px var(--shadow);
-            animation: modalSlide 0.3s ease;
+            display: flex;
+            align-items: center;
         }
 
-        @keyframes modalSlide {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px, 80px 80px;
+            background-position: 0 0, 40px 40px;
+            animation: moveBackground 20s linear infinite;
         }
 
-        .modal-header {
-            background: var(--accent);
+        .hero-content {
+            position: relative;
+            z-index: 2;
             color: white;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            max-width: 600px;
         }
 
-        .modal-header h2 {
-            font-size: 18px;
-            margin: 0;
-        }
-
-        .modal-close {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-
-        .modal-close:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .modal-body {
-            padding: 20px;
-            max-height: calc(80vh - 60px);
-            overflow-y: auto;
-        }
-
-        .settings-item {
-            padding: 16px 0;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .settings-item:last-child {
-            border-bottom: none;
-        }
-
-        .settings-label {
-            font-size: 15px;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .settings-description {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .admin-link {
-            color: var(--text-secondary);
-            font-size: 11px;
-            margin-top: 20px;
-            text-align: center;
-            cursor: pointer;
-            opacity: 0.3;
-            transition: opacity 0.3s;
-        }
-
-        .admin-link:hover {
-            opacity: 0.5;
-        }
-
-        .admin-password-input {
-            margin-top: 8px;
-            width: 100%;
-            padding: 10px 14px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-        }
-
-        .admin-password-input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .admin-panel {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid var(--border);
-        }
-
-        .admin-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #ff3b30;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .admin-section {
-            margin-bottom: 24px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .admin-section:last-child {
-            border-bottom: none;
-        }
-
-        .admin-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-
-        .verified-user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-        }
-
-        .btn-remove {
-            background: #ff3b30;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-remove:hover {
-            background: #d32f2f;
-        }
-
-        .ban-duration-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn-ban {
-            background: var(--text-secondary);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: background 0.3s;
-            flex: 1;
-            min-width: 80px;
-        }
-
-        .btn-ban:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-ban.permanent {
-            background: #ff3b30;
-        }
-
-        .btn-ban.permanent:hover {
-            background: #d32f2f;
-        }
-
-        .banned-message {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-
-        .banned-message.show {
-            display: flex;
-        }
-
-        .banned-content {
-            background: var(--bg-primary);
-            padding: 40px;
-            border-radius: 12px;
-            text-align: center;
-            max-width: 400px;
-        }
-
-        .banned-icon {
-            font-size: 64px;
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1.1;
             margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .hero p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            max-width: 480px;
         }
 
-        .banned-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #ff3b30;
-            margin-bottom: 12px;
-        }
-
-        .banned-text {
-            font-size: 15px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .verified-badge {
+        .hero-btn {
+            background: white;
+            color: var(--primary-dark);
+            padding: 16px 32px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 16px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            background: #0088cc;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            margin-left: 4px;
-            transform: rotate(45deg);
-            position: relative;
-            top: -1px;
+            gap: 10px;
+            transition: var(--transition);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .hero-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(0,0,0,0.2); }
+
+        .hero-char {
+            position: absolute;
+            right: 5%;
+            bottom: -50px;
+            height: 700px;
+            z-index: 1;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
         }
 
-        .verified-badge::before {
-            content: '✓';
-            transform: rotate(-45deg);
-            display: block;
-            line-height: 1;
+        .info-bar-wrapper {
+            margin-top: -50px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 30px 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .server-status { display: flex; align-items: center; gap: 20px; }
+        .status-icon {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px;
+            box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+        }
+        .status-text h3 { font-size: 18px; font-weight: 800; }
+        .status-text p { font-size: 14px; color: var(--text-muted); }
+        .online-count { color: var(--success); font-weight: 700; }
+
+        .ip-block {
+            background: #f4f6f8;
+            padding: 10px 10px 10px 25px;
+            border-radius: 14px;
+            display: flex; align-items: center; gap: 20px;
+            border: 1px solid #e1e4e8;
+        }
+        .ip-text { font-family: monospace; font-size: 18px; font-weight: 700; color: #333; }
+        .copy-btn {
+            background: var(--primary); color: white;
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            transition: var(--transition);
+        }
+        .copy-btn:hover { background: var(--primary-dark); }
+
+        .section { padding: 80px 0; }
+        
+        .currency-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+
+        .currency-icon {
+            width: 120px; height: 120px;
+            flex-shrink: 0;
+            background: #fff3e0;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .currency-icon img { width: 70px; }
+
+        .currency-content { flex-grow: 1; }
+        .currency-header { margin-bottom: 25px; }
+        .currency-header h2 { font-size: 28px; font-weight: 800; }
+        
+        .range-wrapper { margin-bottom: 30px; position: relative; }
+        .range-input {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            outline: none;
+        }
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 0 6px rgba(255, 152, 0, 0.2);
+            transition: .2s;
+        }
+        .range-labels {
+            display: flex; justify-content: space-between;
+            margin-top: 10px; font-size: 13px; color: var(--text-muted); font-weight: 600;
+        }
+
+        .exchange-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 20px;
+            align-items: center;
+        }
+        .ex-box {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+        .ex-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .ex-value { font-size: 24px; font-weight: 800; color: var(--text-main); }
+        .buy-currency-btn {
+            height: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: var(--transition);
+        }
+        .buy-currency-btn:hover { box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3); transform: translateY(-2px); }
+
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 40px;
+        }
+        .section-title { font-size: 32px; font-weight: 900; }
+        
+        .tabs {
+            background: white;
+            padding: 5px;
+            border-radius: 12px;
+            display: inline-flex;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+        }
+
+        .shop-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid transparent;
+        }
+        .shop-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: rgba(255, 152, 0, 0.3);
+        }
+
+        .card-img-wrap {
+            height: 180px;
+            background: #eee;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .shop-card:hover .card-img-wrap img { transform: scale(1.1); }
+
+        .price-badge {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 15px; right: 15px;
+            z-index: 2;
+            transform: rotate(15deg);
+        }
+
+        .card-body { padding: 20px; text-align: center; }
+        .card-title {
+            font-size: 20px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 15px; letter-spacing: 0.5px;
+        }
+        
+        .card-btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f4f6f8;
+            color: var(--text-main);
+            font-weight: 700;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .card-btn:hover {
+            background: var(--primary); color: white;
+        }
+
+        .service-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+        }
+        .service-btn {
+            background: #2d3436;
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            font-weight: 700;
+            transition: var(--transition);
+        }
+        .service-vk { background: #4c75a3; }
+        .service-yt { background: #ff0000; }
+        .service-ds { background: #5865F2; }
+        .service-btn:hover { transform: translateY(-5px); filter: brightness(1.1); }
+
+        footer {
+            background: white;
+            padding: 40px 0;
+            margin-top: 80px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; animation: fadeIn 0.3s; }
+        
+        .modal {
+            background: white;
+            width: 90%; max-width: 500px;
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+        
+        .modal h2 { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+        .modal p { color: var(--text-muted); margin-bottom: 30px; }
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: .3s;
+        }
+        .modal input:focus { border-color: var(--primary); }
+        .modal-btn {
+            width: 100%; padding: 16px;
+            background: var(--primary); color: white;
+            font-weight: 800; border-radius: 12px; font-size: 18px;
+        }
+        .close-modal {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 24px; color: #ccc; cursor: pointer;
+        }
+        .close-modal:hover { color: var(--text-main); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(50px); } to { transform: translateY(0); } }
+
+        @media(max-width: 900px) {
+            .hero { height: auto; padding: 60px 0; text-align: center; }
+            .hero-content { margin: 0 auto; }
+            .hero-char { display: none; }
+            .info-card { flex-direction: column; gap: 20px; text-align: center; }
+            .currency-card { flex-direction: column; padding: 20px; }
+            .exchange-grid { grid-template-columns: 1fr; width: 100%; }
+            .nav-links { display: none; }
+            .service-row { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
-    <!-- ========== AUTH SCREEN ========== -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-box">
-            <!-- Login Form -->
-            <div id="loginForm">
-                <div class="auth-header">
-                    <h1>Messenger</h1>
-                    <p>Увійдіть у свій акаунт</p>
-                </div>
-                <div class="error-message" id="loginError"></div>
-                <div class="form-group">
-                    <label for="loginUsername">Логін</label>
-                    <input type="text" id="loginUsername" placeholder="Введіть логін">
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Пароль</label>
-                    <input type="password" id="loginPassword" placeholder="Введіть пароль">
-                </div>
-                <button class="btn btn-primary" onclick="login()">Увійти</button>
-                <button class="btn btn-secondary" onclick="showRegister()">Створити акаунт</button>
-            </div>
 
-            <!-- Register Form -->
-            <div id="registerForm" class="hidden">
-                <div class="auth-header">
-                    <h1>Реєстрація</h1>
-                    <p>Створіть новий акаунт</p>
+    <header>
+        <div class="container flex flex-between nav-inner">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-cube fa-xl" style="color:var(--primary)"></i>
+                SW <span>SIMPLEWORLD</span>
+            </a>
+            <nav class="nav-links flex">
+                <a href="#" class="active"><i class="fa-solid fa-house"></i> Головна</a>
+                <a href="#shop"><i class="fa-solid fa-cart-shopping"></i> Магазин</a>
+                <a href="#"><i class="fa-solid fa-book"></i> Правила</a>
+                <a href="#"><i class="fa-solid fa-crown"></i> Привілеї</a>
+                <a href="#"><i class="fa-solid fa-headset"></i> Підтримка</a>
+            </nav>
+            <button class="hero-btn" onclick="openModal('Вхід в кабінет')">
+                <i class="fa-solid fa-user"></i> Кабінет
+            </button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container flex flex-between" style="width: 100%;">
+            <div class="hero-content">
+                <h1>SIMPLEWORLD<br>ПОЧАТОК НОВОЇ ЕРИ</h1>
+                <p>Відкрий для себе величезні світи, повні веселощів та мільйонів друзів. Гриферське виживання, Анархія та унікальні івенти вже чекають!</p>
+                <div class="flex" style="gap:15px; flex-wrap:wrap;">
+                    <button class="hero-btn" style="background:var(--text-main); color:white;" onclick="scrollToShop()">
+                        <i class="fa-solid fa-bag-shopping"></i> Придбати донат
+                    </button>
+                    <button class="hero-btn">
+                        <i class="fa-solid fa-play"></i> Почати гру
+                    </button>
                 </div>
-                <div class="error-message" id="registerError"></div>
-                <div class="form-group">
-                    <label for="registerNickname">Нікнейм</label>
-                    <input type="text" id="registerNickname" placeholder="Ваш нікнейм">
+            </div>
+            <img src="https://www.bing.com/images/search?view=detailV2&ccid=AXp%2bjr0p&id=79335E08651BA6A43B878A588CB3068D4CD827BD&thid=OIP.AXp-jr0pIxrHVy-_DYliGwHaID&mediaurl=https%3a%2f%2fi.pinimg.com%2foriginals%2f53%2fa9%2f36%2f53a936a79884e31672ddbca6c069da74.png&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.017a7e8ebd29231ac7572fbf0d89621b%3frik%3dvSfYTI0Gs4xYig%26pid%3dImgRaw%26r%3d0&exph=1121&expw=1030&q=minecraft+stive&FORM=IRPRST&ck=B1D6A53F526715AE99D5EF4D2F3A46C5&selectedIndex=2&itb=0" class="hero-char" alt="Minecraft Character">
+        </div>
+    </section>
+
+    <div class="container info-bar-wrapper">
+        <div class="info-card">
+            <div class="server-status">
+                <div class="status-icon"><i class="fa-solid fa-star"></i></div>
+                <div class="status-text">
+                    <h3>НАШ СЕРВЕР</h3>
+                    <p>Онлайн: <span class="online-count" id="onlineCount">0</span> гравців</p>
                 </div>
-                <div class="form-group">
-                    <label for="registerUsername">Логін</label>
-                    <input type="text" id="registerUsername" placeholder="Створіть логін">
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Пароль</label>
-                    <input type="password" id="registerPassword" placeholder="Створіть пароль">
-                </div>
-                <button class="btn btn-primary" onclick="register()">Зареєструватися</button>
-                <button class="btn btn-secondary" onclick="showLogin()">Вже є акаунт</button>
+            </div>
+            
+            <div class="ip-block">
+                <div class="ip-text" id="ipAddress">simpleworld.aternos.me</div>
+                <button class="copy-btn" onclick="copyIP()">
+                    <i class="fa-regular fa-copy"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- ========== MAIN APP ========== -->
-    <div class="app-container" id="appContainer">
-        <div class="app-header">
-            <h1>
-                <div class="hamburger-menu" onclick="openSettings()">
-                    <div class="hamburger-line"></div>
-                    <div class="hamburger-line"></div>
-                    <div class="hamburger-line"></div>
+    <section class="section">
+        <div class="container">
+            <div class="currency-card">
+                <div class="currency-icon">
+                    <i class="fa-solid fa-coins fa-3x" style="color: #f57c00;"></i>
                 </div>
-                Messenger
-            </h1>
-            <div class="header-user">
-                <div class="user-info">
-                    <div class="user-nickname" id="currentUserNickname"></div>
-                    <div class="user-status">в мережі</div>
-                </div>
-                <button class="btn-logout" onclick="logout()">Вийти</button>
-            </div>
-        </div>
-
-        <div class="app-main">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="search-container">
-                    <div class="search-box">
-                        <input type="text" id="searchInput" placeholder="Пошук користувачів...">
+                <div class="currency-content">
+                    <div class="currency-header">
+                        <h2>Покупка ігрової валюти</h2>
+                        <p style="color:#777">Використовуйте повзунок для вибору суми</p>
                     </div>
-                </div>
-                <div class="chat-list" id="chatList">
-                    <div class="empty-chats">
-                        <p>Почніть розмову!</p>
-                        <p style="font-size: 13px; margin-top: 8px;">Знайдіть користувача за нікнеймом</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chat Area -->
-            <div class="chat-area" id="chatArea">
-                <div class="empty-chat">
-                    <div class="empty-chat-icon">💬</div>
-                    <h2>Виберіть чат</h2>
-                    <p>Оберіть діалог зліва або знайдіть нового співрозмовника</p>
-                </div>
-
-                <div class="chat-header" id="chatHeader">
-                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                        <button class="btn-back" onclick="closeChat()">←</button>
-                        <div>
-                            <div class="chat-header-name" id="chatHeaderName"></div>
-                            <div class="chat-header-status">в мережі</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="messages-container" id="messagesContainer">
-                    <!-- Messages will be loaded here -->
-                </div>
-
-                <div class="input-area" id="inputArea">
-                    <div class="input-container">
-                        <textarea id="messageInput" placeholder="Введіть повідомлення..." rows="1" onkeydown="handleMessageKeyDown(event)"></textarea>
-                        <button class="btn-send" onclick="sendMessage()">Надіслати</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== BANNED MESSAGE ========== -->
-    <div class="banned-message" id="bannedMessage">
-        <div class="banned-content">
-            <div class="banned-icon">🚫</div>
-            <div class="banned-title">Акаунт заблоковано</div>
-            <div class="banned-text" id="bannedText">Ваш акаунт було заблоковано адміністратором.</div>
-            <div class="banned-text" id="bannedUntil"></div>
-            <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">Оновити сторінку</button>
-        </div>
-    </div>
-
-    <!-- ========== SETTINGS MODAL ========== -->
-    <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOnOverlay(event)">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>⚙️ Налаштування</h2>
-                <button class="modal-close" onclick="closeSettings()">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Тема інтерфейсу</div>
-                        <div class="settings-description">Світла або темна тема</div>
-                    </div>
-                    <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="toggleTheme()">Змінити тему</button>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Мій нікнейм</div>
-                        <div class="settings-description" id="settingsNickname"></div>
-                    </div>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Мій логін</div>
-                        <div class="settings-description" id="settingsUsername"></div>
-                    </div>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Дата реєстрації</div>
-                        <div class="settings-description" id="settingsCreatedAt"></div>
-                    </div>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Очистити історію повідомлень</div>
-                        <div class="settings-description">Видалити всі ваші повідомлення</div>
-                    </div>
-                    <button class="btn btn-remove" style="width: auto; padding: 8px 16px;" onclick="clearMyMessages()">Очистити</button>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Експорт даних</div>
-                        <div class="settings-description">Завантажити всі ваші дані</div>
-                    </div>
-                    <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="exportUserData()">Експорт</button>
-                </div>
-
-                <div class="settings-item">
-                    <div>
-                        <div class="settings-label">Експорт всіх акаунтів</div>
-                        <div class="settings-description">Отримати код для додавання в файл</div>
-                    </div>
-                    <button class="btn btn-primary" style="width: auto; padding: 8px 16px;" onclick="exportAllUsersCode()">Отримати код</button>
-                </div>
-
-                <div class="admin-link" onclick="showAdminPasswordInput()">
-                    Адмін панель
-                </div>
-
-                <div id="adminPasswordSection" class="hidden">
-                    <input type="password" id="adminPasswordInput" class="admin-password-input" placeholder="Введіть пароль адміна">
-                    <button class="btn btn-primary" style="margin-top: 12px;" onclick="checkAdminPassword()">Підтвердити</button>
-                </div>
-
-                <div id="adminPanel" class="admin-panel hidden">
-                    <div class="admin-title">🔒 Адмін панель</div>
                     
-                    <!-- Statistics Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-title">📊 Статистика</div>
-                        <div style="font-size: 14px; color: var(--text-secondary);">
-                            <div style="padding: 8px 0;">Всього користувачів: <strong id="totalUsers"></strong></div>
-                            <div style="padding: 8px 0;">Всього повідомлень: <strong id="totalMessages"></strong></div>
-                            <div style="padding: 8px 0;">Веріфікованих: <strong id="totalVerified"></strong></div>
-                            <div style="padding: 8px 0;">Заблокованих: <strong id="totalBanned"></strong></div>
+                    <div class="range-wrapper">
+                        <input type="range" class="range-input" min="100" max="10000" step="1" value="500" id="currencyRange" oninput="updateCurrency()">
+                        <div class="range-labels">
+                            <span>100 R</span>
+                            <span>10000 R</span>
                         </div>
                     </div>
 
-                    <!-- Verification Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-title">✓ Верифікація</div>
-                        <div class="form-group">
-                            <label for="verifyNickname">Нікнейм для верифікації</label>
-                            <input type="text" id="verifyNickname" placeholder="Введіть нікнейм">
+                    <div class="exchange-grid">
+                        <div class="ex-box">
+                            <div class="ex-label">До сплати</div>
+                            <div class="ex-value" id="priceDisplay">5.00 UAH</div>
                         </div>
-                        <button class="btn btn-primary" onclick="verifyUser()">✓ Видати галочку</button>
-                        
-                        <div style="margin-top: 20px;">
-                            <div class="admin-section-title">Веріфіковані користувачі:</div>
-                            <div id="verifiedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
+                        <div class="ex-box">
+                            <div class="ex-label">Ви отримуєте</div>
+                            <div class="ex-value" id="coinsDisplay">500 R</div>
                         </div>
-                    </div>
-
-                    <!-- Ban Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-title">🚫 Блокування користувачів</div>
-                        <div class="form-group">
-                            <label for="banNickname">Нікнейм для блокування</label>
-                            <input type="text" id="banNickname" placeholder="Введіть нікнейм">
-                        </div>
-                        <div class="ban-duration-buttons">
-                            <button class="btn-ban" onclick="banUser(5)">5 хвилин</button>
-                            <button class="btn-ban" onclick="banUser(10)">10 хвилин</button>
-                            <button class="btn-ban" onclick="banUser(60)">1 година</button>
-                            <button class="btn-ban" onclick="banUser(1440)">1 день</button>
-                            <button class="btn-ban permanent" onclick="banUser('permanent')">Назавжди</button>
-                        </div>
-
-                        <div style="margin-top: 20px;">
-                            <div class="admin-section-title">Заблоковані користувачі:</div>
-                            <div id="bannedUsersList" style="font-size: 14px; color: var(--text-secondary);"></div>
-                        </div>
-                    </div>
-
-                    <!-- User Management Section -->
-                    <div class="admin-section">
-                        <div class="admin-section-title">👥 Всі користувачі</div>
-                        <div id="allUsersList" style="font-size: 14px; color: var(--text-secondary); max-height: 300px; overflow-y: auto;"></div>
-                    </div>
-
-                    <!-- Danger Zone -->
-                    <div class="admin-section">
-                        <div class="admin-section-title" style="color: #ff3b30;">⚠️ Небезпечна зона</div>
-                        <button class="btn btn-remove" style="width: 100%; margin-bottom: 8px;" onclick="clearAllMessages()">🗑️ Очистити всі повідомлення</button>
-                        <button class="btn btn-remove" style="width: 100%;" onclick="resetAllData()">💣 Скинути всі дані</button>
+                        <button class="buy-currency-btn" onclick="openModalCurrency()">
+                            ПРИДБАТИ <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="section" id="shop">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Магазин Привілеїв</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="filterShop('ranks')">Донати</button>
+                    <button class="tab-btn" onclick="filterShop('cases')">Скрині</button>
+                    <button class="tab-btn" onclick="filterShop('services')">Послуги</button>
+                </div>
+            </div>
+
+            <div class="cards-grid" id="shopGrid"></div>
+        </div>
+    </section>
+
+    <section class="container" style="margin-bottom: 50px;">
+        <div class="service-row"; text-align: center;>
+            <a href="#" class="service-btn" style="background:#4a90e2"><i class="fa-regular fa-comments fa-lg"></i> Форум</a>
+            <a href="https://www.youtube.com/channel/UCTRqSuJ2xR4jBtYDADw_GxQ" class="service-btn service-yt"><i class="fa-brands fa-youtube fa-lg"></i> Наш YouTube</a>
+            <a href="https://discord.gg/X878gVyG" class="service-btn service-ds"><i class="fa-brands fa-discord fa-lg"></i> Discord Сервер</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 ReallyWorld Project. Not affiliated with Mojang AB.</p>
+            <p style="font-size:13px; margin-top:10px;">Договір оферти | Політика конфіденційності</p>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal">
+            <div class="close-modal" onclick="closeModal()">&times;</div>
+            <div style="font-size: 50px; color: var(--primary); margin-bottom: 20px;">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <h2 id="modalTitle">Покупка</h2>
+            <p>Введіть ваш нікнейм на сервері для продовження</p>
+            <form id="purchaseForm" onsubmit="submitPurchase(event)">
+                <input type="text" name="nickname" placeholder="Ваш нікнейм (Steve)" required>
+                <input type="text" name="promocode" placeholder="Промокод (якщо є)">
+                <input type="text" name="discord" placeholder="Діскорд (або телеграм)">
+                <input type="hidden" name="item" id="itemNameInput">
+                <input type="hidden" name="price" id="itemPriceInput">
+                <button type="submit" class="modal-btn">ПЕРЕЙТИ ДО ОПЛАТИ</button>
+            </form>
         </div>
     </div>
 
     <script>
-        // ========== GLOBALS ==========
-        let currentUser = null;
-        let activeChat = null;
-        let lastMessageCount = 0;
-        let autoRefreshInterval = null;
-        let banCheckInterval = null;
-        const ADMIN_PASSWORD = '12364578TYRR';
-
-        // Проста хеш-функція для паролів (SHA-256 альтернатива)
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return Math.abs(hash).toString(36);
-        }
-
-        // ========== HARDCODED USERS (зберігаються в коді, не видаляються) ==========
-        // Ці користувачі завжди доступні на будь-якому пристрої
-        // 
-        // 📝 ПРИКЛАД ДОДАВАННЯ КОРИСТУВАЧА:
-        // {
-        //     id: 'user_1',
-        //     nickname: 'Admin',
-        //     username: 'admin',
-        //     password: simpleHash('admin123'),  // Пароль: admin123
-        //     createdAt: 1704067200000
-        // }
-        //
-        // 🔧 ЯК ДОДАТИ СВОГО КОРИСТУВАЧА:
-        // 1. Розкоментуйте (видаліть //) приклад вище
-        // 2. Змініть nickname, username та пароль в simpleHash('ваш_пароль')
-        // 3. Збережіть файл
-        // 4. Оновіть сторінку - користувач буде доступний на всіх пристроях!
-        
-        const HARDCODED_USERS = [
-            // Додайте своїх користувачів тут (розкоментуйте та змініть дані):
+        const products = [
+            // RANKS
+            { id: 1, type: 'ranks', name: 'Premium', price: '29 UAH', img: 'orange', discount: false },
+            { id: 2, type: 'ranks', name: 'Elite', price: '49 UAH', img: 'blue', discount: false },
+            { id: 3, type: 'ranks', name: 'Deluxe', price: '69 UAH', img: 'cyan', discount: false },
+            { id: 4, type: 'ranks', name: 'Ultra', price: '99 UAH', img: 'purple', discount: false },
+            { id: 5, type: 'ranks', name: 'Immortal', price: '119 UAH', img: 'red', discount: false },
+            { id: 6, type: 'ranks', name: 'Supreme', price: '149 UAH', img: 'yellow', discount: false },
+            { id: 7, type: 'ranks', name: 'Legend', price: '199 UAH', img: 'blue', discount: false },
+            { id: 8, type: 'ranks', name: 'Infinity', price: '249 UAH', img: 'dark', discount: false },
             
-            // {
-            //     id: 'user_1',
-            //     nickname: 'Admin',
-            //     username: 'admin',
-            //     password: simpleHash('admin123'),
-            //     createdAt: Date.now()
-            // },
-            
-            // {
-            //     id: 'user_2',
-            //     nickname: 'User2',
-            //     username: 'user2',
-            //     password: simpleHash('password123'),
-            //     createdAt: Date.now()
-            // }
+            // CASES
+            { id: 11, type: 'cases', name: '3 Скрині з валютою', price: '15 UAH', img: 'chest', discount: false },
+            { id: 12, type: 'cases', name: '10 Скринь з валютою', price: '45 UAH', img: 'chest', discount: false },
+            { id: 13, type: 'cases', name: '25 Скринь з валютою', price: '99 UAH', img: 'chest', discount: false },
+            { id: 14, type: 'cases', name: '3 Скрині донату', price: '99 UAH', img: 'chest_rare', discount: false },
+
+            // SERVICES
+            { id: 20, type: 'services', name: 'Розбан', price: '89 UAH', img: 'scroll', discount: false },
+            { id: 21, type: 'services', name: 'Розмут', price: '29 UAH', img: 'scroll', discount: false },
         ];
 
-        // ========== UTILITY FUNCTIONS ==========
-        
-        // Отримати веріфікованих користувачів
-        function getVerifiedUsers() {
-            const verified = localStorage.getItem('messenger_verified');
-            return verified ? JSON.parse(verified) : [];
-        }
+        const grid = document.getElementById('shopGrid');
+        const btns = document.querySelectorAll('.tab-btn');
 
-        // Зберегти веріфікованих користувачів
-        function saveVerifiedUsers(verified) {
-            localStorage.setItem('messenger_verified', JSON.stringify(verified));
-        }
-
-        // Перевірити чи користувач веріфікований
-        function isUserVerified(nickname) {
-            const verified = getVerifiedUsers();
-            return verified.includes(nickname);
-        }
-
-        // Отримати заблокованих користувачів
-        function getBannedUsers() {
-            const banned = localStorage.getItem('messenger_banned');
-            return banned ? JSON.parse(banned) : [];
-        }
-
-        // Зберегти заблокованих користувачів
-        function saveBannedUsers(banned) {
-            localStorage.setItem('messenger_banned', JSON.stringify(banned));
-        }
-
-        // Перевірити чи користувач заблокований
-        function isUserBanned(nickname) {
-            const banned = getBannedUsers();
-            const ban = banned.find(b => b.nickname === nickname);
+        function renderCards(filterType) {
+            grid.innerHTML = '';
             
-            if (!ban) return false;
-            
-            // Якщо бан назавжди
-            if (ban.until === 'permanent') return true;
-            
-            // Перевіряємо чи минув час бану
-            if (Date.now() < ban.until) return true;
-            
-            // Час бану минув - видаляємо з списку
-            const updatedBanned = banned.filter(b => b.nickname !== nickname);
-            saveBannedUsers(updatedBanned);
-            return false;
-        }
-
-        // Отримати інформацію про бан
-        function getBanInfo(nickname) {
-            const banned = getBannedUsers();
-            return banned.find(b => b.nickname === nickname);
-        }
-
-        // Отримати всіх користувачів (хардкод + localStorage)
-        function getUsers() {
-            const localUsers = localStorage.getItem('messenger_users');
-            const parsedLocalUsers = localUsers ? JSON.parse(localUsers) : [];
-            
-            // Об'єднуємо хардкод користувачів з localStorage
-            // Хардкод користувачі завжди на початку
-            const allUsers = [...HARDCODED_USERS, ...parsedLocalUsers];
-            
-            // Видаляємо дублікати по username
-            const uniqueUsers = [];
-            const seenUsernames = new Set();
-            
-            for (const user of allUsers) {
-                if (!seenUsernames.has(user.username)) {
-                    seenUsernames.add(user.username);
-                    uniqueUsers.push(user);
-                }
-            }
-            
-            return uniqueUsers;
-        }
-
-        // Зберегти користувачів (тільки нові, хардкод не чіпаємо)
-        function saveUsers(users) {
-            // Фільтруємо тільки нехардкод користувачів
-            const hardcodedUsernames = new Set(HARDCODED_USERS.map(u => u.username));
-            const localOnlyUsers = users.filter(u => !hardcodedUsernames.has(u.username));
-            
-            localStorage.setItem('messenger_users', JSON.stringify(localOnlyUsers));
-        }
-
-        // Отримати повідомлення
-        function getMessages() {
-            const messages = localStorage.getItem('messenger_messages');
-            return messages ? JSON.parse(messages) : [];
-        }
-
-        // Зберегти повідомлення
-        function saveMessages(messages) {
-            localStorage.setItem('messenger_messages', JSON.stringify(messages));
-        }
-
-        // Отримати ID чату між двома користувачами
-        function getChatId(user1, user2) {
-            return [user1, user2].sort().join('_');
-        }
-
-        // Форматування часу
-        function formatTime(timestamp) {
-            const date = new Date(timestamp);
-            const now = new Date();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            
-            if (date.toDateString() === now.toDateString()) {
-                return `${hours}:${minutes}`;
-            }
-            
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            return `${day}.${month} ${hours}:${minutes}`;
-        }
-
-        // ========== AUTH FUNCTIONS ==========
-        
-        function showError(elementId, message) {
-            const errorEl = document.getElementById(elementId);
-            errorEl.textContent = message;
-            errorEl.classList.add('show');
-            setTimeout(() => {
-                errorEl.classList.remove('show');
-            }, 3000);
-        }
-
-        function showLogin() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-        }
-
-        function showRegister() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.remove('hidden');
-        }
-
-        function register() {
-            const nickname = document.getElementById('registerNickname').value.trim();
-            const username = document.getElementById('registerUsername').value.trim();
-            const password = document.getElementById('registerPassword').value;
-
-            if (!nickname || !username || !password) {
-                showError('registerError', 'Заповніть всі поля!');
-                return;
-            }
-
-            // Перевірка на допустимі символи (тільки букви та цифри)
-            const validPattern = /^[a-zA-Z0-9а-яА-ЯіІїЇєЄґҐ]+$/;
-            
-            if (!validPattern.test(nickname)) {
-                showError('registerError', 'Нікнейм може містити тільки букви та цифри!');
-                return;
-            }
-
-            if (!validPattern.test(username)) {
-                showError('registerError', 'Логін може містити тільки букви та цифри!');
-                return;
-            }
-
-            // Перевірка що логін та нікнейм не складаються тільки з цифр
-            if (/^\d+$/.test(nickname)) {
-                showError('registerError', 'Нікнейм не може складатися тільки з цифр!');
-                return;
-            }
-
-            if (/^\d+$/.test(username)) {
-                showError('registerError', 'Логін не може складатися тільки з цифр!');
-                return;
-            }
-
-            if (nickname.length < 2 || username.length < 3) {
-                showError('registerError', 'Нікнейм мінімум 2 символи, логін мінімум 3!');
-                return;
-            }
-
-            if (password.length < 4) {
-                showError('registerError', 'Пароль має бути мінімум 4 символи!');
-                return;
-            }
-
-            const users = getUsers();
-            
-            // Перевірка на існуючий логін
-            if (users.find(u => u.username.toLowerCase() === username.toLowerCase())) {
-                showError('registerError', 'Користувач з таким логіном вже існує!');
-                return;
-            }
-
-            // Перевірка на існуючий нікнейм
-            if (users.find(u => u.nickname.toLowerCase() === nickname.toLowerCase())) {
-                showError('registerError', 'Користувач з таким нікнеймом вже існує!');
-                return;
-            }
-
-            // Створення користувача
-            const newUser = {
-                id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
-                nickname: nickname,
-                username: username,
-                password: simpleHash(password),
-                createdAt: Date.now()
+            const getGradient = (color) => {
+                const map = {
+                    'orange': 'linear-gradient(135deg, #ff9800, #ff5722)',
+                    'blue': 'linear-gradient(135deg, #2196f3, #03a9f4)',
+                    'cyan': 'linear-gradient(135deg, #00bcd4, #80deea)',
+                    'purple': 'linear-gradient(135deg, #673ab7, #9c27b0)',
+                    'red': 'linear-gradient(135deg, #f44336, #e91e63)',
+                    'yellow': 'linear-gradient(135deg, #ffeb3b, #fbc02d)',
+                    'green': 'linear-gradient(135deg, #4caf50, #8bc34a)',
+                    'dark': 'linear-gradient(135deg, #2d3436, #636e72)',
+                    'chest': 'linear-gradient(135deg, #795548, #5d4037)',
+                    'chest_rare': 'linear-gradient(135deg, #009688, #4db6ac)',
+                    'scroll': 'linear-gradient(135deg, #ffca28, #ff6f00)'
+                };
+                return map[color] || map['orange'];
             };
 
-            users.push(newUser);
-            saveUsers(users);
+            const items = products.filter(p => p.type === filterType);
 
-            // Показуємо код для додавання в файл
-            showCodeToAdd(nickname, username, password, newUser.id);
+            items.forEach(item => {
+                const discountHTML = item.discount 
+                    ? `<div class="badge badge-red discount-badge">ЗНИЖКА</div>` 
+                    : '';
+                
+                const imgHTML = `<div style="width:100%; height:100%; background:${getGradient(item.img)}; display:flex; align-items:center; justify-content:center; color:white; font-size:40px;">
+                    <i class="fa-solid ${item.type === 'ranks' ? 'fa-shield-halved' : (item.type === 'cases' ? 'fa-box-open' : 'fa-scroll')}"></i>
+                </div>`;
 
-            // Очищення форми
-            document.getElementById('registerNickname').value = '';
-            document.getElementById('registerUsername').value = '';
-            document.getElementById('registerPassword').value = '';
+                const card = document.createElement('div');
+                card.className = 'shop-card';
+                card.innerHTML = `
+                    <div class="price-badge">${item.price}</div>
+                    ${discountHTML}
+                    <div class="card-img-wrap">${imgHTML}</div>
+                    <div class="card-body">
+                        <div class="card-title" style="color:${item.type==='ranks'?'var(--primary)':'#333'}">${item.name}</div>
+                        <button class="card-btn" onclick="openModal('${item.name}', '${item.price}')">
+                            <i class="fa-solid fa-cart-plus"></i> КУПИТИ
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
         }
 
-        // Показати код для додавання в HARDCODED_USERS
-        function showCodeToAdd(nickname, username, password, userId) {
-            const code = `{
-    id: '${userId}',
-    nickname: '${nickname}',
-    username: '${username}',
-    password: simpleHash('${password}'),
-    createdAt: ${Date.now()}
-}`;
-
-            const message = `✅ Реєстрація успішна!
-
-📋 Щоб акаунт працював на ВСІХ пристроях, додайте цей код в файл:
-
-1. Відкрийте messenger.html в текстовому редакторі
-2. Знайдіть рядок: const HARDCODED_USERS = [
-3. Вставте цей код між дужками:
-
-${code}
-
-Приклад:
-const HARDCODED_USERS = [
-${code}
-];
-
-⚠️ Не забудьте додати кому (,) якщо є інші користувачі!
-
-Тепер можете увійти у систему.`;
-
-            alert(message);
-            
-            // Копіюємо код в буфер обміну
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(code).then(() => {
-                    console.log('Код скопійовано в буфер обміну!');
-                });
-            }
-            
-            showLogin();
-            showError('loginError', '✓ Реєстрація успішна! Код для додавання в файл показано. Тепер увійдіть у систему.');
+        function filterShop(type) {
+            btns.forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderCards(type);
         }
 
-        function login() {
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
+        renderCards('ranks');
 
-            if (!username || !password) {
-                showError('loginError', 'Введіть логін та пароль!');
-                return;
-            }
-
-            const users = getUsers();
-            const user = users.find(u => u.username === username && u.password === simpleHash(password));
-
-            if (!user) {
-                showError('loginError', 'Неправильний логін або пароль!');
-                return;
-            }
-
-            // Перевірка на бан
-            if (isUserBanned(user.nickname)) {
-                showBannedMessage(user.nickname);
-                return;
-            }
-
-            // Успішний вхід
-            currentUser = user;
-            sessionStorage.setItem('currentUser', JSON.stringify(user));
+        function updateCurrency() {
+            const range = document.getElementById('currencyRange');
+            const coins = range.value;
+            const price = (coins * 0.01).toFixed(0.01); // 1 UAH = 100 релік
             
-            // Перехід до додатку
-            document.getElementById('authContainer').style.display = 'none';
-            document.getElementById('appContainer').classList.add('active');
-            
-            initApp();
+            document.getElementById('coinsDisplay').innerText = coins + ' R';
+            document.getElementById('priceDisplay').innerText = price + ' UAH';
         }
 
-        function logout() {
-            // Зупиняємо автооновлення
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
+        let count = 0;
+        const target = 14203;
+        const counterElement = document.getElementById('onlineCount');
+        const interval = setInterval(() => {
+            count += 123;
+            if (count >= target) {
+                count = target;
+                clearInterval(interval);
             }
+            counterElement.innerText = count.toLocaleString();
+        }, 10);
 
-            // Зупиняємо перевірку банів
-            if (banCheckInterval) {
-                clearInterval(banCheckInterval);
-                banCheckInterval = null;
-            }
-
-            currentUser = null;
-            activeChat = null;
-            sessionStorage.removeItem('currentUser');
-            
-            document.getElementById('authContainer').style.display = 'flex';
-            document.getElementById('appContainer').classList.remove('active');
-            
-            // Очищення форми входу
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            
-            showLogin();
-        }
-
-        // ========== APP FUNCTIONS ==========
-        
-        function initApp() {
-            const nicknameEl = document.getElementById('currentUserNickname');
-            nicknameEl.textContent = ''; // Очищаємо спочатку
-            
-            // Додаємо галочку якщо користувач веріфікований
-            if (isUserVerified(currentUser.nickname)) {
-                nicknameEl.innerHTML = escapeHtml(currentUser.nickname) + '<span class="verified-badge"></span>';
-            } else {
-                nicknameEl.textContent = currentUser.nickname;
-            }
-            
-            loadChats();
-            startAutoRefresh();
-            startBanCheck();
-        }
-
-        // Перевірка на бан кожні 5 секунд
-        function startBanCheck() {
-            if (banCheckInterval) {
-                clearInterval(banCheckInterval);
-            }
-
-            banCheckInterval = setInterval(() => {
-                if (currentUser && isUserBanned(currentUser.nickname)) {
-                    showBannedMessage(currentUser.nickname);
-                }
-            }, 5000);
-        }
-
-        function showBannedMessage(nickname) {
-            const banInfo = getBanInfo(nickname);
-            const bannedMessageEl = document.getElementById('bannedMessage');
-            const bannedTextEl = document.getElementById('bannedText');
-            const bannedUntilEl = document.getElementById('bannedUntil');
-
-            if (banInfo.until === 'permanent') {
-                bannedTextEl.textContent = 'Ваш акаунт було заблоковано адміністратором назавжди.';
-                bannedUntilEl.textContent = '';
-            } else {
-                const untilDate = new Date(banInfo.until);
-                bannedTextEl.textContent = 'Ваш акаунт тимчасово заблоковано.';
-                bannedUntilEl.textContent = `Бан діє до: ${untilDate.toLocaleString('uk-UA')}`;
-            }
-
-            bannedMessageEl.classList.add('show');
-
-            // Виходимо з акаунта
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
-            if (banCheckInterval) {
-                clearInterval(banCheckInterval);
-            }
-            
-            currentUser = null;
-            activeChat = null;
-            sessionStorage.removeItem('currentUser');
-        }
-
-        // Автоматичне оновлення повідомлень
-        function startAutoRefresh() {
-            // Очищаємо попередній інтервал якщо є
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
-
-            // Перевіряємо нові повідомлення кожні 2 секунди
-            autoRefreshInterval = setInterval(() => {
-                checkForNewMessages();
+        function copyIP() {
+            navigator.clipboard.writeText('mc.reallyworld.ua');
+            const btn = document.querySelector('.copy-btn');
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btn.style.background = 'var(--success)';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                btn.style.background = 'var(--primary)';
             }, 2000);
         }
 
-        function checkForNewMessages() {
-            const messages = getMessages();
-            const currentMessageCount = messages.length;
-
-            // Якщо кількість повідомлень змінилась
-            if (currentMessageCount !== lastMessageCount) {
-                lastMessageCount = currentMessageCount;
-
-                // Оновлюємо список чатів
-                const searchQuery = document.getElementById('searchInput').value.trim();
-                if (!searchQuery) {
-                    loadChats();
-                }
-
-                // Якщо відкритий активний чат - оновлюємо повідомлення
-                if (activeChat) {
-                    const chatId = getChatId(currentUser.username, activeChat.username);
-                    const chatMessages = messages.filter(m => m.chatId === chatId);
-                    const messagesContainer = document.getElementById('messagesContainer');
-                    const currentScrollHeight = messagesContainer.scrollHeight;
-                    const currentScrollTop = messagesContainer.scrollTop;
-                    const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop <= messagesContainer.clientHeight + 100;
-
-                    loadMessages();
-
-                    // Прокручуємо вниз тільки якщо користувач був внизу
-                    if (isScrolledToBottom) {
-                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                    }
-                }
-            }
-        }
-
-        function loadChats() {
-            const chatListEl = document.getElementById('chatList');
-            const messages = getMessages();
-            const users = getUsers().filter(u => u.id !== currentUser.id);
-
-            // Знаходимо тільки тих користувачів, з якими є повідомлення
-            const chatsWithMessages = [];
-            
-            users.forEach(user => {
-                const chatId = getChatId(currentUser.username, user.username);
-                const chatMessages = messages.filter(m => m.chatId === chatId);
-                
-                if (chatMessages.length > 0) {
-                    const lastMessage = chatMessages[chatMessages.length - 1];
-                    chatsWithMessages.push({
-                        user: user,
-                        lastMessage: lastMessage,
-                        timestamp: lastMessage.timestamp
-                    });
-                }
-            });
-
-            if (chatsWithMessages.length === 0) {
-                chatListEl.innerHTML = `
-                    <div class="empty-chats">
-                        <p>Немає активних чатів</p>
-                        <p style="font-size: 13px; margin-top: 8px;">Знайдіть користувача за нікнеймом</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Сортуємо за останнім повідомленням
-            chatsWithMessages.sort((a, b) => b.timestamp - a.timestamp);
-
-            chatListEl.innerHTML = chatsWithMessages.map(chat => {
-                const verifiedBadge = isUserVerified(chat.user.nickname) ? '<span class="verified-badge"></span>' : '';
-                return `
-                    <div class="chat-item ${activeChat && activeChat.id === chat.user.id ? 'active' : ''}" 
-                         onclick="openChat('${chat.user.id}')">
-                        <div class="chat-item-header">
-                            <div class="chat-item-name">${escapeHtml(chat.user.nickname)}${verifiedBadge}</div>
-                            <div class="chat-item-time">${formatTime(chat.lastMessage.timestamp)}</div>
-                        </div>
-                        <div class="chat-item-preview">${escapeHtml(chat.lastMessage.text)}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function searchUsers() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            
-            if (!query) {
-                loadChats();
-                return;
-            }
-
-            const users = getUsers().filter(u => 
-                u.id !== currentUser.id && 
-                (u.nickname.toLowerCase().includes(query) || u.username.toLowerCase().includes(query))
-            );
-
-            const chatListEl = document.getElementById('chatList');
-
-            if (users.length === 0) {
-                chatListEl.innerHTML = `
-                    <div class="empty-chats">
-                        <p>Користувачів не знайдено</p>
-                        <p style="font-size: 13px; margin-top: 8px;">Спробуйте інший запит</p>
-                    </div>
-                `;
-                return;
-            }
-
-            chatListEl.innerHTML = users.map(user => {
-                const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
-                return `
-                    <div class="chat-item ${activeChat && activeChat.id === user.id ? 'active' : ''}" 
-                         onclick="openChat('${user.id}')">
-                        <div class="chat-item-header">
-                            <div class="chat-item-name">${escapeHtml(user.nickname)}${verifiedBadge}</div>
-                        </div>
-                        <div class="chat-item-preview">@${escapeHtml(user.username)}</div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function openChat(userId) {
-            const users = getUsers();
-            const user = users.find(u => u.id === userId);
-            
-            if (!user) return;
-
-            activeChat = user;
-
-            // Оновлюємо заголовок чату з галочкою якщо є
-            const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
-            document.getElementById('chatHeaderName').innerHTML = escapeHtml(user.nickname) + verifiedBadge;
-            
-            // Показуємо елементи чату
-            document.querySelector('.empty-chat').style.display = 'none';
-            document.getElementById('chatHeader').classList.add('active');
-            document.getElementById('messagesContainer').classList.add('active');
-            document.getElementById('inputArea').classList.add('active');
-
-            // Мобільна версія - показуємо чат поверх всього
-            if (window.innerWidth <= 768) {
-                document.getElementById('chatArea').classList.add('mobile-active');
-            }
-
-            // Завантажуємо повідомлення
-            loadMessages();
-
-            // Оновлюємо список чатів
-            loadChats();
-        }
-
-        function closeChat() {
-            // Повертаємось до списку чатів на мобільних
-            if (window.innerWidth <= 768) {
-                document.getElementById('chatArea').classList.remove('mobile-active');
-            }
-        }
-
-        function loadMessages() {
-            if (!activeChat) return;
-
-            const chatId = getChatId(currentUser.username, activeChat.username);
-            const messages = getMessages().filter(m => m.chatId === chatId);
-            const messagesContainer = document.getElementById('messagesContainer');
-
-            messagesContainer.innerHTML = messages.map(msg => {
-                const isOut = msg.from === currentUser.username;
-                return `
-                    <div class="message ${isOut ? 'out' : 'in'}">
-                        <div class="message-bubble">
-                            <div class="message-text">${escapeHtml(msg.text)}</div>
-                            <div class="message-time">${formatTime(msg.timestamp)}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            // Прокрутка вниз
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function sendMessage() {
-            if (!activeChat) return;
-
-            const input = document.getElementById('messageInput');
-            const text = input.value.trim();
-
-            if (!text) return;
-
-            const chatId = getChatId(currentUser.username, activeChat.username);
-            const messages = getMessages();
-
-            const newMessage = {
-                id: Date.now().toString(),
-                chatId: chatId,
-                from: currentUser.username,
-                to: activeChat.username,
-                text: text,
-                timestamp: Date.now()
-            };
-
-            messages.push(newMessage);
-            saveMessages(messages);
-
-            // Очищуємо поле вводу
-            input.value = '';
-            input.style.height = 'auto';
-
-            // Перезавантажуємо повідомлення
-            loadMessages();
-            loadChats();
-        }
-
-        function handleMessageKeyDown(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-
-            // Авто-розмір текстового поля
-            const textarea = event.target;
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // ========== THEME ==========
+        const modal = document.getElementById('buyModal');
         
-        function toggleTheme() {
-            const currentTheme = document.body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        function openModal(itemName, itemPrice) {
+            document.getElementById('modalTitle').innerText = itemName;
+            document.getElementById('itemNameInput').value = itemName;
+            document.getElementById('itemPriceInput').value = itemPrice || 'N/A';
+            modal.classList.add('open');
+        }
+
+        function openModalCurrency() {
+            const coins = document.getElementById('currencyRange').value;
+            const price = document.getElementById('priceDisplay').innerText;
             
-            document.body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            document.getElementById('modalTitle').innerText = 'Покупка валюти';
+            document.getElementById('itemNameInput').value = `${coins} Релік`;
+            document.getElementById('itemPriceInput').value = price;
+            modal.classList.add('open');
         }
-
-        // Завантаження теми при старті
-        function loadTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-        }
-
-        // ========== SETTINGS & ADMIN ==========
         
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('show');
-            
-            // Показуємо інформацію про користувача
-            if (currentUser) {
-                document.getElementById('settingsNickname').textContent = currentUser.nickname;
-                document.getElementById('settingsUsername').textContent = currentUser.username;
-                const createdDate = new Date(currentUser.createdAt);
-                document.getElementById('settingsCreatedAt').textContent = createdDate.toLocaleDateString('uk-UA');
-            }
-            
-            updateVerifiedUsersList();
-            updateBannedUsersList();
-            updateStatistics();
-            updateAllUsersList();
+        function closeModal() {
+            modal.classList.remove('open');
+            document.getElementById('purchaseForm').reset();
         }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('show');
-            document.getElementById('adminPasswordSection').classList.add('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.getElementById('adminPasswordInput').value = '';
-        }
-
-        function closeSettingsOnOverlay(event) {
-            if (event.target.id === 'settingsModal') {
-                closeSettings();
-            }
-        }
-
-        function showAdminPasswordInput() {
-            const section = document.getElementById('adminPasswordSection');
-            section.classList.toggle('hidden');
-        }
-
-        function checkAdminPassword() {
-            const password = document.getElementById('adminPasswordInput').value;
+        
+        async function submitPurchase(event) {
+            event.preventDefault();
             
-            if (password === ADMIN_PASSWORD) {
-                document.getElementById('adminPasswordSection').classList.add('hidden');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('adminPasswordInput').value = '';
-                updateVerifiedUsersList();
-                updateBannedUsersList();
-                updateStatistics();
-                updateAllUsersList();
-            } else {
-                alert('Неправильний пароль!');
-                document.getElementById('adminPasswordInput').value = '';
-            }
-        }
-
-        function verifyUser() {
-            const nickname = document.getElementById('verifyNickname').value.trim();
+            const form = event.target;
+            const formData = new FormData(form);
             
-            if (!nickname) {
-                alert('Введіть нікнейм!');
-                return;
-            }
-
-            const users = getUsers();
-            const user = users.find(u => u.nickname === nickname);
-
-            if (!user) {
-                alert('Користувача з таким нікнеймом не знайдено!');
-                return;
-            }
-
-            const verified = getVerifiedUsers();
+            const nickname = formData.get('nickname');
+            const promocode = formData.get('promocode') || 'Немає';
+            const item = formData.get('item');
+            const price = formData.get('price');
             
-            if (verified.includes(nickname)) {
-                alert('Цей користувач вже веріфікований!');
-                return;
-            }
-
-            verified.push(nickname);
-            saveVerifiedUsers(verified);
-
-            document.getElementById('verifyNickname').value = '';
-            alert(`✓ Користувач ${nickname} отримав галочку верифікації!`);
+            // Створюємо FormData для FormSubmit
+            const submitData = new FormData();
+            submitData.append('Товар', item);
+            submitData.append('Ціна', price);
+            submitData.append('Нікнейм', nickname);
+            submitData.append('Промокод', promocode);
+            submitData.append('Діскорд', promocode);
+            submitData.append('Час', new Date().toLocaleString('uk-UA'));
+            submitData.append('_subject', `🎮 Замовлення: ${item} - ${nickname}`);
+            submitData.append('_captcha', 'false');
+            submitData.append('_template', 'table');
             
-            updateVerifiedUsersList();
-            updateInterface();
-        }
-
-        function removeVerification(nickname) {
-            if (!confirm(`Видалити верифікацію з ${nickname}?`)) {
-                return;
-            }
-
-            const verified = getVerifiedUsers();
-            const updated = verified.filter(n => n !== nickname);
-            saveVerifiedUsers(updated);
-
-            updateVerifiedUsersList();
-            updateInterface();
-            alert(`Верифікацію видалено з ${nickname}`);
-        }
-
-        function updateVerifiedUsersList() {
-            const verified = getVerifiedUsers();
-            const listEl = document.getElementById('verifiedUsersList');
-            
-            if (verified.length === 0) {
-                listEl.innerHTML = '<div style="opacity: 0.5;">Немає веріфікованих користувачів</div>';
-            } else {
-                listEl.innerHTML = verified.map(nick => 
-                    `<div class="verified-user-item">
-                        <span>${nick} <span class="verified-badge"></span></span>
-                        <button class="btn-remove" onclick="removeVerification('${nick}')">✕ Видалити</button>
-                    </div>`
-                ).join('');
-            }
-        }
-
-        function banUser(duration) {
-            const nickname = document.getElementById('banNickname').value.trim();
-            
-            if (!nickname) {
-                alert('Введіть нікнейм!');
-                return;
-            }
-
-            const users = getUsers();
-            const user = users.find(u => u.nickname === nickname);
-
-            if (!user) {
-                alert('Користувача з таким нікнеймом не знайдено!');
-                return;
-            }
-
-            const banned = getBannedUsers();
-            
-            // Видаляємо старий бан якщо є
-            const filteredBanned = banned.filter(b => b.nickname !== nickname);
-
-            let until;
-            let durationText;
-
-            if (duration === 'permanent') {
-                until = 'permanent';
-                durationText = 'назавжди';
-            } else {
-                until = Date.now() + (duration * 60 * 1000); // хвилини в мілісекунди
-                durationText = `на ${duration} хвилин`;
-            }
-
-            filteredBanned.push({
-                nickname: nickname,
-                username: user.username,
-                bannedAt: Date.now(),
-                until: until
-            });
-
-            saveBannedUsers(filteredBanned);
-
-            document.getElementById('banNickname').value = '';
-            alert(`🚫 Користувача ${nickname} заблоковано ${durationText}!`);
-            
-            updateBannedUsersList();
-
-            // Якщо заблокований користувач зараз в мережі
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                const currentSessionUser = JSON.parse(savedUser);
-                if (currentSessionUser.nickname === nickname) {
-                    // Це спрацює при наступній перевірці через 5 секунд
-                    alert('Користувач буде відключений протягом 5 секунд');
-                }
-            }
-        }
-
-        function unbanUser(nickname) {
-            if (!confirm(`Розблокувати ${nickname}?`)) {
-                return;
-            }
-
-            const banned = getBannedUsers();
-            const updated = banned.filter(b => b.nickname !== nickname);
-            saveBannedUsers(updated);
-
-            updateBannedUsersList();
-            alert(`Користувача ${nickname} розблоковано`);
-        }
-
-        function updateBannedUsersList() {
-            const banned = getBannedUsers();
-            const listEl = document.getElementById('bannedUsersList');
-            
-            if (banned.length === 0) {
-                listEl.innerHTML = '<div style="opacity: 0.5;">Немає заблокованих користувачів</div>';
-            } else {
-                listEl.innerHTML = banned.map(ban => {
-                    let untilText;
-                    if (ban.until === 'permanent') {
-                        untilText = 'Назавжди';
-                    } else {
-                        const untilDate = new Date(ban.until);
-                        if (Date.now() > ban.until) {
-                            untilText = 'Бан закінчився';
-                        } else {
-                            untilText = `До ${untilDate.toLocaleString('uk-UA')}`;
-                        }
-                    }
-                    
-                    return `<div class="verified-user-item">
-                        <div>
-                            <div>${ban.nickname}</div>
-                            <div style="font-size: 12px; opacity: 0.7;">${untilText}</div>
-                        </div>
-                        <button class="btn-remove" onclick="unbanUser('${ban.nickname}')">✕ Розблокувати</button>
-                    </div>`;
-                }).join('');
-            }
-        }
-
-        function updateInterface() {
-            // Оновлюємо інтерфейс якщо це поточний користувач
-            if (currentUser) {
-                const nicknameEl = document.getElementById('currentUserNickname');
-                nicknameEl.textContent = '';
+            try {
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Відправка...';
                 
-                if (isUserVerified(currentUser.nickname)) {
-                    nicknameEl.innerHTML = escapeHtml(currentUser.nickname) + '<span class="verified-badge"></span>';
-                } else {
-                    nicknameEl.textContent = currentUser.nickname;
-                }
-            }
-            
-            // Оновлюємо чати
-            loadChats();
-            
-            // Оновлюємо заголовок активного чату якщо потрібно
-            if (activeChat) {
-                const verifiedBadge = isUserVerified(activeChat.nickname) ? '<span class="verified-badge"></span>' : '';
-                document.getElementById('chatHeaderName').innerHTML = escapeHtml(activeChat.nickname) + verifiedBadge;
-            }
-        }
-
-        function clearMyMessages() {
-            if (!confirm('Видалити всі ваші повідомлення? Цю дію не можна скасувати!')) {
-                return;
-            }
-
-            const messages = getMessages();
-            const filtered = messages.filter(m => m.from !== currentUser.username);
-            saveMessages(filtered);
-            
-            alert('✓ Ваші повідомлення видалено!');
-            loadChats();
-            if (activeChat) {
-                loadMessages();
-            }
-        }
-
-        function exportUserData() {
-            const users = getUsers();
-            const messages = getMessages();
-            const myMessages = messages.filter(m => m.from === currentUser.username || m.to === currentUser.username);
-            
-            const data = {
-                user: currentUser,
-                messages: myMessages,
-                verified: isUserVerified(currentUser.nickname),
-                exportDate: new Date().toISOString()
-            };
-
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `messenger_data_${currentUser.nickname}_${Date.now()}.json`;
-            link.click();
-            
-            URL.revokeObjectURL(url);
-            alert('✓ Дані експортовано!');
-        }
-
-        function exportAllUsersCode() {
-            const users = getUsers();
-            const hardcodedUsernames = new Set(HARDCODED_USERS.map(u => u.username));
-            
-            // Беремо тільки нехардкод користувачів
-            const localUsers = users.filter(u => !hardcodedUsernames.has(u.username));
-
-            if (localUsers.length === 0) {
-                alert('Немає локальних користувачів для експорту!\n\nВсі існуючі користувачі вже в коді.');
-                return;
-            }
-
-            const usersCode = localUsers.map(user => {
-                // Знаходимо оригінальний пароль з localStorage якщо можна
-                return `    {
-        id: '${user.id}',
-        nickname: '${user.nickname}',
-        username: '${user.username}',
-        password: '${user.password}', // Вже захешований
-        createdAt: ${user.createdAt}
-    }`;
-            }).join(',\n');
-
-            const fullCode = `const HARDCODED_USERS = [
-${usersCode}
-];`;
-
-            const message = `📋 КОД ДЛЯ ДОДАВАННЯ ВСІХ КОРИСТУВАЧІВ В ФАЙЛ:
-
-Скопіюйте цей код і замініть рядок:
-const HARDCODED_USERS = [
-    // ...
-];
-
-На цей код:
-
-${fullCode}
-
-⚠️ УВАГА: Паролі вже захешовані!
-Користувачів: ${localUsers.length}
-
-Код скопійовано в буфер обміну!`;
-
-            // Копіюємо в буфер обміну
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(fullCode).then(() => {
-                    alert(message);
+                const response = await fetch('https://formsubmit.co/simpleworld237@gmail.com', {
+                    method: 'POST',
+                    body: submitData
                 });
-            } else {
-                alert(message);
+                
+                if (response.ok) {
+                    alert('✅ Замовлення успішно відправлено! Очікуйте на підтвердження.');
+                    closeModal();
+                } else {
+                    throw new Error('Failed to submit');
+                }
+            } catch (error) {
+                alert('❌ Помилка відправки. Спробуйте ще раз або напишіть нам напряму.');
+                const btn = event.target.querySelector('button[type="submit"]');
+                btn.disabled = false;
+                btn.innerHTML = 'ПЕРЕЙТИ ДО ОПЛАТИ';
             }
-
-            // Також показуємо в консолі
-            console.log('═══════════════════════════════════════════');
-            console.log('КОД ДЛЯ HARDCODED_USERS:');
-            console.log('═══════════════════════════════════════════');
-            console.log(fullCode);
-            console.log('═══════════════════════════════════════════');
         }
-
-        function updateStatistics() {
-            const users = getUsers();
-            const messages = getMessages();
-            const verified = getVerifiedUsers();
-            const banned = getBannedUsers();
-
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('totalMessages').textContent = messages.length;
-            document.getElementById('totalVerified').textContent = verified.length;
-            document.getElementById('totalBanned').textContent = banned.length;
-        }
-
-        function updateAllUsersList() {
-            const users = getUsers();
-            const listEl = document.getElementById('allUsersList');
-            
-            listEl.innerHTML = users.map(user => {
-                const verifiedBadge = isUserVerified(user.nickname) ? '<span class="verified-badge"></span>' : '';
-                const createdDate = new Date(user.createdAt).toLocaleDateString('uk-UA');
-                return `
-                    <div class="verified-user-item">
-                        <div>
-                            <div>${user.nickname}${verifiedBadge}</div>
-                            <div style="font-size: 12px; opacity: 0.7;">@${user.username} • ${createdDate}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function clearAllMessages() {
-            if (!confirm('⚠️ ВИДАЛИТИ ВСІ ПОВІДОМЛЕННЯ В СИСТЕМІ?\nЦю дію не можна скасувати!')) {
-                return;
-            }
-
-            if (!confirm('Ви впевнені? Це видалить ВСІ повідомлення всіх користувачів!')) {
-                return;
-            }
-
-            saveMessages([]);
-            alert('✓ Всі повідомлення видалено!');
-            loadChats();
-            if (activeChat) {
-                loadMessages();
-            }
-            updateStatistics();
-        }
-
-        function resetAllData() {
-            if (!confirm('⚠️ СКИНУТИ ВСІ ДАНІ?\nБуде видалено:\n- Всі акаунти\n- Всі повідомлення\n- Всі верифікації\n- Всі бани\n\nВи також вийдете з системи!')) {
-                return;
-            }
-
-            if (!confirm('ЦЕ ОСТАННЯ ПЕРЕВІРКА!\nВи точно хочете видалити ВСІ дані назавжди?')) {
-                return;
-            }
-
-            localStorage.removeItem('messenger_users');
-            localStorage.removeItem('messenger_messages');
-            localStorage.removeItem('messenger_verified');
-            localStorage.removeItem('messenger_banned');
-            
-            alert('✓ Всі дані видалено! Сторінка буде перезавантажена.');
-            location.reload();
-        }
-
-        // ========== INITIALIZATION ==========
         
-        window.onload = function() {
-            loadTheme();
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
 
-            // Ініціалізуємо лічильник повідомлень
-            lastMessageCount = getMessages().length;
-
-            // Перевірка збереженої сесії
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                
-                // Перевіряємо чи не заблокований користувач
-                if (isUserBanned(currentUser.nickname)) {
-                    showBannedMessage(currentUser.nickname);
-                    return;
-                }
-                
-                document.getElementById('authContainer').style.display = 'none';
-                document.getElementById('appContainer').classList.add('active');
-                initApp();
-            }
-
-            // Enter на формах
-            document.getElementById('loginPassword').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') login();
-            });
-
-            document.getElementById('registerPassword').addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') register();
-            });
-
-            // Реал-тайм пошук - додаємо після того як додаток ініціалізований
-            setTimeout(() => {
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.addEventListener('input', searchUsers);
-                }
-            }, 100);
-        };
+        function scrollToShop() {
+            document.getElementById('shop').scrollIntoView({behavior: 'smooth'});
+        }
     </script>
 </body>
 </html>
