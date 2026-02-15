@@ -4,28 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SimpleWorld — Форум</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 :root{
 --primary:#ff9800;
 --dark:#1e1e1e;
---bg:#f4f6f8;
+--light:#f5f5f5;
 --card:#ffffff;
 --radius:14px;
 --shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, sans-serif;
-}
-
-body{
-background:var(--bg);
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, sans-serif;}
+body{background:var(--light);}
 
 header{
 background:white;
@@ -45,55 +38,127 @@ font-weight:900;
 color:var(--primary);
 }
 
-.nav a{
-margin-left:20px;
+.back-btn{
+background:var(--primary);
+color:white;
+padding:10px 18px;
+border-radius:var(--radius);
 text-decoration:none;
-color:#333;
 font-weight:700;
+transition:0.3s;
 }
+.back-btn:hover{opacity:0.8;}
 
 .container{
 max-width:1200px;
-margin:50px auto;
+margin:40px auto;
 padding:0 20px;
 }
 
-.title{
-font-size:32px;
-margin-bottom:30px;
+.section{
+margin-bottom:60px;
 }
 
-.categories{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
-}
-
-.category{
-background:var(--card);
-padding:30px;
-border-radius:var(--radius);
-box-shadow:var(--shadow);
-transition:0.3s;
-cursor:pointer;
-text-decoration:none;
+.section h2{
+margin-bottom:20px;
+font-size:28px;
 color:#333;
 }
 
-.category:hover{
+.card{
+background:var(--card);
+padding:20px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+margin-bottom:20px;
+transition:0.3s;
+}
+.card:hover{
 transform:translateY(-5px);
+}
+
+.news-date{
+font-size:13px;
+color:gray;
+margin-bottom:10px;
+}
+
+.rule-list li{
+margin-bottom:8px;
+}
+
+.quest{
+background:#fff3e0;
+}
+
+.top-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.top-table th, .top-table td{
+padding:12px;
+border-bottom:1px solid #eee;
+text-align:left;
+}
+
+.top-table th{
 background:var(--primary);
 color:white;
 }
 
-.category h3{
-margin-bottom:10px;
-font-size:20px;
+.vote-box button{
+padding:10px 20px;
+border:none;
+background:var(--primary);
+color:white;
+border-radius:10px;
+cursor:pointer;
+margin-right:10px;
 }
 
-.category p{
-font-size:14px;
-opacity:0.8;
+.forum-categories{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.category{
+background:white;
+padding:20px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+cursor:pointer;
+transition:0.3s;
+}
+.category:hover{
+background:var(--primary);
+color:white;
+}
+
+.topic-form textarea,
+.topic-form input{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+.topic-form button{
+background:var(--primary);
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.comment-box{
+margin-top:10px;
+padding:10px;
+background:#f1f1f1;
+border-radius:8px;
 }
 
 footer{
@@ -108,49 +173,165 @@ color:gray;
 
 <header>
 <div class="logo"><i class="fa-solid fa-cube"></i> SIMPLEWORLD FORUM</div>
-<div class="nav">
-<a href="index.html">Головна</a>
-</div>
+<a href="index.html" class="back-btn">⬅ Повернутись на головну</a>
 </header>
 
 <div class="container">
 
-<h1 class="title">Форум SimpleWorld</h1>
+<!-- НОВИНИ -->
+<div class="section">
+<h2>🔥 Останні новини</h2>
 
-<div class="categories">
+<div class="card">
+<div class="news-date">14 Лютого 2026</div>
+<h3>Глобальне оновлення 2.0</h3>
+<p>Додано нові квести, баланс донату та PvP арену!</p>
+</div>
 
-<a href="news.html" class="category">
-<h3>📢 Новини</h3>
-<p>Оновлення сервера, івенти, глобальні зміни.</p>
-</a>
+<div class="card">
+<div class="news-date">10 Лютого 2026</div>
+<h3>Запуск нового світу ANARCHY</h3>
+<p>Повна свобода дій. Без правил. Виживай як можеш.</p>
+</div>
 
-<a href="rules.html" class="category">
-<h3>📜 Правила</h3>
-<p>Офіційні правила сервера та покарання.</p>
-</a>
+</div>
 
-<a href="bugs.html" class="category">
-<h3>🐞 Баги</h3>
-<p>Повідомлення про помилки та недоліки.</p>
-</a>
+<!-- ПРАВИЛА -->
+<div class="section">
+<h2>📜 Правила сервера</h2>
+<div class="card">
+<ul class="rule-list">
+<li>1. Заборонено використовувати чіти</li>
+<li>2. Заборонено дюпати ресурси</li>
+<li>3. Заборонено образи адміністрації</li>
+<li>4. Заборонено рекламу інших серверів</li>
+<li>5. Заборонено гриферство на режимі Survival+</li>
+<li>6. Поважайте інших гравців</li>
+<li>7. Використання багів = бан</li>
+</ul>
+</div>
+</div>
 
-<a href="ideas.html" class="category">
-<h3>💡 Ідеї</h3>
-<p>Пропозиції від гравців.</p>
-</a>
+<!-- КВЕСТИ -->
+<div class="section">
+<h2>🎯 Тижневі квести</h2>
 
-<a href="chat.html" class="category">
-<h3>💬 Загальне</h3>
-<p>Спілкування між гравцями.</p>
-</a>
+<div class="card quest">
+<h3>Шахтар тижня</h3>
+<p>Викопай 5000 блоків і отримай 200 релік.</p>
+</div>
+
+<div class="card quest">
+<h3>Мисливець</h3>
+<p>Вбий 200 мобів та отримай унікальний меч.</p>
+</div>
+
+</div>
+
+<!-- ТОП ГРАВЦІ -->
+<div class="section">
+<h2>🏆 Топ гравці</h2>
+<div class="card">
+<table class="top-table">
+<tr><th>#</th><th>Нік</th><th>Реліки</th></tr>
+<tr><td>1</td><td>PlayerPro</td><td>15230</td></tr>
+<tr><td>2</td><td>DarkMiner</td><td>12400</td></tr>
+<tr><td>3</td><td>SkyPvP</td><td>11200</td></tr>
+<tr><td>4</td><td>UltraKing</td><td>10400</td></tr>
+</table>
+</div>
+</div>
+
+<!-- ГОЛОСУВАННЯ -->
+<div class="section">
+<h2>🗳 Голосування</h2>
+<div class="card vote-box">
+<p>Який режим додати наступним?</p>
+<button onclick="vote('SkyBlock')">SkyBlock</button>
+<button onclick="vote('Hardcore')">Hardcore</button>
+<button onclick="vote('BedWars')">BedWars</button>
+<p id="voteResult"></p>
+</div>
+</div>
+
+<!-- КАТЕГОРІЇ -->
+<div class="section">
+<h2>📂 Розділи форуму</h2>
+<div class="forum-categories">
+<div class="category">📢 Оголошення адміністрації</div>
+<div class="category">💬 Загальні питання</div>
+<div class="category">🐞 Повідомлення про баги</div>
+<div class="category">⚔ PvP Турніри</div>
+<div class="category">🏰 Клани</div>
+<div class="category">🎁 Ідеї для сервера</div>
+</div>
+</div>
+
+<!-- СТВОРЕННЯ ТЕМИ -->
+<div class="section">
+<h2>📝 Створити тему</h2>
+<div class="card">
+<form class="topic-form" onsubmit="addTopic(event)">
+<input type="text" id="author" placeholder="Ваш нік" required>
+<input type="text" id="title" placeholder="Назва теми" required>
+<textarea id="content" placeholder="Текст повідомлення" rows="4" required></textarea>
+<button type="submit">Опублікувати</button>
+</form>
+</div>
+
+<div id="topics"></div>
 
 </div>
 
 </div>
 
 <footer>
-© 2026 SimpleWorld Project
+© 2026 SimpleWorld Project | Не афілійовано з Mojang
 </footer>
+
+<script>
+let topics = JSON.parse(localStorage.getItem("topics")) || [];
+
+function renderTopics(){
+const container = document.getElementById("topics");
+container.innerHTML="";
+topics.forEach((t,i)=>{
+container.innerHTML+=`
+<div class="card">
+<h3>${t.title}</h3>
+<p><b>${t.author}</b></p>
+<p>${t.content}</p>
+<div class="comment-box">
+<button onclick="deleteTopic(${i})">❌ Видалити</button>
+</div>
+</div>
+`;
+});
+}
+
+function addTopic(e){
+e.preventDefault();
+const author=document.getElementById("author").value;
+const title=document.getElementById("title").value;
+const content=document.getElementById("content").value;
+topics.push({author,title,content});
+localStorage.setItem("topics",JSON.stringify(topics));
+renderTopics();
+e.target.reset();
+}
+
+function deleteTopic(i){
+topics.splice(i,1);
+localStorage.setItem("topics",JSON.stringify(topics));
+renderTopics();
+}
+
+function vote(option){
+document.getElementById("voteResult").innerText="Ваш голос за: "+option;
+}
+
+renderTopics();
+</script>
 
 </body>
 </html>
