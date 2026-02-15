@@ -2,109 +2,298 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SimpleWorld — Підтримка</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
-body{
+:root{
+--primary:#ff9800;
+--primary-dark:#f57c00;
+--bg:#f4f6f8;
+--card:#ffffff;
+--text:#2d3436;
+--muted:#777;
+--radius:16px;
+--shadow:0 15px 40px rgba(0,0,0,0.08);
+--transition:all 0.3s ease;
+}
+
+*{
 margin:0;
-font-family:Arial;
-background:linear-gradient(135deg,#ff8c00,#ff6a00);
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
 }
 
 header{
 background:white;
-padding:15px 40px;
+padding:20px 40px;
 display:flex;
 justify-content:space-between;
 align-items:center;
+box-shadow:var(--shadow);
+position:sticky;
+top:0;
+z-index:100;
 }
 
 .logo{
-font-weight:bold;
-color:#ff7a00;
 font-size:22px;
+font-weight:900;
+color:var(--primary);
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-.home-btn{
-background:#ff7a00;
+.back-btn{
+background:var(--primary);
 color:white;
-padding:10px 18px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
+padding:10px 20px;
+border-radius:var(--radius);
+text-decoration:none;
+font-weight:700;
+transition:var(--transition);
+}
+
+.back-btn:hover{
+background:var(--primary-dark);
+}
+
+.hero{
+padding:80px 20px;
+text-align:center;
+background:linear-gradient(135deg,#ff9800,#ff6d00);
+color:white;
+}
+
+.hero h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.hero p{
+opacity:0.9;
 }
 
 .container{
-max-width:600px;
+max-width:1100px;
 margin:60px auto;
+padding:0 20px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+margin-bottom:60px;
 }
 
 .card{
 background:white;
 padding:30px;
-border-radius:20px;
-box-shadow:0 10px 25px rgba(0,0,0,0.2);
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+text-align:center;
+transition:var(--transition);
 }
 
-h2{
-color:#ff7a00;
-margin-top:0;
+.card:hover{
+transform:translateY(-5px);
 }
 
-input, textarea{
+.card i{
+font-size:40px;
+color:var(--primary);
+margin-bottom:15px;
+}
+
+.card h3{
+margin-bottom:10px;
+}
+
+.support-form{
+background:white;
+padding:40px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+}
+
+.support-form h2{
+margin-bottom:20px;
+}
+
+input, textarea, select{
 width:100%;
-padding:12px;
-margin-top:10px;
+padding:14px;
+margin-bottom:15px;
 border-radius:10px;
-border:1px solid #ccc;
+border:2px solid #eee;
+font-size:15px;
+transition:0.3s;
+}
+
+input:focus, textarea:focus, select:focus{
+border-color:var(--primary);
+outline:none;
+}
+
+textarea{
+resize:vertical;
+min-height:120px;
 }
 
 button{
-margin-top:15px;
-width:100%;
-background:#ff7a00;
+background:var(--primary);
 color:white;
 border:none;
-padding:14px;
+padding:15px;
+width:100%;
 border-radius:12px;
-font-weight:bold;
+font-weight:800;
 cursor:pointer;
+transition:var(--transition);
+}
+
+button:hover{
+background:var(--primary-dark);
+}
+
+.success-message{
+display:none;
+background:#e8f5e9;
+color:#2e7d32;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+font-weight:600;
+}
+
+footer{
+text-align:center;
+padding:40px;
+color:var(--muted);
 }
 </style>
 </head>
+
 <body>
 
 <header>
-<div class="logo">SW SIMPLEWORLD — Підтримка</div>
-<link href="blob:https://gemini.google.com/7549d577-9a23-4594-b954-3a995fd0abe1">
-<button class="home-btn" onclick="window.location.href='index.html'">
-🏠 Повернутись на головну
-</button>
+<div class="logo">
+<i class="fa-solid fa-headset"></i>
+ПІДТРИМКА SIMPLEWORLD
+</div>
+<a href="index.html" class="back-btn">⬅ На головну</a>
 </header>
 
+<section class="hero">
+<h1>Служба підтримки</h1>
+<p>Ми відповідаємо протягом 24 годин</p>
+</section>
+
 <div class="container">
+
+<div class="cards">
 <div class="card">
+<i class="fa-solid fa-bug"></i>
+<h3>Баги</h3>
+<p>Повідомлення про помилки сервера</p>
+</div>
 
-<h2>📩 Зв'язок з техпідтримкою</h2>
+<div class="card">
+<i class="fa-solid fa-credit-card"></i>
+<h3>Проблеми з донатом</h3>
+<p>Платежі, не виданий донат</p>
+</div>
 
-<form action="https://formsubmit.co/simpleworld237@gmail.com" method="POST">
+<div class="card">
+<i class="fa-solid fa-user-shield"></i>
+<h3>Блокування</h3>
+<p>Питання по бану або муту</p>
+</div>
 
-<input type="text" name="contact" placeholder="Ваш Telegram або Discord" required>
+<div class="card">
+<i class="fa-solid fa-circle-question"></i>
+<h3>Інше</h3>
+<p>Будь-які інші питання</p>
+</div>
+</div>
+
+<div class="support-form">
+<h2>Створити запит</h2>
+
+<form id="supportForm">
 
 <input type="text" name="minecraft" placeholder="Ваш нік в Minecraft" required>
 
-<textarea name="problem" rows="5" placeholder="Опишіть проблему" required></textarea>
+<input type="text" name="contact" placeholder="Ваш Telegram або Discord" required>
 
-<input type="hidden" name="_captcha" value="false">
-<input type="hidden" name="_template" value="box">
-<input type="hidden" name="_subject" value="Нова заявка підтримки SimpleWorld">
+<select name="category" required>
+<option value="">Оберіть тип проблеми</option>
+<option>Баг</option>
+<option>Проблема з донатом</option>
+<option>Бан / Мут</option>
+<option>Інше</option>
+</select>
 
-<button type="submit">Відправити заявку</button>
+<input type="text" name="orderid" placeholder="ID покупки (якщо є)">
+
+<textarea name="message" placeholder="Опишіть проблему максимально детально..." required></textarea>
+
+<button type="submit">Відправити запит</button>
 
 </form>
 
+<div class="success-message" id="successMsg">
+✅ Ваш запит успішно відправлено!
 </div>
+
 </div>
+
+</div>
+
+<footer>
+© 2026 SimpleWorld Project
+</footer>
+
+<script>
+document.getElementById("supportForm").addEventListener("submit", async function(e){
+e.preventDefault();
+
+const form = e.target;
+const formData = new FormData(form);
+
+const data = new FormData();
+data.append("Нік Minecraft", formData.get("minecraft"));
+data.append("Контакт (TG/Discord)", formData.get("contact"));
+data.append("Категорія", formData.get("category"));
+data.append("ID покупки", formData.get("orderid"));
+data.append("Повідомлення", formData.get("message"));
+data.append("_subject", "🎫 Новий запит підтримки SimpleWorld");
+data.append("_captcha", "false");
+
+try{
+await fetch("https://formsubmit.co/simpleworld237@gmail.com",{
+method:"POST",
+body:data
+});
+
+document.getElementById("successMsg").style.display="block";
+form.reset();
+
+}catch(err){
+alert("Помилка відправки. Спробуйте пізніше.");
+}
+});
+</script>
 
 </body>
 </html>
