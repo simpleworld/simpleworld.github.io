@@ -532,7 +532,7 @@
             
             <div class="ip-block">
                 <div class="ip-text" id="ipAddress">simpleworld.aternos.me</div>
-                <button class="copy-btn" onclick="copyIP(simpleworld.aternos.me)">
+                <button class="copy-btn" onclick="copyIP()">
                     <i class="fa-regular fa-copy"></i>
                 </button>
             </div>
@@ -730,7 +730,7 @@
         }, 10);
 
         function copyIP() {
-            navigator.clipboard.writeText('mc.reallyworld.ua');
+            navigator.clipboard.writeText('simpleworld.aternos.me');
             const btn = document.querySelector('.copy-btn');
             btn.innerHTML = '<i class="fa-solid fa-check"></i>';
             btn.style.background = 'var(--success)';
