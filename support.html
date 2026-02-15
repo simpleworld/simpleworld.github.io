@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SimpleWorld — Підтримка</title>
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 :root{
 --primary:#ff9800;
@@ -20,177 +18,63 @@
 --transition:all 0.3s ease;
 }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Inter',sans-serif;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
 
-body{
-background:var(--bg);
-color:var(--text);
-}
+body{background:var(--bg);color:var(--text);}
 
 header{
-background:white;
-padding:20px 40px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-box-shadow:var(--shadow);
-position:sticky;
-top:0;
-z-index:100;
+background:white;padding:20px 40px;
+display:flex;justify-content:space-between;align-items:center;
+box-shadow:var(--shadow);position:sticky;top:0;z-index:100;
 }
 
-.logo{
-font-size:22px;
-font-weight:900;
-color:var(--primary);
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-.back-btn{
-background:var(--primary);
-color:white;
-padding:10px 20px;
-border-radius:var(--radius);
-text-decoration:none;
-font-weight:700;
-transition:var(--transition);
-}
-
-.back-btn:hover{
-background:var(--primary-dark);
-}
+.logo{font-size:22px;font-weight:900;color:var(--primary);display:flex;align-items:center;gap:10px;}
+.back-btn{background:var(--primary);color:white;padding:10px 20px;border-radius:var(--radius);text-decoration:none;font-weight:700;transition:var(--transition);}
+.back-btn:hover{background:var(--primary-dark);}
 
 .hero{
-padding:80px 20px;
-text-align:center;
-background:linear-gradient(135deg,#ff9800,#ff6d00);
-color:white;
+padding:80px 20px;text-align:center;background:linear-gradient(135deg,#ff9800,#ff6d00);color:white;
 }
+.hero h1{font-size:40px;margin-bottom:10px;}
+.hero p{opacity:0.9;}
 
-.hero h1{
-font-size:40px;
-margin-bottom:10px;
-}
+.container{max-width:1100px;margin:60px auto;padding:0 20px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:25px;margin-bottom:60px;}
+.card{background:white;padding:30px;border-radius:var(--radius);box-shadow:var(--shadow);text-align:center;transition:var(--transition);}
+.card:hover{transform:translateY(-5px);}
+.card i{font-size:40px;color:var(--primary);margin-bottom:15px;}
+.card h3{margin-bottom:10px;}
 
-.hero p{
-opacity:0.9;
-}
+.support-form{background:white;padding:40px;border-radius:var(--radius);box-shadow:var(--shadow);}
+.support-form h2{margin-bottom:20px;}
 
-.container{
-max-width:1100px;
-margin:60px auto;
-padding:0 20px;
-}
-
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
-margin-bottom:60px;
-}
-
-.card{
-background:white;
-padding:30px;
-border-radius:var(--radius);
-box-shadow:var(--shadow);
-text-align:center;
-transition:var(--transition);
-}
-
-.card:hover{
-transform:translateY(-5px);
-}
-
-.card i{
-font-size:40px;
-color:var(--primary);
-margin-bottom:15px;
-}
-
-.card h3{
-margin-bottom:10px;
-}
-
-.support-form{
-background:white;
-padding:40px;
-border-radius:var(--radius);
-box-shadow:var(--shadow);
-}
-
-.support-form h2{
-margin-bottom:20px;
-}
-
-input, textarea, select{
-width:100%;
-padding:14px;
-margin-bottom:15px;
-border-radius:10px;
-border:2px solid #eee;
-font-size:15px;
-transition:0.3s;
-}
-
-input:focus, textarea:focus, select:focus{
-border-color:var(--primary);
-outline:none;
-}
-
-textarea{
-resize:vertical;
-min-height:120px;
-}
+input, textarea, select{width:100%;padding:14px;margin-bottom:15px;border-radius:10px;border:2px solid #eee;font-size:15px;transition:0.3s;}
+input:focus, textarea:focus, select:focus{border-color:var(--primary);outline:none;}
+textarea{resize:vertical;min-height:120px;}
 
 button{
-background:var(--primary);
-color:white;
-border:none;
-padding:15px;
-width:100%;
-border-radius:12px;
-font-weight:800;
-cursor:pointer;
-transition:var(--transition);
+background:var(--primary);color:white;border:none;padding:15px;width:100%;border-radius:12px;font-weight:800;cursor:pointer;transition:var(--transition);position:relative;
+}
+button:hover{background:var(--primary-dark);}
+
+.spinner{
+border:4px solid #f3f3f3;border-top:4px solid var(--primary);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:10px;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+
+.status-message{
+display:none;padding:15px;border-radius:10px;margin-top:15px;font-weight:600;display:flex;align-items:center;gap:10px;
 }
 
-button:hover{
-background:var(--primary-dark);
-}
+.success{background:#e8f5e9;color:#2e7d32;}
+.error{background:#ffebee;color:#c62828;}
 
-.success-message{
-display:none;
-background:#e8f5e9;
-color:#2e7d32;
-padding:15px;
-border-radius:10px;
-margin-top:15px;
-font-weight:600;
-}
-
-footer{
-text-align:center;
-padding:40px;
-color:var(--muted);
-}
+footer{text-align:center;padding:40px;color:var(--muted);}
 </style>
 </head>
-
 <body>
 
 <header>
-<div class="logo">
-<i class="fa-solid fa-headset"></i>
-ПІДТРИМКА SIMPLEWORLD
-</div>
+<div class="logo"><i class="fa-solid fa-headset"></i>ПІДТРИМКА SIMPLEWORLD</div>
 <a href="index.html" class="back-btn">⬅ На головну</a>
 </header>
 
@@ -200,42 +84,18 @@ color:var(--muted);
 </section>
 
 <div class="container">
-
 <div class="cards">
-<div class="card">
-<i class="fa-solid fa-bug"></i>
-<h3>Баги</h3>
-<p>Повідомлення про помилки сервера</p>
-</div>
-
-<div class="card">
-<i class="fa-solid fa-credit-card"></i>
-<h3>Проблеми з донатом</h3>
-<p>Платежі, не виданий донат</p>
-</div>
-
-<div class="card">
-<i class="fa-solid fa-user-shield"></i>
-<h3>Блокування</h3>
-<p>Питання по бану або муту</p>
-</div>
-
-<div class="card">
-<i class="fa-solid fa-circle-question"></i>
-<h3>Інше</h3>
-<p>Будь-які інші питання</p>
-</div>
+<div class="card"><i class="fa-solid fa-bug"></i><h3>Баги</h3><p>Повідомлення про помилки сервера</p></div>
+<div class="card"><i class="fa-solid fa-credit-card"></i><h3>Проблеми з донатом</h3><p>Платежі, не виданий донат</p></div>
+<div class="card"><i class="fa-solid fa-user-shield"></i><h3>Блокування</h3><p>Питання по бану або муту</p></div>
+<div class="card"><i class="fa-solid fa-circle-question"></i><h3>Інше</h3><p>Будь-які інші питання</p></div>
 </div>
 
 <div class="support-form">
 <h2>Створити запит</h2>
-
 <form id="supportForm">
-
 <input type="text" name="minecraft" placeholder="Ваш нік в Minecraft" required>
-
 <input type="text" name="contact" placeholder="Ваш Telegram або Discord" required>
-
 <select name="category" required>
 <option value="">Оберіть тип проблеми</option>
 <option>Баг</option>
@@ -243,55 +103,61 @@ color:var(--muted);
 <option>Бан / Мут</option>
 <option>Інше</option>
 </select>
-
 <input type="text" name="orderid" placeholder="ID покупки (якщо є)">
-
 <textarea name="message" placeholder="Опишіть проблему максимально детально..." required></textarea>
-
-<button type="submit">Відправити запит</button>
-
+<button type="submit"><span class="btn-text">Відправити запит</span></button>
 </form>
 
-<div class="success-message" id="successMsg">
-✅ Ваш запит успішно відправлено!
+<div class="status-message success" id="successMsg"><i class="fa-solid fa-circle-check"></i>Запит успішно надіслано!</div>
+<div class="status-message error" id="errorMsg"><i class="fa-solid fa-triangle-exclamation"></i>Помилка відправки. Спробуйте пізніше.</div>
+</div>
 </div>
 
-</div>
-
-</div>
-
-<footer>
-© 2026 SimpleWorld Project
-</footer>
+<footer>© 2026 SimpleWorld Project</footer>
 
 <script>
-document.getElementById("supportForm").addEventListener("submit", async function(e){
-e.preventDefault();
+const form = document.getElementById("supportForm");
+const successMsg = document.getElementById("successMsg");
+const errorMsg = document.getElementById("errorMsg");
+const btnText = form.querySelector(".btn-text");
 
-const form = e.target;
-const formData = new FormData(form);
+form.addEventListener("submit", async function(e){
+    e.preventDefault();
 
-const data = new FormData();
-data.append("Нік Minecraft", formData.get("minecraft"));
-data.append("Контакт (TG/Discord)", formData.get("contact"));
-data.append("Категорія", formData.get("category"));
-data.append("ID покупки", formData.get("orderid"));
-data.append("Повідомлення", formData.get("message"));
-data.append("_subject", "🎫 Новий запит підтримки SimpleWorld");
-data.append("_captcha", "false");
+    // Показуємо спінер
+    btnText.innerHTML = '<span class="spinner"></span>Відправка...';
+    form.querySelector("button").disabled = true;
 
-try{
-await fetch("https://formsubmit.co/simpleworld237@gmail.com",{
-method:"POST",
-body:data
-});
+    const formData = new FormData(form);
+    const data = new FormData();
+    data.append("Нік Minecraft", formData.get("minecraft"));
+    data.append("Контакт (TG/Discord)", formData.get("contact"));
+    data.append("Категорія", formData.get("category"));
+    data.append("ID покупки", formData.get("orderid"));
+    data.append("Повідомлення", formData.get("message"));
+    data.append("_subject", "🎫 Новий запит підтримки SimpleWorld");
+    data.append("_captcha", "false");
 
-document.getElementById("successMsg").style.display="block";
-form.reset();
+    try{
+        await fetch("https://formsubmit.co/simpleworld237@gmail.com",{
+            method:"POST",
+            body:data
+        });
 
-}catch(err){
-alert("Помилка відправки. Спробуйте пізніше.");
-}
+        // Показуємо успіх
+        successMsg.style.display="flex";
+        errorMsg.style.display="none";
+        btnText.textContent = "Відправити запит";
+        form.reset();
+        form.querySelector("button").disabled = false;
+
+    }catch(err){
+        // Показуємо помилку
+        errorMsg.style.display="flex";
+        successMsg.style.display="none";
+        btnText.textContent = "Відправити запит";
+        form.querySelector("button").disabled = false;
+    }
 });
 </script>
 
