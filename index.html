@@ -647,33 +647,8 @@
             </form>
         </div>
     </div>
-
-        <script>
-  // Початкова ціна
-  let priceEl = document.getElementById('price'); // елемент з ціною
-  let originalPrice = parseFloat(priceEl.textContent);
-
-  // Промокод
-  const promoCode = "vortex";
-
-  // Функція для перевірки промокоду і знижки
-  function applyPromo(code) {
-    if(code.trim().toUpperCase() === promoCode) {
-      let newPrice = originalPrice * 0.7; // 30% знижка
-      priceEl.textContent = newPrice.toFixed(2);
-    }
-  }
-
-  // Автоматично застосувати, якщо код введений в поле #promo
-  let promoInput = document.getElementById('promo');
-  if(promoInput) {
-    promoInput.addEventListener('input', function() {
-      applyPromo(this.value);
-    });
-  }
-
-  // Якщо хочеш застосовувати одразу без введення, можна так:
-  // applyPromo("VORTEX");
+    
+ <script>
         const products = [
             // RANKS
           { id: 6, type: 'ranks', name: 'Infinity', price: '499 UAH (-10%)', img: 'dark', discount: false },
@@ -784,6 +759,28 @@
                 btn.style.background = 'var(--primary)';
             }, 2000);
         }
+      // Початкова ціна
+  let priceEl = document.getElementById('price'); // елемент з ціною
+  let originalPrice = parseFloat(priceEl.textContent);
+
+  // Промокод
+  const promoCode = "vortex";
+
+  // Функція для перевірки промокоду і знижки
+  function applyPromo(code) {
+    if(code.trim().toUpperCase() === promoCode) {
+      let newPrice = originalPrice * 0.7; // 30% знижка
+      priceEl.textContent = newPrice.toFixed(2);
+    }
+  }
+
+  // Автоматично застосувати, якщо код введений в поле #promo
+  let promoInput = document.getElementById('promo');
+  if(promoInput) {
+    promoInput.addEventListener('input', function() {
+      applyPromo(this.value);
+    });
+  }
 
         const modal = document.getElementById('buyModal');
         
@@ -816,7 +813,7 @@
             const formData = new FormData(form);
             
             const nickname = formData.get('nickname');
-            const promocode = formData.get('promocode') || 'Немає';
+            const promocode = formData.get('promo') || 'Немає';
             const discord = formData.get('discord');
             const item = formData.get('item');
             const price = formData.get('price');
@@ -826,7 +823,7 @@
             submitData.append('Товар', item);
             submitData.append('Ціна', price);
             submitData.append('Нікнейм', nickname);
-            submitData.append('Промокод', promocode);
+            submitData.append('Промокод', promo);
             submitData.append('Діскорд', discord);
             submitData.append('Час', new Date().toLocaleString('uk-UA'));
             submitData.append('_subject', `🎮 Замовлення: ${item} - ${nickname}`);
