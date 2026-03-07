@@ -792,7 +792,7 @@
             const formData = new FormData(form);
             
             const nickname = formData.get('nickname');
-            const promocode = formData.get('promo') || 'Немає';
+            const promocode = formData.get('promocode') || 'Немає';
             const discord = formData.get('discord');
             const item = formData.get('item');
             const price = formData.get('price');
@@ -802,7 +802,7 @@
             submitData.append('Товар', item);
             submitData.append('Ціна', price);
             submitData.append('Нікнейм', nickname);
-            submitData.append('Промокод', promo);
+            submitData.append('Промокод', promocode);
             submitData.append('Діскорд', discord);
             submitData.append('Час', new Date().toLocaleString('uk-UA'));
             submitData.append('_subject', `🎮 Замовлення: ${item} - ${nickname}`);
