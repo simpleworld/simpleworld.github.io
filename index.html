@@ -639,7 +639,7 @@
             <p>Введіть ваш нікнейм на сервері для продовження</p>
             <form id="purchaseForm" onsubmit="submitPurchase(event)">
                 <input type="text" name="nickname" placeholder="Ваш нікнейм в майнкрафті" required>
-                <input type="text" name="promocode" placeholder="Промокод (якщо є)">
+                <input type="text" name="promo" placeholder="Промокод (якщо є)">
                 <input type="text" name="discord" placeholder="Телеграм (username)">
                 <input type="hidden" name="item" id="itemNameInput">
                 <input type="hidden" name="price" id="itemPriceInput">
@@ -648,7 +648,32 @@
         </div>
     </div>
 
-    <script>
+        <script>
+  // Початкова ціна
+  let priceEl = document.getElementById('price'); // елемент з ціною
+  let originalPrice = parseFloat(priceEl.textContent);
+
+  // Промокод
+  const promoCode = "vortex";
+
+  // Функція для перевірки промокоду і знижки
+  function applyPromo(code) {
+    if(code.trim().toUpperCase() === promoCode) {
+      let newPrice = originalPrice * 0.7; // 30% знижка
+      priceEl.textContent = newPrice.toFixed(2);
+    }
+  }
+
+  // Автоматично застосувати, якщо код введений в поле #promo
+  let promoInput = document.getElementById('promo');
+  if(promoInput) {
+    promoInput.addEventListener('input', function() {
+      applyPromo(this.value);
+    });
+  }
+
+  // Якщо хочеш застосовувати одразу без введення, можна так:
+  // applyPromo("VORTEX");
         const products = [
             // RANKS
           { id: 6, type: 'ranks', name: 'Infinity', price: '499 UAH (-10%)', img: 'dark', discount: false },
